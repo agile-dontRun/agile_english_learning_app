@@ -16,7 +16,8 @@ PLAN
   5.3 chat
   5.4 record
 7. login (xiangtian,zeyuan)
-8. search words (uncertain)
+  7.1 userpage 
+9. search words (uncertain)
 ----------------------------------------------
 In week 2 & 3
 week 2: complete 1 and 2
