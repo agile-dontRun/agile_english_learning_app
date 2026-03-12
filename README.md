@@ -19,7 +19,7 @@ PLAN-VERSION 1.0
 8. search words (ruomu)
 ----------------------------------------------
 In week 2 & 3
-week 2: complete 1 and 2
+week 2: complete 1 and 2 ,explore the feasibility of an AI assistent
 week 3: complete 3 6 7 8 features; 
         integration testing. (Tursday)
 
