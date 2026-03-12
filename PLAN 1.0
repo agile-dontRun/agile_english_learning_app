@@ -1,6 +1,6 @@
 # agile_english_learning_app
 
-PLAN-VERSION 1.1
+PLAN-VERSION 1.0
 -----------------FEATURES------------
 1. database (yixuan, yichang)
 2. user interface design (yichang)
@@ -16,7 +16,7 @@ PLAN-VERSION 1.1
 6. clock in (zeyv, ruomu)
 7. login (xiangtian,zeyuan)
   7.1 userpage 
-8. vocabulary notebook (ruomu)
+8. search words (ruomu)
 ----------------------------------------------
 In week 2 & 3
 week 2: complete 1 and 2 ,explore the feasibility of an AI assistent
