@@ -1,0 +1,209 @@
+1. Modify home.html
+
+replace the <main> tag and <script> tag parts in original home.html with the code:
+<main class="content-container">
+        
+        <section id="welcome-view" class="welcome-section">
+            <div class="welcome-flex">
+                <div class="illustration-box">
+                    <img src="ted_stage.png" alt="TED Stage" class="stage-img">
+                </div>
+                <div class="thought-cloud">
+                    <h2 class="cloud-text">Ideas worth<br>spreading</h2>
+                </div>
+            </div>
+            
+            <div class="enter-area">
+                <div class="enter-wrapper" onclick="showVideoGrid()">
+                    <span class="tedx-text">TED<sup>X</sup></span>
+                    <div class="play-button">▶</div>
+                    <span class="enter-text">ENTER</span>
+                </div>
+            </div>
+        </section>
+        
+        
+        <section id="video-view" class="video-section" style="display: none;">
+            <div class="top-controls">
+                <button class="back-btn" onclick="showWelcomeView()">
+                    <span class="arrow">⬅</span> BACK
+                </button>
+            </div>
+            
+            <div class="study-banner">
+                listening study (xiangtian, zeyv, zeyuan, lilin)
+            </div>
+            <div class="video-grid">
+                <div class="video-card active-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+            </div>
+            <div class="footer-logo">
+                <div class="ted-tag">TED TALK</div>
+            </div>
+        </section>
+
+        <section id="player-view" class="player-section" style="display: none;">
+            <div class="player-layout">
+                
+                <div class="side-decorations left-decorations">
+                    <div class="sticker tilt-right"><img src="sticker1.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-left"><img src="sticker2.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-right"><img src="sticker3.png" alt="TED Sticker"></div>
+                </div>
+                
+                <div class="main-player-area">
+                    <div class="video-player-box"></div>
+                    
+                    <button class="practice-btn">DO SOME LISTENING PRACTICES</button>
+                </div>
+                
+                <div class="side-decorations right-decorations">
+                    <button class="player-back-btn" onclick="showVideoGridFromPlayer()">BACK</button>
+                    <div class="sticker tilt-left"><img src="sticker4.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-right"><img src="sticker5.png" alt="TED Sticker"></div>
+                </div>
+                
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function showVideoGrid() {
+            document.getElementById('welcome-view').style.display = 'none';
+            document.getElementById('video-view').style.display = 'block';
+            document.getElementById('player-view').style.display = 'none';
+        }
+
+        function showWelcomeView() {
+            document.getElementById('video-view').style.display = 'none';
+            document.getElementById('welcome-view').style.display = 'block';
+        }
+
+        function showPlayerView() {
+            document.getElementById('video-view').style.display = 'none';
+            document.getElementById('player-view').style.display = 'block';
+        }
+
+        function showVideoGridFromPlayer() {
+            document.getElementById('player-view').style.display = 'none';
+            document.getElementById('video-view').style.display = 'block';
+        }
+    </script>
+
+
+
+
+
+2. Append styles.css
+Append the following CSS code to the bottom of the styles.css file to restore the layout of the playback interface as shown in the simulation image:
+
+.player-section {
+    padding: 20px 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-layout {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.side-decorations {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+    gap: 20px;
+}
+
+.left-decorations {
+    align-items: flex-end;
+    padding-top: 50px; 
+}
+
+.right-decorations {
+    align-items: flex-end;
+}
+
+.sticker {
+    width: 120px;
+    height: 120px;
+    background-color: #fff;
+    border: 2px dashed #ccc; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+}
+
+.sticker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tilt-left { transform: rotate(-8deg); }
+.tilt-right { transform: rotate(10deg); }
+
+.main-player-area {
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.video-player-box {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #c4c4c4; 
+    border: 2px solid #001f3f; 
+}
+
+.practice-btn {
+    background-color: #92d992;
+    color: #4a7c4a;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+}
+
+.practice-btn:hover {
+    background-color: #7ab97a;
+    color: white;
+}
+
+.player-back-btn {
+    background-color: #92d992;
+    color: #4a7c4a;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-bottom: 20px;
+}
+
+.player-back-btn:hover {
+    background-color: #7ab97a;
+    color: white;
+}
