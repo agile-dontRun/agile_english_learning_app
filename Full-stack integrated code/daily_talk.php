@@ -179,6 +179,19 @@ if (empty($page_titles)) {
             }
         }
 
+        function switchVer(mode) {
+            const video = document.getElementById('player');
+            video.src = activeData.versions[mode];
+            video.load(); 
+            video.play();
+        
+            document.getElementById('btn-with').classList.remove('active');
+            document.getElementById('btn-without').classList.remove('active');
+            
+            const targetBtn = document.getElementById(mode === 'with_subtitle' ? 'btn-with' : 'btn-without');
+            if(targetBtn) targetBtn.classList.add('active');
+        }
+
         function closePlayer() {
             const video = document.getElementById('player');
             video.pause();
