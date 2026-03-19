@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening Prep</title>
+    <style>
+        /* Reset & Base */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+
+        body { 
+            background-color: #f7f6f2; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+
+        /* App Layout */
+        .app-container {
+            width: 1200px; 
+            height: 675px; 
+            background-color: #f7f6f2;
+            border: 1px solid #ddd; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: #bce0a8; 
+            height: 70px; 
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: flex-end; 
+            padding: 0 20px; 
+            gap: 10px;
+        }
+
+        .nav-item {
+            background-color: #d6eed1; 
+            color: #2e5c31; 
+            font-weight: bold; 
+            font-size: 16px; 
+            padding: 15px 25px;
+            border-radius: 10px 10px 0 0; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: background-color 0.2s;
+        }
+
+        .nav-item.active { 
+            background-color: #9bd082; 
+        }
+
+        /* Fixed bottom decorations (AI & Group icons) */
+        .bottom-icons { 
+            position: absolute; 
+            bottom: 20px; 
+            width: 100%; 
+            padding: 0 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            pointer-events: none; 
+        }
+        .bottom-icons svg { pointer-events: auto; cursor: pointer; }
+
+        /* Main Content Area */
+        .main-content { 
+            flex: 1; 
+            padding: 20px 40px; 
+            position: relative; 
+        }
+
+        /* SPA View Management */
+        .view-section { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            animation: fadeIn 0.3s ease; 
+        }
+        .view-section.active { 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(5px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* View 1: Books Grid */
+        .top-controls { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            align-items: flex-start;
+        }
+        
+        .history-btn { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #4a704e; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+        .history-btn svg { width: 40px; height: 40px; margin-bottom: 5px; }
+        
+        .scrollbar-indicator { 
+            width: 15px; 
+            height: 60px; 
+            background-color: #1a5276; 
+            margin-right: 20px; 
+            border-radius: 2px;
+        }
+
+        .books-grid { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 30px; 
+            height: 100%; 
+            padding-bottom: 40px;
+        }
+
+        .book-card {
+            background-color: #d8e8f8; 
+            border-radius: 25px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            font-size: 20px; 
+            color: #333; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            user-select: none;
+        }
+        .book-card:hover { 
+            transform: translateY(-5px); 
+            background-color: #c0dbf5; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05); 
+        }
+
+        /* View 2 & 3: Sidebar Layout */
+        .split-layout { 
+            display: flex; 
+            width: 100%; 
+            height: 100%; 
+            gap: 40px; 
+            padding-bottom: 40px;
+        }
+        
+        .sidebar { 
+            width: 280px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            padding-top: 20px;
+        }
+
+        .sidebar-title { 
+            font-size: 28px; 
+            color: #006699; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            margin-left: 10px;
+        }
+
+        .sidebar-btn {
+            background-color: #e4f1fa; 
+            color: #006699; 
+            font-size: 22px; 
+            font-weight: bold; 
+            padding: 20px;
+            border-radius: 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            border: none;
+            user-select: none;
+        }
+        .sidebar-btn:hover { 
+            background-color: #cde6f7; 
+            transform: translateX(4px); 
+        }
+        .sidebar-btn.active { 
+            background-color: #cde6f7; 
+        }
+
+        /* Placeholder for actual test content */
+        .content-area {
+            flex: 1; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            position: relative;
+            background: linear-gradient(135deg, #5b86e5, #36d1dc);
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        
+        .placeholder-text { 
+            color: rgba(255, 255, 255, 0.9); 
+            font-size: 24px; 
+            font-weight: bold; 
+            letter-spacing: 1px; 
+        }
+        
+        /* Loading text style */
+        .loading-text {
+            grid-column: span 5;
+            text-align: center;
+            font-size: 20px;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-item">TED TALK</div>
+        <div class="nav-item active" id="navHomeBtn">IELTS LISTENING</div>
+        <div class="nav-item">DAILY<br>TALK</div>
+        <div class="nav-item">VOCABULARY</div>
+        <div class="nav-item">CALENDAR</div>
+        <div class="nav-item">PROFILE</div>
+    </nav>
+
+    <!-- App Views -->
+    <div class="main-content">
+        
+        <!-- View 1: Book Selection -->
+        <div id="booksView" class="view-section active">
+            <div class="top-controls">
+                <div class="history-btn">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="20" fill="#f39c12"/>
+                        <path d="M50 10 L50 20 M50 80 L50 90 M10 50 L20 50 M80 50 L90 50 M22 22 L29 29 M71 71 L78 78 M22 78 L29 71 M71 29 L78 22" stroke="#e67e22" stroke-width="4"/>
+                    </svg>
+                    History
+                </div>
+                <div class="scrollbar-indicator"></div>
+            </div>
+            <!-- JS will populate books here -->
+            <div class="books-grid" id="booksGrid"></div>
+        </div>
+
+        <!-- View 2: Test Selection -->
+        <div id="testsView" class="view-section">
+            <div class="split-layout">
+                <!-- JS will populate tests here -->
+                <div class="sidebar" id="testSidebar"></div>
+                <div class="content-area" id="testContentArea">
+                    <div class="placeholder-text">Please select a Test from the left sidebar...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 3: Part Selection -->
+        <div id="partsView" class="view-section">
+            <div class="split-layout">
+                <!-- JS will populate parts here -->
+                <div class="sidebar" id="partSidebar"></div>
+                <div class="content-area" id="partContentArea">
+                    <div class="placeholder-text">Loading questions area...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UI Decorations -->
+    <div class="bottom-icons">
+        <svg width="60" height="70" viewBox="0 0 100 100">
+            <path d="M50 10 C20 10 10 40 10 60 C10 80 20 90 30 90 L30 100 L50 100 L50 90 C70 90 90 70 80 50 C70 30 60 10 50 10 Z" fill="#81d773"/>
+            <path d="M30 40 L40 40 M30 50 L45 50 M45 40 L45 60 L60 60" stroke="white" stroke-width="4" fill="none"/>
+            <circle cx="60" cy="60" r="4" fill="white"/>
+            <circle cx="40" cy="40" r="4" fill="white"/>
+        </svg>
+        <svg width="80" height="60" viewBox="0 0 100 60">
+            <circle cx="20" cy="20" r="10" fill="#42a5f5"/>
+            <path d="M5 50 C5 35 35 35 35 50 Z" fill="#42a5f5"/>
+            <circle cx="80" cy="20" r="10" fill="#42a5f5"/>
+            <path d="M65 50 C65 35 95 35 95 50 Z" fill="#42a5f5"/>
+            <circle cx="50" cy="25" r="12" fill="#29b6f6"/>
+            <path d="M30 60 C30 40 70 40 70 60 Z" fill="#29b6f6"/>
+        </svg>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. API Configuration ---
+        const API_BASE_URL = 'http://8.162.9.154'; // Your Server IP
+
+        // --- 2. Cache DOM Elements ---
+        const views = {
+            books: document.getElementById('booksView'),
+            tests: document.getElementById('testsView'),
+            parts: document.getElementById('partsView')
+        };
+        
+        const uiElements = {
+            booksGrid: document.getElementById('booksGrid'),
+            navHomeBtn: document.getElementById('navHomeBtn'),
+            testSidebar: document.getElementById('testSidebar'),
+            partSidebar: document.getElementById('partSidebar'),
+            testContentArea: document.getElementById('testContentArea'),
+            partContentArea: document.getElementById('partContentArea')
+        };
+
+        // State Management
+        let currentState = {
+            cambridgeNo: null,
+            testNo: null
+        };
+
+        // View router utility
+        const switchView = (targetView) => {
+            Object.values(views).forEach(view => view.classList.remove('active'));
+            targetView.classList.add('active');
+        };
+
+        // --- 3. Fetch & Render Books (Level 1) ---
+        const loadBooks = async () => {
+            try {
+                uiElements.booksGrid.innerHTML = '<div class="loading-text">Loading books from server...</div>';
+                const response = await fetch(`${API_BASE_URL}/get_books.php`);
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    uiElements.booksGrid.innerHTML = ''; 
+                    const fragment = document.createDocumentFragment();
+                    
+                    result.data.forEach(book => {
+                        const card = document.createElement('div');
+                        card.className = 'book-card';
+                        card.textContent = `CAMBRIDGE ${book.cambridge_no}`;
+                        
+                        // Bind Click: Go to Tests View
+                        card.addEventListener('click', () => {
+                            currentState.cambridgeNo = book.cambridge_no;
+                            loadTests(book.cambridge_no);
+                        });
+                        
+                        fragment.appendChild(card);
+                    });
+                    uiElements.booksGrid.appendChild(fragment);
+                }
+            } catch (error) {
+                console.error("Failed to load books:", error);
+                uiElements.booksGrid.innerHTML = '<div class="loading-text" style="color:red;">Error connecting to server. Is PHP running?</div>';
+            }
+        };
+
+        // --- 4. Fetch & Render Tests (Level 2) ---
+        const loadTests = async (cambridgeNo) => {
+            try {
+        const response = await fetch(`${API_BASE_URL}/get_tests.php?cambridge_no=${cambridgeNo}`);
+        const result = await response.json();
+
+        if (result.code === 200) {
+            // Rebuild Sidebar
+            uiElements.testSidebar.innerHTML = `<div class="sidebar-title">CAMBRIDGE ${cambridgeNo}</div>`;
+            
+            result.data.forEach((test, index) => {
+                const btn = document.createElement('div');
+                btn.className = `sidebar-btn test-btn ${index === 0 ? 'active' : ''}`;
+                btn.textContent = `TEST ${test.test_no}`;
+                
+                // --- 这里就是关键！一定要确保这几行代码存在 ---
+                btn.addEventListener('click', (e) => {
+                    // 1. 切换按钮的 active 样式
+                    uiElements.testSidebar.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // 2. 更新状态并拉取 Parts
+                    currentState.testNo = test.test_no;
+                    uiElements.testTitle.textContent = `TEST ${test.test_no}`;
+                    
+                    // --- 这一行代码是触发获取 Parts 的核心！ ---
+                    loadParts(cambridgeNo, test.test_no); 
+                });
+                
+                uiElements.testSidebar.appendChild(btn);
+            });
+
+            switchView(views.tests); // 确保成功渲染后切换到 Tests 视图
+        }
+    } catch (error) {
+        console.error("Failed to load tests:", error);
+    }
+        };
+
+        // --- 5. Fetch & Render Parts (Level 3) ---
+        const loadParts = async (cambridgeNo, testNo) => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/get_parts.php?cambridge_no=${cambridgeNo}&test_no=${testNo}`);
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    // Rebuild Sidebar HTML
+                    uiElements.partSidebar.innerHTML = `<div class="sidebar-title">TEST ${testNo}</div>`;
+
+                    result.data.forEach((part, index) => {
+                        const btn = document.createElement('div');
+                        btn.className = `sidebar-btn part-btn ${index === 0 ? 'active' : ''}`;
+                        btn.textContent = `PART ${part.part_no}`;
+                        
+                        // Bind Click: Show Part Content on the right
+                        btn.addEventListener('click', (e) => {
+                            uiElements.partSidebar.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+                            e.target.classList.add('active');
+                            
+                            renderPartContent(part);
+                        });
+                        
+                        uiElements.partSidebar.appendChild(btn);
+                    });
+
+                    // Auto-render the first part's content
+                    if(result.data.length > 0) {
+                        renderPartContent(result.data[0]);
+                    }
+
+                    switchView(views.parts);
+                }
+            } catch (error) {
+                console.error("Failed to load parts:", error);
+            }
+        };
+
+        // --- 6. Render Actual Question Content ---
+        const renderPartContent = (partData) => {
+            // This injects the database content into the right-hand container
+            const contentHtml = `
+                <div style="color: white; padding: 40px; width: 100%; height: 100%; overflow-y: auto;">
+                    <h2 style="font-size: 32px; margin-bottom: 20px;">${partData.title || 'Part ' + partData.part_no}</h2>
+                    
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <strong>Audio:</strong> ${partData.audio_url || 'No audio file available'}
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; font-size: 18px; line-height: 1.6;">
+                        <strong>Transcript / Questions:</strong><br><br>
+                        ${partData.transcript_text || 'Questions will appear here once added to the database.'}
+                    </div>
+                </div>
+            `;
+            uiElements.partContentArea.innerHTML = contentHtml;
+        };
+
+        // --- Global Nav: Return Home ---
+        uiElements.navHomeBtn.addEventListener('click', () => {
+            switchView(views.books);
+            loadBooks(); // Optional: Refresh books list when going back home
+        });
+
+        // Initialize App
+        loadBooks();
+    });
+</script>
+
+</body>
+</html>
