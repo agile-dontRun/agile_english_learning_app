@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Garden - TED Talk</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="home-page">
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="nav-item active">TED TALK</button>
+            <button class="nav-item">IELTS LISTENING</button>
+            <button class="nav-item">DAILY TALK</button>
+            <button class="nav-item">VOCABULARY</button>
+            <button class="nav-item">CALENDAR</button>
+            <button class="nav-item">GROUP</button>
+            <button class="nav-item">PROFILE</button>
+        </div>
+    </nav>
+
+    <!-- CONTAINER -->
+    <main class="content-container">
+        
+        <section id="welcome-view" class="welcome-section">
+            <div class="welcome-flex">
+                <div class="illustration-box">
+                    <img src="ted_stage.png" alt="TED Stage" class="stage-image">
+                </div>
+                <div class="cloud-shape">
+                    <h2>Ideas worth<br>spreading</h2>
+                </div>
+            </div>
+            <!--enter button-->
+            <div class="enter-area">
+                <div class="enter-wrapper" onclick="showVideoGrid()">
+                    <div class="tedx-logo">TED<sup>x</sup></div>
+
+                    <div class="play-circle">
+                        <div class="play-triangle"></div>
+                    </div>
+                    <div class="enter-text">ENTER</div>
+                </div>
+            </div>
+        </section>
+        
+        
+        <section id="video-view" class="video-section" style="display: none;">
+            <div class="top-controls">
+                <button class="back-btn" onclick="showWelcomeView()">
+                    <span class="arrow">⬅</span> BACK
+                </button>
+            </div>
+            
+            <div class="study-banner">
+                listening study (xiangtian, zeyv, zeyuan, lilin)
+            </div>
+            <div class="video-grid">
+                <div class="video-card active-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+                <div class="video-card" onclick="showPlayerView()"><div class="play-arrow"></div></div>
+            </div>
+            <div class="footer-logo">
+                <div class="ted-tag">TED TALK</div>
+            </div>
+        </section>
+
+        <section id="player-view" class="player-section" style="display: none;">
+            <div class="player-layout">
+                
+                <div class="side-decorations left-decorations">
+                    <div class="sticker tilt-right"><img src="ted 3.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-left"><img src="ted 4.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-right"><img src="ted 5.png" alt="TED Sticker"></div>
+                </div>
+                
+                <div class="main-player-area">
+                    <div class="video-player-box"></div>
+                    
+                    <button class="practice-btn" onclick="window.location.href='practice.html'">DO SOME LISTENING PRACTICES</button>
+                </div>
+                
+                <div class="side-decorations right-decorations">
+                    <button class="player-back-btn" onclick="showVideoGridFromPlayer()">BACK</button>
+                    <div class="sticker tilt-left"><img src="ted 6.png" alt="TED Sticker"></div>
+                    <div class="sticker tilt-right"><img src="ted 7.png" alt="TED Sticker"></div>
+                </div>
+                
+            </div>
+        </section>
+
+    </main>
+
+
+
+    <script>
+        // ENTER VIDEO 
+        function showVideoGrid() {
+            document.getElementById('welcome-view').style.display = 'none';
+            document.getElementById('video-view').style.display = 'block';
+            document.getElementById('player-view').style.display = 'none';
+        }
+
+        // BACK FROM 
+        function showWelcomeView() {
+            document.getElementById('video-view').style.display = 'none';
+            document.getElementById('welcome-view').style.display = 'block';
+        }
+
+        // DISPALY VIDEO
+        function showPlayerView() {
+            document.getElementById('video-view').style.display = 'none';
+            document.getElementById('player-view').style.display = 'block';
+        }
+
+        // BAKE FROM
+        function showVideoGridFromPlayer() {
+            document.getElementById('player-view').style.display = 'none';
+            document.getElementById('video-view').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
