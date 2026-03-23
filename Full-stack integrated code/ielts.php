@@ -2,255 +2,402 @@
 session_start();
 require_once 'db_connect.php';
 
-$nickname = $_SESSION['nickname'] ?? 'Student';
-$cam = isset($_GET['cam']) && is_numeric($_GET['cam']) ? (int)$_GET['cam'] : 19;
-$test = isset($_GET['test']) && is_numeric($_GET['test']) ? (int)$_GET['test'] : 0;
-
-
-$tests = [];
-$stmt = $conn->prepare("SELECT DISTINCT test_no FROM ielts_listening_parts WHERE cambridge_no = ? ORDER BY test_no ASC");
-$stmt->bind_param("i", $cam);
-$stmt->execute();
-$result = $stmt->get_result();
-while ($row = $result->fetch_assoc()) {
-    $tests[] = $row['test_no'];
+// 1. Login Security Check
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
 }
 
+$nickname = $_SESSION['nickname'] ?? 'Learner';
+
+// Initialize parameters
+$cam = isset($_GET['cam']) && is_numeric($_GET['cam']) ? (int)$_GET['cam'] : 0;
+$test = isset($_GET['test']) && is_numeric($_GET['test']) ? (int)$_GET['test'] : 0;
+$part_id = isset($_GET['part_id']) && is_numeric($_GET['part_id']) ? (int)$_GET['part_id'] : 0;
+
+// Fetch Data Logic (Maintained from original)
+$books = [];
+$res_books = $conn->query("SELECT DISTINCT cambridge_no FROM ielts_listening_parts ORDER BY cambridge_no DESC");
+if($res_books) { while($row = $res_books->fetch_assoc()) { $books[] = $row['cambridge_no']; } }
+
+$tests = [];
+if ($cam > 0) {
+    $stmt = $conn->prepare("SELECT DISTINCT test_no FROM ielts_listening_parts WHERE cambridge_no = ? ORDER BY test_no ASC");
+    $stmt->bind_param("i", $cam);
+    $stmt->execute();
+    $res_tests = $stmt->get_result();
+    while($row = $res_tests->fetch_assoc()) { $tests[] = $row['test_no']; }
+}
 
 $parts = [];
-if ($test > 0) {
-    $stmt2 = $conn->prepare("SELECT part_no, title, audio_url FROM ielts_listening_parts 
-                             WHERE cambridge_no = ? AND test_no = ? ORDER BY part_no ASC");
+if ($cam > 0 && $test > 0) {
+    $stmt2 = $conn->prepare("SELECT * FROM ielts_listening_parts WHERE cambridge_no = ? AND test_no = ? ORDER BY part_no ASC");
     $stmt2->bind_param("ii", $cam, $test);
     $stmt2->execute();
-    $res = $stmt2->get_result();
-    while ($row = $res->fetch_assoc()) {
-        $parts[] = $row;
-    }
+    $res_parts = $stmt2->get_result();
+    while($row = $res_parts->fetch_assoc()) { $parts[] = $row; }
+}
+
+$current_part = null;
+$images = [];
+$questions = [];
+if ($part_id > 0) {
+    $stmt3 = $conn->prepare("SELECT * FROM ielts_listening_parts WHERE part_id = ?");
+    $stmt3->bind_param("i", $part_id);
+    $stmt3->execute();
+    $current_part = $stmt3->get_result()->fetch_assoc();
+
+    $stmt4 = $conn->prepare("SELECT image_url FROM ielts_part_images WHERE part_id = ? ORDER BY image_order ASC");
+    $stmt4->bind_param("i", $part_id);
+    $stmt4->execute();
+    $res_img = $stmt4->get_result();
+    while($row = $res_img->fetch_assoc()) { $images[] = $row['image_url']; }
+    
+    $stmt5 = $conn->prepare("SELECT * FROM ielts_answers WHERE part_id = ? ORDER BY question_no ASC");
+    $stmt5->bind_param("i", $part_id);
+    $stmt5->execute();
+    $res_ques = $stmt5->get_result();
+    while($row = $res_ques->fetch_assoc()) { $questions[] = $row; }
 }
 ?>
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Garden - IELTS Listening</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>IELTS Listening - Word Garden</title>
     <style>
-        .ielts-page {
-            display: flex;
-            height: calc(100vh - 80px);
-            background: #f8f1e9;
+        /* ===== Premium Green Theme System ===== */
+        :root {
+            --primary-green: #1b4332;
+            --accent-green: #40916c;
+            --soft-green-bg: #f2f7f5;
+            --card-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            --card-shadow-hover: 0 20px 40px rgba(27, 67, 50, 0.15);
+            --text-main: #2d3436;
         }
 
-        .sidebar {
-            width: 320px;
-            background: #f8f1e9;
-            padding: 40px 20px;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-        }
-        .cam-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1e3a8a;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .test-btn {
-            background: #dbeafe;
-            border: none;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #1e40af;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .test-btn:hover, .test-btn.active {
-            background: #3b82f6;
-            color: white;
-            transform: translateX(8px);
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--soft-green-bg);
+            margin: 0;
+            color: var(--text-main);
+            padding-bottom: 100px; /* Space for footer player */
         }
 
-
-        .main-area {
-            flex: 1;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        /* ===== 1. Navigation Header ===== */
+        .nav-header {
+            width: 100%;
+            height: 70px;
+            background: white;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            position: relative;
+            justify-content: space-between;
+            padding: 0 50px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
         }
-        .placeholder {
-            font-size: 28px;
+        .nav-logo { font-size: 22px; font-weight: bold; color: var(--primary-green); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
             font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-green); background: #f0f7f4; }
+
+        /* ===== 2. Hero Banner ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #081c15 0%, #1b4332 100%);
+            color: white;
+            padding: 110px 20px 70px;
             text-align: center;
-            max-width: 500px;
+        }
+        .hero-mini h1 { margin: 0; font-size: 2.4rem; letter-spacing: 1px; }
+        .hero-mini p { opacity: 0.8; margin-top: 10px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* ===== 3. Main Content Container ===== */
+        .main-content {
+            max-width: 1200px;
+            margin: -50px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
         }
 
-
-        .parts-container {
-            width: 90%;
-            max-width: 700px;
-            text-align: center;
+        /* Card Grids */
+        .grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
         }
-        .test-header {
-            font-size: 26px;
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s;
+            border: 1px solid transparent;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--accent-green);
+        }
+
+        /* Sidebar Replacement (Control Header) */
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 30px;
         }
-        .parts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        .part-card {
-            background: rgba(255,255,255,0.95);
-            color: #1e3a8a;
-            border-radius: 16px;
-            padding: 24px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .part-card:hover {
-            transform: scale(1.05);
-            background: #fff;
-        }
-        .part-card svg {
-            width: 48px;
-            height: 48px;
-            fill: #1e40af;
-            margin-bottom: 12px;
-        }
-
-        .player-area {
-            margin-top: 40px;
-            width: 100%;
-        }
-        #ielts-player {
-            width: 100%;
+        .btn-back {
             background: white;
+            color: var(--primary-green);
+            border: none;
+            padding: 10px 20px;
             border-radius: 12px;
-            padding: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--card-shadow);
+            text-decoration: none;
+            font-size: 14px;
         }
-        .now-playing {
-            margin: 15px 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
+        .btn-back:hover { background: #f0f7f4; }
 
-        .bottom-decor {
-            position: absolute;
-            bottom: 30px;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            padding: 0 40px;
+        /* Question Box */
+        .question-container {
+            background: white;
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: var(--card-shadow);
         }
-        .leaf { font-size: 48px; }
-        .group-icon { font-size: 42px; color: white; }
+        .img-item {
+            max-width: 100%;
+            display: block;
+            margin: 30px auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .q-row {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .q-input {
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            width: 250px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .q-input:focus { border-color: var(--accent-green); }
+
+        /* Submit Button */
+        .submit-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .submit-btn:hover { background: var(--accent-green); transform: translateY(-2px); }
+
+        /* ===== 4. Audio Player Bar ===== */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .player-info { min-width: 250px; }
+        .player-info strong { color: var(--primary-green); display: block; margin-bottom: 5px; }
+        audio { flex: 1; height: 35px; }
+
+        /* AI Assistant */
+        .side-controls { position: fixed; bottom: 120px; right: 40px; z-index: 100; }
+        .ai-assistant { display: flex; align-items: center; gap: 15px; }
+        .chat-bubble {
+            background: white; color: var(--primary-green);
+            padding: 12px 20px; border-radius: 20px 20px 5px 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); font-size: 14px;
+            border: 1px solid #eef5f2;
+        }
+        .ai-icon-circle {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: white; font-weight: bold;
+        }
     </style>
 </head>
-<body class="home-page">
+<body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <button class="nav-item" data-target="homepage-view">HOMEPAGE</button>
-            <button class="nav-item" data-target="welcome-view">TED TALK</button>
-            <button class="nav-item active" data-target="ielts-view">IELTS LISTENING</button>
-            <button class="nav-item" data-target="daily-talk-view">DAILY TALK</button>
-            <button class="nav-item">VOCABULARY</button>
-            <button class="nav-item">CALENDAR</button>
-            <button class="nav-item">GROUP</button>
-            <button class="nav-item">PROFILE</button>
+    <nav class="nav-header">
+        <a href="home.php" class="nav-logo">Word Garden</a>
+        <div class="nav-links">
+            <a href="home.php">Home</a>
+            <a href="TED.php">TED Talk</a>
+            <a href="ielts.php" class="active">IELTS</a>
+            <a href="daily_talk.php">Daily Talk</a>
+            <a href="vocabulary.php">Vocabulary</a>
+            <a href="calendar.php">Calendar</a>
+            <a href="profile.php">Profile</a>
         </div>
     </nav>
 
-    <div class="ielts-page">
+    <header class="hero-mini">
+        <h1>IELTS Listening</h1>
+        <p>Master your Cambridge exams with precision</p>
+    </header>
 
-        <div class="sidebar">
-            <div class="cam-title">CAMBRIDGE <?= $cam ?></div>
-            <?php foreach ($tests as $t): ?>
-                <button class="test-btn <?= $test == $t ? 'active' : '' ?>" 
-                        onclick="window.location.href='ielts.php?cam=<?= $cam ?>&test=<?= $t ?>'">
-                    TEST <?= $t ?>
-                </button>
-            <?php endforeach; ?>
-        </div>
-
-  
-        <div class="main-area">
-            <?php if ($test === 0): ?>
-             
-                <div class="placeholder">
-                    Please select a Test from the left sidebar...
-                </div>
-            <?php else: ?>
-              
-                <div class="parts-container">
-                    <div class="test-header">
-                        Cambridge <?= $cam ?> - Test <?= $test ?>
-                    </div>
-                    
-                    <div class="parts-grid">
-                        <?php foreach ($parts as $p): ?>
-                        <div class="part-card" 
-                             onclick="playPart('<?= htmlspecialchars($p['audio_url']) ?>', 'Part <?= $p['part_no'] ?> - <?= htmlspecialchars($p['title'] ?? '') ?>')">
-                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            <div style="font-size:20px;font-weight:bold;">Part <?= $p['part_no'] ?></div>
-                            <div style="font-size:14px;margin-top:8px;"><?= htmlspecialchars($p['title'] ?? 'Listening Part') ?></div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <div class="player-area">
-                        <div class="now-playing">
-                            Now Playing: <span id="current-part-title">请选择 Part</span>
-                        </div>
-                        <audio id="ielts-player" controls></audio>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <div class="bottom-decor">
-                <div class="leaf">🌱</div>
-                <div class="group-icon">👥</div>
+    <main class="main-content">
+        
+        <?php if ($cam === 0): ?>
+            <div class="grid-view">
+                <?php foreach ($books as $b): ?>
+                    <div class="card" onclick="location.href='?cam=<?= $b ?>'">CAMBRIDGE <?= $b ?></div>
+                <?php endforeach; ?>
             </div>
+
+        <?php elseif ($test === 0): ?>
+            <div class="breadcrumb-nav">
+                <a href="ielts.php" class="btn-back">← Back to Books</a>
+                <span style="font-weight: bold; color: var(--primary-green);">Cambridge <?= $cam ?></span>
+            </div>
+            <div class="grid-view">
+                <?php foreach ($tests as $t): ?>
+                    <div class="card" onclick="location.href='?cam=<?= $cam ?>&test=<?= $t ?>'">TEST <?= $t ?></div>
+                <?php endforeach; ?>
+            </div>
+
+        <?php elseif ($part_id === 0): ?>
+            <div class="breadcrumb-nav">
+                <a href="?cam=<?= $cam ?>" class="btn-back">← Back to Tests</a>
+                <span style="font-weight: bold; color: var(--primary-green);">Cambridge <?= $cam ?> / Test <?= $test ?></span>
+            </div>
+            <div class="grid-view">
+                <?php foreach ($parts as $p): ?>
+                    <div class="card" onclick="location.href='?cam=<?= $cam ?>&test=<?= $test ?>&part_id=<?= $p['part_id'] ?>'">PART <?= $p['part_no'] ?></div>
+                <?php endforeach; ?>
+            </div>
+
+        <?php else: ?>
+            <div class="breadcrumb-nav">
+                <button onclick="history.back()" class="btn-back">← Back</button>
+                <span style="font-weight: bold; color: var(--primary-green);">Part <?= $current_part['part_no'] ?> - <?= htmlspecialchars($current_part['title']) ?></span>
+            </div>
+
+            <div class="question-container">
+                <?php foreach ($images as $img): ?>
+                    <img src="<?= htmlspecialchars($img) ?>" class="img-item">
+                <?php endforeach; ?>
+
+                <form id="quiz-form" style="margin-top:40px;">
+                    <?php foreach ($questions as $q): ?>
+                        <div class="q-row">
+                            <strong style="width: 50px; color: var(--primary-green);">Q<?= $q['question_no'] ?>:</strong>
+                            <input type="text" class="q-input" name="q<?= $q['question_no'] ?>" placeholder="Type answer here...">
+                        </div>
+                    <?php endforeach; ?>
+                    <div style="text-align: center;">
+                        <button type="button" class="submit-btn" onclick="submitAnswers()">Submit and Check Results</button>
+                    </div>
+                </form>
+            </div>
+        <?php endif; ?>
+
+    </main>
+
+    <?php if ($current_part): ?>
+    <div class="player-bar">
+        <div class="player-info">
+            <strong>Now Playing</strong>
+            <span style="font-size: 13px; color: #666;"><?= htmlspecialchars($current_part['title']) ?></span>
         </div>
+        <audio controls src="<?= htmlspecialchars($current_part['audio_url']) ?>"></audio>
     </div>
+    <?php endif; ?>
 
     <aside class="side-controls">
         <div class="ai-assistant">
-            <div class="chat-bubble">Hi <?= htmlspecialchars($nickname) ?>, I'm AI assistant</div>
-            <div class="icon-label"><img src="ai_icon.png" alt="AI"></div>
+            <div class="chat-bubble">Hi <?= htmlspecialchars($nickname) ?>, focus on the keywords!</div>
+            <div class="ai-icon-circle">AI</div>
         </div>
     </aside>
 
     <script>
-        function playPart(audioUrl, title) {
-            const audio = document.getElementById('ielts-player');
-            audio.src = audioUrl;
-            audio.play();
-            document.getElementById('current-part-title').textContent = title;
-        }
+        const correctAnswers = {
+            <?php foreach ($questions as $q): ?>
+                "q<?= $q['question_no'] ?>": "<?= addslashes($q['correct_answer']) ?>",
+            <?php endforeach; ?>
+        };
 
-        document.querySelector('.nav-container').addEventListener('click', (e) => {
-            const target = e.target.getAttribute('data-target');
-            if (!target) return;
+        function submitAnswers() {
+        const form = document.getElementById('quiz-form');
+        const inputs = form.querySelectorAll('input[type="text"]');
+        let score = 0;
 
-            if (target === 'ielts-view') {
-                window.location.href = `ielts.php?cam=<?= $cam ?>`;   
-                return;
-            }
-            if (['homepage-view', 'welcome-view', 'daily-talk-view'].includes(target)) {
-                window.location.href = 'home.php';
+        // Remove old global rating display
+        const oldScore = document.getElementById('final-score');
+        if (oldScore) oldScore.remove();
+
+        inputs.forEach(input => {
+            const qName = input.name;
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctStr = (correctAnswers[qName] || "").toLowerCase();
+            const allowed = correctStr.split('|').map(s => s.trim());
+
+            // Remove old prompts
+            const existingHint = input.parentNode.querySelector('.hint');
+            if (existingHint) existingHint.remove();
+
+            if (allowed.includes(userAnswer) && userAnswer !== "") {
+                input.style.borderColor = "#22c55e"; 
+                score++;
+            } else {
+                input.style.borderColor = "#ef4444"; 
+                const span = document.createElement('span');
+                span.className = 'hint';
+                span.style.cssText = 'color: #ef4444; font-size: 12px; margin-left: 10px; font-weight: 600;';
+                span.innerHTML = ' Correct: ' + correctStr.split('|')[0];
+                input.parentNode.appendChild(span);
             }
         });
+
+        // Create a dynamic rating bar to display above the submit button
+        const scoreDiv = document.createElement('div');
+        scoreDiv.id = 'final-score';
+        scoreDiv.style.cssText = 'text-align: center; font-size: 20px; font-weight: bold; margin-top: 20px; color: var(--primary-green);';
+        scoreDiv.innerHTML = `Your Score: ${score} / ${inputs.length}`;
+        form.appendChild(scoreDiv);
+        }
     </script>
 </body>
 </html>
