@@ -2,27 +2,32 @@
 session_start();
 require_once 'db_connect.php';  
 
-$nickname = $_SESSION['nickname'] ?? '学习者';
+// 1. Login Security Check
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 
+$nickname = $_SESSION['nickname'] ?? 'Learner';
 
+// Pagination Logic (Kept as per your original code)
 $limit = 8;                                      
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-
+// Fetch Total Count
 $total_sql = "SELECT COUNT(*) as total FROM ted_talks";
 $total_result = $conn->query($total_sql);
 $total = $total_result ? $total_result->fetch_assoc()['total'] : 0;
 $total_pages = ceil($total / $limit);
 
-
 $ted_id = isset($_GET['ted_id']) && is_numeric($_GET['ted_id']) ? (int)$_GET['ted_id'] : 0;
 $talk = null;
 $sibling = null;
-$back_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$back_page = $page;
 
 if ($ted_id > 0) {
-    
+    // 2. Player Logic (Fetching specific video)
     $stmt = $conn->prepare("SELECT ted_id, title, speaker, subtitle_mode, video_url FROM ted_talks WHERE ted_id = ?");
     $stmt->bind_param("i", $ted_id);
     $stmt->execute();
@@ -34,6 +39,7 @@ if ($ted_id > 0) {
         exit();
     }
 
+    // Sibling toggle logic (With/Without subtitle)
     $stmt2 = $conn->prepare("SELECT ted_id, subtitle_mode FROM ted_talks WHERE title = ? AND subtitle_mode != ? LIMIT 1");
     $stmt2->bind_param("ss", $talk['title'], $talk['subtitle_mode']);
     $stmt2->execute();
@@ -42,7 +48,7 @@ if ($ted_id > 0) {
         $sibling = $sib_res->fetch_assoc();
     }
 } else {
-
+    // 3. List Logic (Fetching grid items)
     $stmt = $conn->prepare("SELECT ted_id, title, speaker, subtitle_mode FROM ted_talks ORDER BY ted_id ASC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
@@ -50,373 +56,288 @@ if ($ted_id > 0) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Garden - TED Talk</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>TED Talk - Word Garden</title>
     <style>
-       
-        .view-section {
-            width: 100%;
-            height: calc(100vh - 80px);
-            display: none;
-            overflow-y: auto;
+        /* ===== Premium Green Theme System ===== */
+        :root {
+            --primary-green: #1b4332;
+            --accent-green: #40916c;
+            --soft-green-bg: #f2f7f5;
+            --card-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            --card-shadow-hover: 0 20px 40px rgba(27, 67, 50, 0.15);
+            --text-main: #2d3436;
         }
 
-       
-        #video-view {
-            background-color: #fdfae7;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--soft-green-bg);
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        /* ===== 1. Navigation Header ===== */
+        .nav-header {
+            width: 100%;
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .nav-logo { font-size: 22px; font-weight: bold; color: var(--primary-green); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-green); background: #f0f7f4; }
+
+        /* ===== 2. Hero Banner ===== */
+        .hero-mini {
+            background: linear-gradient(135deg, #081c15 0%, #1b4332 100%);
+            color: white;
+            padding: 110px 20px 70px;
+            text-align: center;
+        }
+        .hero-mini h1 { margin: 0; font-size: 2.4rem; letter-spacing: 1px; }
+        .hero-mini p { opacity: 0.8; margin-top: 10px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* ===== 3. Content Layout ===== */
+        .main-content {
+            max-width: 1200px;
+            margin: -50px auto 60px;
+            padding: 0 20px;
             position: relative;
+            z-index: 10;
+        }
+
+        /* Video Grid Styling */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .video-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 0;
-            height: calc(100vh - 80px);
-            overflow: hidden;
+            border: 1px solid transparent;
         }
-        .study-banner {
-            background-color: #fff176;
-            padding: 5px 30px;
-            border-radius: 5px;
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--accent-green);
         }
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 20px;
-            width: 90%;
-            max-width: 1200px;
-            z-index: 2;
-        }
-        .video-card {
-            background-color: #e0e0e0;
-            border: 2px solid #263238;
-            aspect-ratio: 16 / 10;
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: #f7fdfa;
+            border-radius: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 15px;
         }
-        .video-card:hover {
-            transform: scale(1.02);
-            background-color: #d1d1d1;
-        }
-        .play-arrow-svg {
-            width: 50px;
-            height: 50px;
-            fill: #004d40;
-        }
-       
+        .play-icon { font-size: 40px; color: var(--accent-green); }
         .subtitle-badge {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.75);
-            color: #fff;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .footer-logo-main {
-            margin-top: 30px;
-            width: 350px;
-            height: auto;
-        }
-        .history-decor {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-align: center;
-        }
-        .history-decor img { width: 50px; }
-        .history-decor span { display: block; color: #555; font-weight: bold; }
-        .brain-decor { position: absolute; bottom: 30px; left: 30px; width: 80px; }
-        .group-decor { position: absolute; bottom: 30px; right: 30px; width: 100px; }
-        .right-decor-box {
-            position: absolute;
-            top: 80px;
-            right: 15px;
-            width: 15px;
-            height: 80px;
-            background-color: #316d86;
-            border-radius: 3px;
-        }
-
-     
-        .pagination {
-            margin-top: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 16px;
-        }
-        .pagination a {
-            padding: 8px 16px;
-            background: #5a8a31;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-        .pagination a:hover { background: #4a7a25; }
-
-     
-        .player-section {
-            background-color: #fff;
-            overflow: hidden;
-        }
-        .player-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding: 0 50px;
-            box-sizing: border-box;
-        }
-        .side-decorations {
-            width: 160px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            align-items: center;
-        }
-        .sticker img {
-            width: 130px; 
-            height: auto;
-            border-radius: 10px;
-            transition: transform 0.3s ease;
-        }
-        .tilt-right { transform: rotate(8deg); }
-        .tilt-left { transform: rotate(-8deg); }
-
-        .main-player-area {
-            flex: 1;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
-        .talk-header {
-            width: 100%;
-            text-align: center;
-        }
-        .talk-header h2 {
-            margin: 0 0 8px 0;
-            font-size: 24px;
-            color: #263238;
-        }
-        .talk-header .mode-info {
-            font-size: 15px;
-            color: #555;
-        }
-        .subtitle-toggle-btn {
-            padding: 12px 28px;
-            background: #5a8a31;
-            color: white;
-            border: none;
+            font-size: 11px;
+            background: var(--soft-green-bg);
+            color: var(--primary-green);
+            padding: 4px 12px;
             border-radius: 50px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Player Section Styling */
+        .player-container {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            max-width: 900px;
+            margin: 0 auto;
         }
         .video-player-box {
             width: 100%;
             aspect-ratio: 16 / 9;
-            background: #222;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            background: #000;
+            border-radius: 15px;
             overflow: hidden;
-            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 25px 0;
         }
-        .video-player-box iframe,
-        .video-player-box video {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .practice-btn {
-            padding: 18px 45px;
-            background: #e62b1e;
-            color: white;
+        .video-player-box iframe { width: 100%; height: 100%; border: none; }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 28px;
             border: none;
             border-radius: 50px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 18px;
-            transition: background 0.3s;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
-        .practice-btn:hover { background: #c42318; }
+        .btn-primary { background: var(--primary-green); color: white; }
+        .btn-accent { background: var(--accent-green); color: white; }
+        .btn-danger { background: #e63946; color: white; margin-top: 20px; padding: 18px 45px; font-size: 16px; }
+        .btn:hover { opacity: 0.9; transform: scale(1.03); }
 
-        .player-back-btn {
-            padding: 10px 25px;
-            background: #5a8a31;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: bold;
+        /* Pagination */
+        .pagination {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .pagination a {
+            text-decoration: none;
+            color: var(--primary-green);
+            background: white;
+            padding: 8px 20px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            font-weight: 600;
+        }
+
+        /* ===== 4. Side AI Assistant ===== */
+        .side-controls { position: fixed; bottom: 40px; right: 40px; z-index: 100; }
+        .ai-assistant { display: flex; align-items: center; gap: 15px; }
+        .chat-bubble {
+            background: white; color: var(--primary-green);
+            padding: 12px 20px; border-radius: 20px 20px 5px 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); font-size: 14px;
+            border: 1px solid #eef5f2;
+        }
+        .ai-icon-circle {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 8px 20px rgba(27, 67, 50, 0.2); color: white; font-weight: bold;
         }
     </style>
 </head>
-<body class="home-page">
+<body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <button class="nav-item" data-target="homepage-view">HOMEPAGE</button>
-            <button class="nav-item active" data-target="welcome-view">TED TALK</button>
-            <button class="nav-item" data-target="ielts-view">IELTS LISTENING</button>
-            <button class="nav-item" data-target="daily-talk-view">DAILY TALK</button>
-            <button class="nav-item">VOCABULARY</button>
-            <button class="nav-item">CALENDAR</button>
-            <button class="nav-item">GROUP</button>
-            <button class="nav-item">PROFILE</button>
+    <nav class="nav-header">
+        <a href="home.php" class="nav-logo">Word Garden</a>
+        <div class="nav-links">
+            <a href="home.php">Home</a>
+            <a href="TED.php" class="active">TED Talk</a>
+            <a href="ielts.php">IELTS</a>
+            <a href="daily_talk.php">Daily Talk</a>
+            <a href="vocabulary.php">Vocabulary</a>
+            <a href="calendar.php">Calendar</a>
+            <a href="profile.php">Profile</a>
         </div>
     </nav>
 
-    <main class="content-container">
-        
-    
-        <section id="video-view" class="video-section view-section" 
-                 style="display: <?= $ted_id > 0 ? 'none' : 'flex' ?>;">
-            
-            <div class="history-decor" onclick="window.location.href='home.php'">
-                <img src="static/images/sun_icon.png" alt="History"> <span>History</span>
-            </div>
-            <div class="right-decor-box"></div>
-            
-            <div class="video-grid">
-                <?php 
-                if ($ted_id === 0 && $video_result->num_rows > 0) {
-                    while ($row = $video_result->fetch_assoc()) {
-                        $mode_text = ($row['subtitle_mode'] === 'with_subtitle') ? 'With subtitle' : 'Without subtitle';
-                ?>
-                <div class="video-card" 
-                     onclick="window.location.href='TED.php?ted_id=<?= $row['ted_id'] ?>&page=<?= $page ?>'">
-                    <svg class="play-arrow-svg" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                    </svg>
-                    <div class="subtitle-badge"><?= $mode_text ?></div>
-                </div>
-                <?php 
-                    }
-                } else if ($ted_id === 0) {
-                    echo '<p style="grid-column:1/-1;text-align:center;color:#666;">暂无TED视频</p>';
-                }
-                ?>
-            </div>
-            
+    <header class="hero-mini">
+        <h1>TED Talk</h1>
+        <p>Expand your mind and polish your listening</p>
+    </header>
 
-            <?php if ($ted_id === 0 && $total_pages > 1): ?>
+    <main class="main-content">
+        
+        <?php if ($ted_id === 0): ?>
+            <div class="video-grid">
+                <?php if ($video_result->num_rows > 0): ?>
+                    <?php while ($row = $video_result->fetch_assoc()): 
+                        $mode_text = ($row['subtitle_mode'] === 'with_subtitle') ? 'Subtitles' : 'No Subtitles';
+                    ?>
+                    <div class="video-card" onclick="window.location.href='TED.php?ted_id=<?= $row['ted_id'] ?>&page=<?= $page ?>'">
+                        <div class="video-placeholder">
+                            <span class="play-icon">▶</span>
+                        </div>
+                        <h4 style="margin: 0 0 10px 0; color: var(--primary-green);"><?= htmlspecialchars($row['title']) ?></h4>
+                        <div class="subtitle-badge"><?= $mode_text ?></div>
+                    </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p style="grid-column: 1/-1; text-align: center; color: #666;">No TED talks available currently.</p>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($total_pages > 1): ?>
             <div class="pagination">
                 <?php if ($page > 1): ?>
-                    <a href="TED.php?page=<?= $page-1 ?>">Previous Page</a>
+                    <a href="TED.php?page=<?= $page-1 ?>">Previous</a>
                 <?php endif; ?>
-                Page <?= $page ?> of <?= $total_pages ?>
+                <span style="font-weight: 600;">Page <?= $page ?> of <?= $total_pages ?></span>
                 <?php if ($page < $total_pages): ?>
-                    <a href="TED.php?page=<?= $page+1 ?>">Next Page</a>
+                    <a href="TED.php?page=<?= $page+1 ?>">Next</a>
                 <?php endif; ?>
             </div>
             <?php endif; ?>
-            
-            <img src="static/images/ted_talk_red_logo.png" class="footer-logo-main" alt="TED TALK">
-            <img src="static/images/brain_icon.png" class="brain-decor" alt="brain">
-            <img src="static/images/group_icon.png" class="group-decor" alt="group">
-        </section>
 
-
-        <?php if ($ted_id > 0 && $talk): ?>
-        <section id="player-view" class="player-section view-section" style="display: flex;">
-            <div class="player-layout">
-            
-                <div class="side-decorations">
-                    <div class="sticker tilt-right"><img src="ted 3.png" alt="sticker"></div>
-                    <div class="sticker tilt-left"><img src="ted 4.png" alt="sticker"></div>
-                    <div class="sticker tilt-right"><img src="ted 5.png" alt="sticker"></div>
+        <?php else: ?>
+            <div class="player-container">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <a href="TED.php?page=<?= $back_page ?>" class="btn btn-primary" style="font-size: 14px;">← Back to List</a>
+                    <?php if ($sibling): ?>
+                        <a href="TED.php?ted_id=<?= $sibling['ted_id'] ?>&page=<?= $back_page ?>" class="btn btn-accent" style="font-size: 14px;">
+                            Switch to <?= $sibling['subtitle_mode'] === 'with_subtitle' ? 'Subtitled' : 'Original' ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
-                
 
-                <div class="main-player-area">
-                 
-                    <div class="talk-header">
-                        <h2><?= htmlspecialchars($talk['title']) ?></h2>
-                        <div class="mode-info">
-                            Speaker: <?= htmlspecialchars($talk['speaker'] ?? 'Unknown') ?>　｜　
-                            <?= $talk['subtitle_mode'] === 'with_subtitle' ? 'With subtitle' : 'Without subtitle' ?>
-                        </div>
-                        
-                        <?php if ($sibling): 
-                            $sib_text = ($sibling['subtitle_mode'] === 'with_subtitle') ? 'With subtitle' : 'Without subtitle';
-                        ?>
-                        <button class="subtitle-toggle-btn" 
-                                onclick="window.location.href='TED.php?ted_id=<?= $sibling['ted_id'] ?>&page=<?= $back_page ?>'">
-                            Switch to <?= $sib_text ?> version
-                        </button>
-                        <?php endif; ?>
-                    </div>
-
-        
-                    <div class="video-player-box">
-                        <?php
-                
-                        $video_src = htmlspecialchars($talk['video_url']);
-                        if (preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $talk['video_url'], $m) ||
-                            preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $talk['video_url'], $m)) {
-                            $video_src = 'https://www.youtube.com/embed/' . $m[1];
-                        }
-                        ?>
-                        <iframe src="<?= $video_src ?>" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen></iframe>
-                    </div>
-
-                    <button class="practice-btn" onclick="window.location.href='practice.php'">DO SOME LISTENING PRACTICES</button>
+                <div style="text-align: center; margin-top: 30px;">
+                    <h2 style="color: var(--primary-green); margin: 0;"><?= htmlspecialchars($talk['title']) ?></h2>
+                    <p style="color: #666; margin: 10px 0;">Speaker: <?= htmlspecialchars($talk['speaker'] ?? 'Unknown') ?></p>
                 </div>
-                
-                <div class="side-decorations">
-                    <button class="player-back-btn" 
-                            onclick="window.location.href='TED.php?page=<?= $back_page ?>'">BACK</button>
-                    <div class="sticker tilt-left"><img src="ted 6.png" alt="sticker"></div>
-                    <div class="sticker tilt-right"><img src="ted 7.png" alt="sticker"></div>
+
+                <div class="video-player-box">
+                    <?php
+                    $video_src = htmlspecialchars($talk['video_url']);
+                    if (preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $talk['video_url'], $m) ||
+                        preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $talk['video_url'], $m)) {
+                        $video_src = 'https://www.youtube.com/embed/' . $m[1];
+                    }
+                    ?>
+                    <iframe src="<?= $video_src ?>" allowfullscreen></iframe>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn btn-danger" onclick="window.location.href='practice.php?ted_id=<?= $talk['ted_id'] ?>'">
+                        DO SOME LISTENING PRACTICES
+                    </button>
                 </div>
             </div>
-        </section>
         <?php endif; ?>
+
     </main>
 
     <aside class="side-controls">
         <div class="ai-assistant">
-            <div class="chat-bubble">Hi <?= htmlspecialchars($nickname) ?>, I'm AI assistant</div>
-            <div class="icon-label"><img src="ai_icon.png" alt="AI"></div>
+            <div class="chat-bubble">Hi <?= htmlspecialchars($nickname) ?>, let's dive into some great ideas!</div>
+            <div class="ai-icon-circle">AI</div>
         </div>
     </aside>
 
-    <script>
-
-        document.querySelector('.nav-container').addEventListener('click', (e) => {
-            const targetId = e.target.getAttribute('data-target');
-            if (!targetId) return;
-
-            if (targetId === 'welcome-view') {
-                window.location.href = 'TED.php';   
-                return;
-            }
-            if (['homepage-view', 'ielts-view', 'daily-talk-view'].includes(targetId)) {
-                window.location.href = 'home.php';
-                return;
-            }
-        });
-    </script>
 </body>
 </html>
