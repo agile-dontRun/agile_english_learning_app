@@ -48,8 +48,8 @@ if ($ted_id > 0) {
         $sibling = $sib_res->fetch_assoc();
     }
 } else {
-    // 3. List Logic (Fetching grid items)
-    $stmt = $conn->prepare("SELECT ted_id, title, speaker, subtitle_mode FROM ted_talks ORDER BY ted_id ASC LIMIT ? OFFSET ?");
+    // 3. List Logic (Fetching grid items, added cover_url)
+    $stmt = $conn->prepare("SELECT ted_id, title, speaker, subtitle_mode, cover_url FROM ted_talks ORDER BY ted_id ASC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
     $video_result = $stmt->get_result();
@@ -150,6 +150,8 @@ if ($ted_id > 0) {
             box-shadow: var(--card-shadow-hover);
             border-color: var(--accent-green);
         }
+        
+        /* Updated Placeholder & Cover Styles */
         .video-placeholder {
             width: 100%;
             aspect-ratio: 16/10;
@@ -159,8 +161,45 @@ if ($ted_id > 0) {
             justify-content: center;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
         }
-        .play-icon { font-size: 40px; color: var(--accent-green); }
+        .video-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        .play-icon-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        .play-icon { 
+            font-size: 22px; 
+            color: var(--accent-green); 
+            margin-left: 4px;
+            transition: color 0.3s ease;
+        }
+        .video-card:hover .play-icon-wrapper {
+            background: var(--accent-green);
+            transform: scale(1.1);
+        }
+        .video-card:hover .play-icon {
+            color: white;
+        }
+
         .subtitle-badge {
             font-size: 11px;
             background: var(--soft-green-bg);
@@ -272,7 +311,12 @@ if ($ted_id > 0) {
                     ?>
                     <div class="video-card" onclick="window.location.href='TED.php?ted_id=<?= $row['ted_id'] ?>&page=<?= $page ?>'">
                         <div class="video-placeholder">
-                            <span class="play-icon">▶</span>
+                            <?php if (!empty($row['cover_url'])): ?>
+                                <img src="<?= htmlspecialchars($row['cover_url']) ?>" alt="Video Cover" class="video-cover">
+                            <?php endif; ?>
+                            <div class="play-icon-wrapper">
+                                <span class="play-icon">▶</span>
+                            </div>
                         </div>
                         <h4 style="margin: 0 0 10px 0; color: var(--primary-green);"><?= htmlspecialchars($row['title']) ?></h4>
                         <div class="subtitle-badge"><?= $mode_text ?></div>
