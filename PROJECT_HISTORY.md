@@ -1,0 +1,1 @@
+This project will initiate agile process refactoring on March 30, 2026. The issue records from previous versions (Pre Agile Phase) are for reference only and do not represent the latest progress. Please refer to Milestone: Sprint 2 for the latest development goals. "
