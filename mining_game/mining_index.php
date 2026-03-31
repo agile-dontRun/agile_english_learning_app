@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>挖矿学单词 - 游戏大厅</title>
+    <title>MINING IN LEARNING - HOME</title>
     <link rel="stylesheet" href="mining_style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <div id="game-container">
         
         <div class="top-bar">
-            <button class="back-btn" onclick="goBack()">◀ 返回</button>
+            <button class="back-btn" onclick="goBack()">◀ BACK</button>
             <div class="coin-display">
                 <span class="coin-icon">💰</span>
                 <span class="coin-amount" id="coin-count">1250</span>
@@ -19,8 +19,8 @@
         </div>
 
         <div class="center-area">
-            <h1 class="game-title">挖矿学单词</h1>
-            <!-- 角色容器 - 所有图层叠加 -->
+            <h1 class="game-title">MINING IN LEARNING</h1>
+
             <div class="character-container">
                 <img src="people.png" alt="身体" id="layer_body" class="character-layer base-layer" />
                 <img src="people.png" alt="鞋子" id="layer_shoes" class="character-layer" style="display: none;" />
@@ -41,10 +41,10 @@
         </div>
 
         <div class="menu-buttons">
-            <button class="menu-btn" onclick="startGame('single')">单人</button>
-            <button class="menu-btn" onclick="startGame('double')">双人</button>
-            <button class="menu-btn" onclick="openMenu('collection')">收藏</button>
-            <button class="menu-btn" onclick="openMenu('achievement')">成就</button>
+            <button class="menu-btn" onclick="startGame('single')">SINGLE-GAME</button>
+            <button class="menu-btn" onclick="startGame('double')">DOUBLE-GAME</button>
+            <button class="menu-btn" onclick="openMenu('collection')">COLLECTION</button>
+            <button class="menu-btn" onclick="openMenu('achievement')">ACHIEVEMENT</button>
         </div>
 
     </div>
