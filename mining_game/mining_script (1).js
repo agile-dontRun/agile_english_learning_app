@@ -1,9 +1,5 @@
-// script.js - HTML叠加图层版
-
-// ==================== 角色相关变量 ====================
 let customCharacterLoaded = false;
 
-// 图层ID映射
 const layerMap = {
     'body': 'layer_body',
     'shoes': 'layer_shoes',
@@ -22,19 +18,17 @@ const layerMap = {
     'background': 'layer_background'
 };
 
-// ==================== 加载自定义角色形象 ====================
 async function loadCustomCharacter() {
     try {
-        console.log('开始加载自定义角色...');
+        console.log('SELF...');
         
         const response = await fetch('mining_index.php?action=get_character');
         const data = await response.json();
-        console.log('角色数据:', data);
+        console.log('SELF_DATA:', data);
         
         if (data.success && data.outfit && Object.keys(data.outfit).length > 0) {
-            console.log('找到保存的穿搭，图层:', Object.keys(data.outfit));
+            console.log('FIND SAVED DATA', Object.keys(data.outfit));
             
-            // 先隐藏所有图层
             for (let layerId of Object.values(layerMap)) {
                 const element = document.getElementById(layerId);
                 if (element) {
@@ -42,7 +36,6 @@ async function loadCustomCharacter() {
                 }
             }
             
-            // 加载每个图层
             for (let [layerName, imageId] of Object.entries(data.outfit)) {
                 const layerElementId = layerMap[layerName];
                 if (layerElementId) {
@@ -51,7 +44,7 @@ async function loadCustomCharacter() {
                         const imgUrl = 'mining_index.php?action=get_image&id=' + imageId + '&t=' + Date.now();
                         imgElement.src = imgUrl;
                         imgElement.style.display = 'block';
-                        console.log('✅ 加载图层:', layerName);
+                        console.log('✅ UPLOAD:', layerName);
                     }
                 }
             }
@@ -59,8 +52,7 @@ async function loadCustomCharacter() {
             customCharacterLoaded = true;
             return true;
         } else {
-            console.log('没有找到保存的穿搭，使用默认身体');
-            // 只显示身体
+            console.log('DEFAULT BODY');
             for (let layerId of Object.values(layerMap)) {
                 const element = document.getElementById(layerId);
                 if (element && layerId !== 'layer_body') {
@@ -74,18 +66,16 @@ async function loadCustomCharacter() {
             }
         }
     } catch (error) {
-        console.error('加载失败:', error);
+        console.error('UPLOAD FAIL:', error);
     }
     
     return false;
 }
 
-// ==================== 更新角色显示 ====================
 function updateCharacterDisplay() {
-    console.log('角色显示已更新，自定义角色状态:', customCharacterLoaded);
+    console.log('PLAEASE WAIT:', customCharacterLoaded);
 }
 
-// ==================== 返回前一个网页 ====================
 function goBack() {
     if (document.referrer && document.referrer !== '') {
         window.history.back();
@@ -97,25 +87,24 @@ function goBack() {
 // 游戏模式选择：单人 / 双人
 function startGame(mode) {
     if (mode === 'single') {
-        console.log("进入单人模式");
+        console.log("ENTER SINGLE MODEL");
         window.location.href = "mining_map.php"; 
     } else if (mode === 'double') {
-        console.log("进入双人模式");
+        console.log("ENTER DOUBLE MODEL");
         window.location.href = "mining_match.php"; 
     }
 }
 
-// 打开收藏或成就菜单
 function openMenu(menu) {
     if (menu === 'collection') {
-        console.log("打开收藏界面");
+        console.log("OPEN COLLECTION PAGE");
         window.location.href = "mining_collection.php"; 
     } else if (menu === 'achievement') {
-        console.log("打开成就界面");
+        console.log("OPEN ACHIEVEMENT PAGE");
         window.location.href = "mining_achievement.php"; 
     }
 }
-// ==================== 更新金币 ====================
+
 function updateCoinDisplay() {
     let coins = localStorage.getItem('playerCoins');
     if (coins === null) {
@@ -130,16 +119,13 @@ function updateCoinDisplay() {
     }
 }
 
-// ==================== 页面加载 ====================
 window.onload = async function() {
-    console.log('游戏大厅加载中...');
+    console.log('HOME PAGE LOADING...');
     
-    // 更新金币显示
     updateCoinDisplay();
-    
-    // 加载自定义角色
+
     await loadCustomCharacter();
     updateCharacterDisplay();
     
-    console.log('游戏大厅加载完成');
+    console.log('LOADING FINISHED');
 };
