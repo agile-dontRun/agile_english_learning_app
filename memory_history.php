@@ -7,11 +7,6 @@ $user = mm_get_user($conn, $userId);
 
 $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
 
-/*
- * 历史战绩：
- * - 当前用户参加过的所有 Memory Match
- * - 用 player_count 来区分 solo / pvp
- */
 $sql = "
     SELECT
         m.match_id,
