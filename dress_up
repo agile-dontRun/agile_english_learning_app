@@ -1,0 +1,20 @@
+async function autoImport() {
+        try {
+            const res = await fetch('?action=auto_import');
+            const data = await res.json();
+            if (data.success && data.imported > 0) {
+                console.log(`✅ 自动导入 ${data.imported} 张新图片`);
+                const statsDiv = document.getElementById('stats');
+                statsDiv.innerHTML = `📥 自动导入 ${data.imported} 张图片！`;
+                statsDiv.style.color = '#28a745';
+                setTimeout(() => {
+                    statsDiv.style.color = '#666';
+                }, 3000);
+            }
+            return data;
+        } catch (error) {
+            console.error('自动导入失败:', error);
+            return null;
+        }
+    }
+ 
