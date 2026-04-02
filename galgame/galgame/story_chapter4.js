@@ -1,6 +1,6 @@
 const chapter4 =[
-    {type: 'dialogue', speaker: '旁白', text: '你走进了校园里的一家咖啡店，想要点一杯咖啡提提神。'},
-    {type: 'dialogue', speaker: 'barista', text: "(面带微笑)Hi there! How's it going today?" },
+    {type: 'dialogue', speaker: 'Narration', text: 'You walked into a coffee shop on campus and wanted to order a cup of coffee to refresh yourself.'},
+    {type: 'dialogue', speaker: 'barista', text: "(With a smile on her face) Hi there! How's it going today?" },
     {type: 'choice',
         options :[
             {
@@ -80,7 +80,7 @@ const chapter4 =[
             }
         ]
     },
-    {type: 'dialogue', speaker: "旁白", text: "你在出杯台等了一会......"},
+    {type: 'dialogue', speaker: "Narration", text: "You waited at the counter for a bit..."},
     {type: "dialogue", speaker: "barista", text:"There you go! Have a good one!" },
     {type: "choice", 
         options: [
@@ -101,5 +101,5 @@ const chapter4 =[
             }
         ]
     },
-    {type: "dialogue", speaker: "旁白", text:"恭喜你完成了咖啡店的试炼！让我们复习一下今天的黄金句型：1. 打招呼：Good, thanks! How are you? 2.点单神器：Can I get a... / I'll have a... 3.报名字：It's [Name]. 4.告别神回复：You too!"}
+    {type: "dialogue", speaker: "Narration", text:"Congratulations on completing the coffee shop trial! Let's review today's golden phrases: 1. Greeting: Good, thanks! How are you? 2. Ordering magic: Can I get a... / I'll have a... 3. Introducing yourself: It's [Name]. 4. Farewell response: You too!"}
 ]
