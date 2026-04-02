@@ -278,16 +278,20 @@ function goToScenario(bgUrl, chapterData) {
 
 // 确保你的 startStory 函数是长这样的：
 function startStory(newChapterData) {
-    storyData = newChapterData; // 替换剧本
-    currentStep = 0;            // 进度条归零
-    homeScreen.classList.add('hidden'); // 隐藏大地图界面！
-    
-    // 【双重保险】：如果剧本的第一句话自带了 bg 属性，也让它生效
+    storyData = newChapterData;
+    currentStep = 0;
+    isPlayingTutorial = tutorialMode;
+
+    homeScreen.classList.add('hidden');
+    floor6Screen.classList.add('hidden');
+    dialogueBox.classList.remove('hidden');
+    optionsContainer.classList.add('hidden');
+
     if (storyData[0] && storyData[0].bg) {
         document.getElementById('bg-image').src = storyData[0].bg;
     }
-    
-    renderStep(); // 重新开始渲染剧情
+
+    renderStep();
 }
 
 // 绑定全局点击事件
