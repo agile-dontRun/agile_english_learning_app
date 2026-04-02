@@ -1,5 +1,5 @@
 const chapter1 = [
-    { type: 'dialogue', speaker: '旁白', text: '今天是开学第一天的 Campus Open Day。虽然我已经背了几万个单词，但真正面对全英文环境，手心还是直冒汗……', bg: "../frontend/assets/scene1/lobby1.jpg" },
+    { type: 'dialogue', speaker: 'Narration', text: '今天是开学第一天的 Campus Open Day。虽然我已经背了几万个单词，但真正面对全英文环境，手心还是直冒汗……', bg: "../frontend/assets/scene1/lobby1.jpg" },
     { type: 'dialogue', speaker: 'Karen', text: "Hey everyone! Welcome to the university! I'm Mr. Davis. You guys must be the fresh blood. How's everyone doing today?" },
     { type: 'dialogue', speaker: '系统提示', text: '导师突然看向了你，全场的目光聚焦在你身上。请作答！' },
     { 
@@ -47,6 +47,6 @@ const chapter1 = [
         ]
     },
     {type: "dialogue", speaker: 'Karen', text: '(笑着点头，竖起大拇指）That’s fantastic! Painting is a great way to relax, and practicing English with friends is exactly what we encourage here. I’m sure you’ll have a great time in our college.' },
-    {type: 'dialogue', speaker: '旁白', text: 'A few minutes later...' },
+    {type: 'dialogue', speaker: 'Narration', text: 'A few minutes later...' },
     {type: 'dialogue', speaker: 'Karen', text: "Alright everyone, It seems that everyone has arrived. Next, I will take you to visit our school.. Follow me!" },
 ]
