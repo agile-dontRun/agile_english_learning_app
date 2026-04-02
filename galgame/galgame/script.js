@@ -1,5 +1,8 @@
 // 第一章剧情数据结构
-let storyData =[].concat(chapter1, chapter2, chapter3);
+const prologueData = [].concat(chapter1, chapter2, chapter3);
+
+let storyData = [];
+let isPlayingTutorial = false;
 
 // 游戏状态变量
 let currentStep = 0;
