@@ -46,7 +46,7 @@ const chapter1 = [
             }
         ]
     },
-    {type: "dialogue", speaker: 'Karen', text: '(笑着点头，竖起大拇指）That’s fantastic! Painting is a great way to relax, and practicing English with friends is exactly what we encourage here. I’m sure you’ll have a great time in our college.' },
+    {type: "dialogue", speaker: 'Karen', text: '(Nodding with a smile and giving a thumbs up)That’s fantastic! Painting is a great way to relax, and practicing English with friends is exactly what we encourage here. I’m sure you’ll have a great time in our college.' },
     {type: 'dialogue', speaker: 'Narration', text: 'A few minutes later...' },
     {type: 'dialogue', speaker: 'Karen', text: "Alright everyone, It seems that everyone has arrived. Next, I will take you to visit our school.. Follow me!" },
 ]
