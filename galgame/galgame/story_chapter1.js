@@ -6,24 +6,24 @@ const chapter1 = [
         type: 'choice',
         options:[
             {
-                text: "A: 'Pretty good! Excited to be here.' (地道)",
+                text: "A: 'Pretty good! Excited to be here.'",
                 isCorrect: true,
                 response: "That's the spirit! ",
                 //score: 5
             },
             {
-                text: "B: 'I am fine, thank you, and you?' (课本机器英语)",
+                text: "B: 'I am fine, thank you, and you?'",
                 isCorrect: false,
-                mentorText: "Bzzzt! 警报！除非你刚从医院抢救回来，否则没人会像机器人一样说 'I am fine'。直接说 'Pretty good' 就行了！重来！"
+                mentorText: "Bzzzt! Alert! Unless you have just been rescued from the hospital, no one will say 'I am fine' like a robot. Just say 'Pretty good' directly! Start over!"
             },
             {
-                text: "C: 'My mood is very high today!' (中式直译)",
+                text: "C: 'My mood is very high today!'",
                 isCorrect: false,
-                mentorText: "Oh my god! 'High' 形容状态通常指你嗑药了！想表达心情好用 'Excited'。如果不想被保安带走，请立刻撤回这句话！"
+                mentorText: "Oh my god! 'High' Describing a state usually refers to you taking drugs! To express a good mood, use 'Excited'. If you don't want to be taken away by security, please retract this sentence immediately!"
             }
         ]
     },
-    //{ type: 'dialogue', speaker: '旁白', text: '（场景一顺利通过，你松了一口气，跟着队伍继续往前走……）' },
+    //{ type: 'dialogue', speaker: 'Narration', text: '（场景一顺利通过，你松了一口气，跟着队伍继续往前走……）' },
     { type: 'dialogue', speaker: 'Karen', text: "I love your energy. Next up, let's talk about your hobbies! What do you like to do in your free time? Who wants to be the first to share?" },
     { type: 'dialogue', speaker: 'Xiaowang', text: "Hi Karen, I'm Xiangwang. In my free time, I like to watch English movies and read international news. I hope I can improve my English and learn more about different cultures here, since it's an international college."},
     { type: 'dialogue', speaker: 'Karen', text: 'Wonderful choice! Watching movies is a great way to pick up daily English. Thank you, Xiangwang. Now, how about you? 【他的目光转向你，眼神温和，等待你的回答】What do you like to do in your free time?'},
