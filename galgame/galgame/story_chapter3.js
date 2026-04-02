@@ -2,12 +2,12 @@ const chapter3 = [
     {type: 'dialogue', speaker: 'Narration', text: 'You follow the teacher on the elevator to the sixth floor. The elevator door opens, and you see a blue lobby.', bg: '../frontend/assets/scene3/lobby3.jpg'},
     {type: 'dialogue', speaker: "Karen", text: "Welcome to the sixth floor! This is our student activity center, where we host various events and clubs. Let me show you around!"},
     {type: 'transition', images: ['../frontend/assets/scene3/gate.jpg', '../frontend/assets/scene3/corridor3.jpg'], timePerImage: 800},
-    {type: 'dialogue', speaker: 'Karen', text: "右手边是一个小沙发，大家可以在这里讨论作业，休息等等" , bg: '../frontend/assets/scene3/discussing_area.jpg'},
+    {type: 'dialogue', speaker: 'Karen', text: "On the right-hand side is a small sofa where everyone can discuss homework, rest, and more" , bg: '../frontend/assets/scene3/discussing_area.jpg'},
     {type: 'transition', images: ['../frontend/assets/scene3/corridor2.jpg',
     '../frontend/assets/scene3/seminor_room.jpg'],
     timePerImage: 800},
-    {type: 'dialogue', speaker: "Karen", text:"左手边是seminor room，我们经常在这里举办讲座和研讨会。", bg: '../frontend/assets/scene3/seminor_room.jpg'},
-    {type: 'dialogue', speaker: 'Narration', text:'The door of the Seminor room was ajar, revealing a crack that seemed to emit golden light .....', bg:'../frontend/assets/scene3/shining_seminor_room.png'},
+    {type: 'dialogue', speaker: "Karen", text:"On the left side is the seminar room, where we often host lectures and seminars.", bg: '../frontend/assets/scene3/seminor_room.jpg'},
+    {type: 'dialogue', speaker: 'Narration', text:'The door of the Seminar room was ajar, revealing a crack that seemed to emit golden light .....', bg:'../frontend/assets/scene3/shining_seminor_room.png'},
     {type: 'explore_choice',
         options:[
             {
@@ -23,17 +23,17 @@ const chapter3 = [
             }   
         ]},
         {type: 'transition', images: ['../frontend/assets/scene3/corridor2.jpg']},
-        {type: 'dialogue', speaker:"Karen", text:"继续往前走，左边可以看到是一个休息区，这里是学生聊天，吃饭的地方。", bg: '../frontend/assets/scene3/rest_area.jpg'},
-        {type: 'dialogue', speaker:"旁白", text:"你在这里四处走了走，看到这里有printer, water pool, coffee machine and water dispenser."},
+        {type: 'dialogue', speaker:"Karen", text:"Continue walking forward, and you can see a rest area on the left. This is where students chat and have meals.", bg: '../frontend/assets/scene3/rest_area.jpg'},
+        {type: 'dialogue', speaker:"Narration", text:"You walk around and see a printer, water fountain, coffee machine, and water dispenser."},
         {type: 'transition', images: ['../frontend/assets/scene3/printer.jpg',
         '../frontend/assets/scene3/water_pool.jpg',
         '../frontend/assets/scene3/coffee_machine.jpg',
         '../frontend/assets/scene3/water_dispenser.jpg'],
         timePerImage: 800},
         {type: 'dialogue', speaker:'Narration', text:'You follow the teacher and continue walking. At the end of the hallway, you see a conference room', bg:'../frontend/assets/scene3/classroom_gate.jpg'},
-        {type: 'dialogue', speaker: "Karen", text:"这里就将是你们今后经常来的教室啦， 你们的课程大部分都会在这里开展。"},
+        {type: 'dialogue', speaker: "Karen", text:"This will be the classroom where you will often come in the future, and most of your courses will be conducted here."},
         {type: 'dialogue', speaker: "Narration", text:"You pushed open the door and saw some students studying hard inside, afraid to make a sound, so you quickly came out.", bg:'../frontend/assets/scene3/classroom.jpg'},
         {type: 'transition', images:['../frontend/assets/scene3/corridor4.jpg', '../frontend/assets/scene3/lobby3.jpg'], timePerImage: 800},
-        {type: 'dialogue', speaker: "Karen", text:"好了，今天的参观就到这里了，时间不早了，祝大家在DIICSU有一个愉快的学习生活！食堂就在不远处，大家可以去吃饭了！",},
+        {type: 'dialogue', speaker: "Karen", text:"Alright, that's all for today's visit. It's getting late, and I wish everyone a pleasant learning experience at DIICSU! The cafeteria is not far away, everyone can go eat now!",},
 
 ]
