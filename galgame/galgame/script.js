@@ -241,12 +241,12 @@ async function markTutorialCompleted() {
 }
 
 // ================= 界面跳转与游戏启动逻辑 =================
-function startStory(newChapterData) {
-    storyData = newChapterData; 
-    currentStep = 0;            
-    homeScreen.classList.add('hidden'); 
-    renderStep();               
-}
+// function startStory(newChapterData) {
+//     storyData = newChapterData; 
+//     currentStep = 0;            
+//     homeScreen.classList.add('hidden'); 
+//     renderStep();               
+// }
 
 function goToFloor6() {
     homeScreen.classList.add('hidden');
@@ -290,7 +290,7 @@ function goToScenario(bgUrl, chapterData) {
 }
 
 // 确保你的 startStory 函数是长这样的：
-function startStory(newChapterData) {
+function startStory(newChapterData, tutorialMode = false) {
     storyData = newChapterData;
     currentStep = 0;
     isPlayingTutorial = tutorialMode;
@@ -299,7 +299,11 @@ function startStory(newChapterData) {
     floor6Screen.classList.add('hidden');
     dialogueBox.classList.remove('hidden');
     optionsContainer.classList.add('hidden');
+    mentorOverlay.classList.add('hidden');
+    mentorSprite.classList.add('hidden');
+    characterSprite.style.filter = "brightness(100%)";
 
+    // 如果剧本第一句带背景，优先生效
     if (storyData[0] && storyData[0].bg) {
         document.getElementById('bg-image').src = storyData[0].bg;
     }
