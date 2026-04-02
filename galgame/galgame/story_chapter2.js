@@ -8,7 +8,7 @@ const chapter2 = [
     timePerImage: 800  // 每张照片停留 800 毫秒 (0.8秒)，你可以调整这个数值控制走路的快慢
     },
     {type: 'dialogue', speaker: "Karen", text: "This is your English Classroom. You'll be having your morning readings and english classes here. So, don't be late!",  bg: "../frontend/assets/scene2/english_classroom.jpg"},
-    { type: 'dialogue', speaker: '旁白', text: '你想问问早读具体几点开始。' },
+    { type: 'dialogue', speaker: 'Narration', text: 'Do you want to ask specifically when morning reading starts.' },
     {type: "choice",
         options:[
             {
