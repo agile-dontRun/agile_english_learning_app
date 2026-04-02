@@ -1,9 +1,9 @@
 /* double.css */
 :root {
-    --mine-dirt: #2c3e50; /* 联机默认使用深色酷炫背景 */
-    --header-bg: #f9d860; 
-    --player-bg: #1a252f; 
-    --wood: #a1784f; 
+    --mine-dirt: #2c3e50; /* Default mine background color for multiplayer mode */
+    --header-bg: #f9d860;
+    --player-bg: #1a252f;
+    --wood: #a1784f;
 }
 
 body { margin: 0; padding: 0; font-family: 'Arial', 'Microsoft YaHei', sans-serif; background-color: var(--mine-dirt); color: #333; overflow: hidden; user-select: none; }
@@ -17,7 +17,7 @@ body { margin: 0; padding: 0; font-family: 'Arial', 'Microsoft YaHei', sans-seri
 
 .avatar { padding: 5px 15px; background: #3498db; color: white; border-radius: 20px; font-size: 20px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 .icon { width: 32px; height: 32px; display: inline-block; background-size: cover; border-radius: 5px; box-shadow: 0 2px 2px rgba(0,0,0,0.3); }
-.icon-money { background: #27ae60; } 
+.icon-money { background: #27ae60; }
 
 .center-panel { display: flex; flex-direction: column; align-items: center; }
 .vs-text { font-size: 36px; font-weight: 900; color: #e74c3c; text-shadow: 2px 2px 0 #fff; font-style: italic; }
@@ -28,12 +28,12 @@ body { margin: 0; padding: 0; font-family: 'Arial', 'Microsoft YaHei', sans-seri
 .controls-hint { position:absolute; top:150px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.4); font-weight:bold; font-size: 22px; letter-spacing: 2px; }
 canvas { width: 100%; height: 100%; display: block; }
 
-/* 答题面板样式 (复用单人) */
+/* Quiz modal styles (reused from single-player mode) */
 #quiz-modal {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 400px;
     background: var(--wood); background-image: repeating-linear-gradient(to bottom, #a88158, #a88158 1px, #a1784f 1px, #a1784f 5px);
     padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 10px #5a3c26;
-    border: 6px solid #5a3c26; z-index: 100; display: none; 
+    border: 6px solid #5a3c26; z-index: 100; display: none;
 }
 #quiz-modal.active { display: block; animation: popIn 0.3s ease-out; }
 #player-indicator { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
@@ -56,7 +56,7 @@ canvas { width: 100%; height: 100%; display: block; }
     20%, 40%, 60%, 80% { transform: translate(5px, 3px); }
 }
 
-/* 新增：倒计时样式 */
+/* Added countdown timer styles */
 .timer-box {
     font-size: 46px;
     font-weight: 900;
