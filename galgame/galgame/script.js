@@ -160,9 +160,9 @@ function handleChoice(option) {
         mentorSprite.classList.remove('hidden');
         characterSprite.style.filter = "brightness(30%)"; 
         
-        speakerName.innerText = '😎 口语导师';
+        speakerName.innerText = '😎 Oral Tutor';
         speakerName.style.color = '#FF6347'; 
-        dialogueText.innerText = option.mentorText + " (点击屏幕重新选择)";
+        dialogueText.innerText = option.mentorText + " (Click on the screen to select again)";
         avatarBox.classList.add('hidden');
         
         dialogueBox.onclick = resetFromMentor;
