@@ -50,16 +50,21 @@ async function initGame() {
 }
 
 // 渲染当前剧情步骤
-function renderStep() {
+async function renderStep() {
     // ================= 【修复核心：补回了缺失的 if 条件】 =================
     if (currentStep >= storyData.length) {
-        // 剧情结束了，隐藏对话界面，显示校园大地图！
         dialogueBox.classList.add('hidden');
-        characterSprite.classList.add('hidden'); 
+        characterSprite.classList.add('hidden');
         avatarBox.classList.add('hidden');
-        document.getElementById('bg-image').src = '../frontend/assets/home_page/home_bg.jpg';
-        homeScreen.classList.remove('hidden'); 
-        return; // 结束渲染
+
+        // 如果刚结束的是教程，就写数据库
+        if (isPlayingTutorial) {
+            await markTutorialCompleted();
+            isPlayingTutorial = false;
+        }
+
+        showHomeScreen();
+        return;
     }
     // ===================================================================
 
@@ -225,6 +230,26 @@ function handleExploreChoice(option) {
         storyData.splice(currentStep + 1, 0, ...option.subStory);
     }
     advanceStory();
+}
+
+async function markTutorialCompleted() {
+    try {
+        const res = await fetch('../api/complete_tutorial.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data.success) {
+            console.error('标记教程完成失败：', data.message);
+        }
+    } catch (err) {
+        console.error('标记教程完成失败：', err);
+    }
 }
 
 // ================= 界面跳转与游戏启动逻辑 =================
