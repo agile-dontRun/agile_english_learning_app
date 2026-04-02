@@ -5,6 +5,27 @@ import json
 import gzip
 import protocol
 import config
+import mysql.connector
+
+
+def save_speaking_record(user_id, session_id, user_text, ai_text, eval_payload):
+    db = mysql.connector.connect(host="localhost", user="", password="", database="english_learning_app")
+    cursor = db.cursor()
+    
+    # Retrieve scores from evaluation payload, defaulting to 0 if not present
+    overall = eval_payload.get('score', 0)
+    pron = eval_payload.get('pronunciation', 0)
+    fluency = eval_payload.get('fluency', 0)
+    
+    sql = """INSERT INTO user_speaking_attempts 
+             (user_id, session_id, user_text, ai_response, overall_score, pronunciation_score, fluency_score, evaluation_json) 
+             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+    
+    values = (user_id, session_id, user_text, ai_text, overall, pron, fluency, json.dumps(eval_payload))
+    cursor.execute(sql, values)
+    db.commit()
+    db.close()
+
 
 async def handle_client(frontend_ws, path):
     
