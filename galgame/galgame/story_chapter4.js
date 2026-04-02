@@ -26,17 +26,17 @@ const chapter4 =[
             {
                 text: "A: I want a latte.",
                 isCorrect: false,
-                mentorText:"虽然语法没错，但 \"I want\" 听起来稍微有点像小孩子在要糖果，略显生硬。"
+                mentorText:"Although the grammar is correct, 'I want' sounds a bit like a child asking for candy, slightly stiff."
             },
             {
                 text:"B: Can I get a large latte with oat milk, please?",
                 isCorrect: true,
-                response: "满分句型！点餐的神仙句型永远是 \"Can I get a...\" 或者 \"I'll have a...\"。加上 \"please\" 更是素质体现。你甚至一次性把大小（large）和奶类（oat milk）都说清楚了，效率极高！"
+                response: "Full marks sentence structure! The immortal sentence pattern for ordering is always \"Can I get a...\" or \"I\'ll have a...\". Adding \'please\' is even more a reflection of one\'s character. You even clearly stated the size and oat milk at once, which is extremely efficient!"
             },
             {
                 text: "C: Please give me one big coffee, no cow milk. ",
                 isCorrect: false,
-                mentorText: " \"Big coffee\" 勉强能听懂，但 \"no cow milk\"（不要牛奶）是什么鬼？直接说替代奶的名字就好啦，比如 oat milk（燕麦奶）, soy milk（豆奶）, almond milk（杏仁奶）。"
+                mentorText: " \"Big coffee\" can be barely understood, but what the hell is' no cow milk '? Just mention the names of alternative milk, such as oat milk, soy milk, and almond milk."
             }
         ]
     },
