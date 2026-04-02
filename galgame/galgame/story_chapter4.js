@@ -46,17 +46,17 @@ const chapter4 =[
             {
                 text: 'A: Take out, please.',
                 isCorrect: false,
-                mentorText:"\"Take out\" 通常用于中餐馆、披萨店点外卖带回家的食物。对于咖啡或者快餐，通常不这么说。"
+                mentorText:"\"Take out\" is usually used in Chinese restaurants and pizza shops to order takeout and take home food. For coffee or fast food, this is usually not the case."
             },
             {
                 text: "B: To go, please.",
                 isCorrect: true,
-                response: "标答！\"To go\" 是北美（美、加）最常用的表达。记住这个短语，走遍美国都不怕。"
+                response: "Perfect!\"To go \"is the most commonly used expression in North America (USA, Canada). Remember this phrase, you won't be afraid to travel all over America."
             },
             {
                 text: "C: Take away.",
                 isCorrect: true,
-                response: "正确！如果你设定在英国、澳大利亚或新西兰，\"Take away\" 是最地道的说法。根据你的留学目的地灵活切换吧！"
+                response: "Correct! If you're setting in the UK, Australia or New Zealand, \"Take away\" is the most authentic way to say it. Flexibly switch based on your study destination!"
             }
         ]
     },
