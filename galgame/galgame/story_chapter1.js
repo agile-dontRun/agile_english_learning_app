@@ -1,7 +1,7 @@
 const chapter1 = [
-    { type: 'dialogue', speaker: 'Narration', text: '今天是开学第一天的 Campus Open Day。虽然我已经背了几万个单词，但真正面对全英文环境，手心还是直冒汗……', bg: "../frontend/assets/scene1/lobby1.jpg" },
+    { type: 'dialogue', speaker: 'Narration', text: 'Today is Campus Open Day, the first day of school. Although I have memorized tens of thousands of words, when facing an all English environment, my palms still sweat profusely……', bg: "../frontend/assets/scene1/lobby1.jpg" },
     { type: 'dialogue', speaker: 'Karen', text: "Hey everyone! Welcome to the university! I'm Mr. Davis. You guys must be the fresh blood. How's everyone doing today?" },
-    { type: 'dialogue', speaker: '系统提示', text: '导师突然看向了你，全场的目光聚焦在你身上。请作答！' },
+    { type: 'dialogue', speaker: 'System Prompt', text: 'Karen suddenly looks at you, and everyone\'s attention is focused on you. Please answer!' },
     { 
         type: 'choice',
         options:[
