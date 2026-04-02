@@ -24,28 +24,14 @@ const floor6Screen = document.getElementById('floor6-screen');
 
 // 初始化游戏
 async function initGame() {
-    try {
-        const res = await fetch('../api/get_tutorial_status.php', {
-            credentials: 'include'
-        });
+    const data = await getTutorialStatus();
 
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (data.success && data.is_tutorial_completed) {
-            // 已完成教程，直接进主页
-            showHomeScreen();
-        } else {
-            // 未完成教程，开始序章
-            startStory(prologueData);
-        }
-    } catch (err) {
-        console.error('获取教程状态失败：', err);
-        // 出错时给一个兜底策略：默认先进序章
-        startStory(prologueData);
+    if (data.success && data.is_tutorial_completed) {
+        // 已完成教程：直接显示主页
+        showHomeScreen();
+    } else {
+        // 未完成教程：开始序章
+        startStory(prologueData, true);
     }
 }
 
