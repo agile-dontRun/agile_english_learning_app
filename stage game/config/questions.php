@@ -198,11 +198,17 @@ $allQuestions = [
     ]
 ];
 
+function getAllQuestions() {
+    global $allQuestions;
+    return $allQuestions;
+}
+
 function getRandomQuestions($allQuestions, $count = 8) {
     $questionsCopy = $allQuestions;
     shuffle($questionsCopy);
     return array_slice($questionsCopy, 0, $count);
 }
+
 
 $questions = getRandomQuestions($allQuestions, 8);
 
@@ -216,5 +222,5 @@ $endingMessages = [
     6 => '🏆 Excellent! The judges are impressed!',
     7 => '💫 Amazing! The crowd cheers for you!',
     8 => '🎭✨ Perfect! Outstanding performance! You\'re a star!',
-
 ];
+?>

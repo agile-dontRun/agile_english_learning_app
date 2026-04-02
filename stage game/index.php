@@ -2,59 +2,87 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
+session_start();
+
 require_once 'config/questions.php';
 require_once 'includes/session.php';
-
 initGameState();
+
+
+if (!isset($endingMessages)) {
+    $endingMessages = [
+        0 => '😢 Keep practicing! You\'ll do better next time!',
+        1 => '💪 Not bad! Keep working hard!',
+        2 => '👍 Room for improvement! Practice makes perfect!',
+        3 => '🎭 Good job! You have potential!',
+        4 => '🌟 Nice work! The audience appreciates you!',
+        5 => '🎉 Great! Your performance was well received!',
+        6 => '🏆 Excellent! The judges are impressed!',
+        7 => '💫 Amazing! The crowd cheers for you!',
+        8 => '🎭✨ Perfect! Outstanding performance! You\'re a star!',
+    ];
+}
+
+if (!isset($_SESSION['stage_state']['questions']) || ($_SESSION['stage_state']['reset_flag'] ?? false)) {
+    $allQuestionsData = getAllQuestions();
+    $_SESSION['stage_state']['questions'] = getRandomQuestions($allQuestionsData, 8);
+    $_SESSION['stage_state']['reset_flag'] = false;
+}
+
+$questions = $_SESSION['stage_state']['questions'];
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
     
-  if ($_POST['action'] === 'answer') {
-    $question_index = intval($_POST['question_index']);  
-    $answer = intval($_POST['answer']);
-    
-   
-    if (!isset($questions[$question_index])) {
+    if ($_POST['action'] === 'answer') {
+        $question_index = intval($_POST['question_index']);  
+        $answer = intval($_POST['answer']);
+        
+        if (!isset($questions[$question_index])) {
+            echo json_encode([
+                'success' => false,
+                'error' => 'Question not found at index: ' . $question_index
+            ]);
+            exit;
+        }
+        
+        $current_question = $questions[$question_index];
+        $is_correct = ($answer == $current_question['correct']);
+        
+        if ($is_correct) {
+            $_SESSION['stage_state']['correct_count']++;
+        }
+        
+        $_SESSION['stage_state']['answers'][$question_index] = $is_correct;
+        $_SESSION['stage_state']['current_question']++;
+        
+        $all_done = ($_SESSION['stage_state']['current_question'] >= 8);
+        
         echo json_encode([
-            'success' => false,
-            'error' => 'Question not found at index: ' . $question_index
+            'success' => true,
+            'is_correct' => $is_correct,
+            'correct_count' => $_SESSION['stage_state']['correct_count'],
+            'current_question' => $_SESSION['stage_state']['current_question'],
+            'all_done' => $all_done,
+            'explanation' => $current_question['explanation'],
+            'correct_answer' => $current_question['options'][$current_question['correct']]
         ]);
         exit;
     }
     
-    $current_question = $questions[$question_index];
-    $is_correct = ($answer == $current_question['correct']);
-    
-    if ($is_correct) {
-        $_SESSION['stage_state']['correct_count']++;
-    }
-    
-    $_SESSION['stage_state']['answers'][$question_index] = $is_correct;
-    $_SESSION['stage_state']['current_question']++;
-    
-    $all_done = ($_SESSION['stage_state']['current_question'] >= 8);
-    
-    echo json_encode([
-        'success' => true,
-        'is_correct' => $is_correct,
-        'correct_count' => $_SESSION['stage_state']['correct_count'],
-        'current_question' => $_SESSION['stage_state']['current_question'],
-        'all_done' => $all_done,
-        'explanation' => $current_question['explanation'],
-        'correct_answer' => $current_question['options'][$current_question['correct']]
-    ]);
-    exit;
-}
-
-    
     if ($_POST['action'] === 'reset') {
+        $allQuestionsData = getAllQuestions();
         $_SESSION['stage_state'] = [
             'current_question' => 0,
             'correct_count' => 0,
             'answers' => [],
             'game_active' => true,
-            'game_finished' => false
+            'game_finished' => false,
+            'questions' => getRandomQuestions($allQuestionsData, 8),
+            'reset_flag' => false
         ];
         echo json_encode(['success' => true]);
         exit;
@@ -62,14 +90,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     if ($_POST['action'] === 'get_question') {
         $index = intval($_POST['index']);
-        $question = $questions[$index];
-        echo json_encode([
-            'id' => $question['id'],
-            'question' => $question['question'],
-            'options' => $question['options'],
-            'current' => $index + 1,
-            'total' => 8
-        ]);
+        if (isset($questions[$index])) {
+            $question = $questions[$index];
+            echo json_encode([
+                'id' => $question['id'],
+                'question' => $question['question'],
+                'options' => $question['options'],
+                'current' => $index + 1,
+                'total' => 8
+            ]);
+        } else {
+            echo json_encode(['error' => 'Question not found']);
+        }
         exit;
     }
 }

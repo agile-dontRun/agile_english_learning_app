@@ -6,7 +6,9 @@ function initGameState() {
             'correct_count' => 0,
             'answers' => [],
             'game_active' => true,
-            'game_finished' => false
+            'game_finished' => false,
+            'reset_flag' => true  
         ];
     }
 }
+?>

@@ -343,6 +343,15 @@ body {
     }
 }
 
+#gifScoreText {
+    color: #ffd966;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: -7px;
+    text-shadow: 2px 2px 4px black;
+    text-align: center;
+}
 @media (max-width: 768px) {
     .game-container {
         padding: 15px;
