@@ -11,14 +11,14 @@ const chapter3 = [
     {type: 'explore_choice',
         options:[
             {
-                text: "A. 推开门",
+                text: "A. Push the door open.",
                 subStory:[
-                    {type:'dialogue', speaker:"旁白", text:"你突然感受到了一股神秘的力量，刺眼的光让你闭上眼睛"},
-                    {type:"dialogue", speaker:"旁白", text:"轰隆隆！一阵强烈的震动过后，你发现自己竟然穿越了！"},
-                    {type:'dialogue', speaker:"旁白", text:"恭喜解锁黄金矿工世界！"}
+                    {type:'dialogue', speaker:"Narration", text:"You suddenly feel a mysterious force, and the blinding light makes you close your eyes."},
+                    {type:"dialogue", speaker:"Narration", text:"BOOM! After a strong tremor, you find yourself having traveled through time!"},
+                    {type:'dialogue', speaker:"Narration", text:"Congratulations on unlocking the Golden Miner World!"}
                 ]
             },
-            {text:"B. 什么都不做，继续往前走。",
+            {text:"B. Do nothing and continue walking forward.",
                 subStory:[]
             }   
         ]},
