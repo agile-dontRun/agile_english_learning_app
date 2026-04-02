@@ -32,13 +32,13 @@ timePerImage: 800},
     {type: 'explore_choice',
         options:[
             {
-                text: "A. 看看英语角",
+                text: "A. Take a look at the English corner",
                 subStory:[
-                    {type:'dialogue', speaker:"Xiaowang", text:"这里放了一盒牌，好像可以玩，（目光看向你)来玩一下吧?", bg: "../frontend/assets/scene2/table.jpg"},
-                    {type:"dialogue", speaker:"旁白", text:"系统提示：解锁翻牌小游戏！"},
+                    {type:'dialogue', speaker:"Xiaowang", text:"Here's a box of cards, it seems like they can be played. (Looking at you) Can you play with them?", bg: "../frontend/assets/scene2/table.jpg"},
+                    {type:"dialogue", speaker:"Narration", text:"System prompt: Unlock the flip card game!"},
                 ]
             },
-            {text:"B. 算了，原地等着。",
+            {text:"B. Never mind, let's just wait here.",
                 subStory:[]
             }   
         ]
