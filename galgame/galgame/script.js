@@ -247,8 +247,10 @@ async function markTutorialCompleted() {
         if (!data.success) {
             console.error('标记教程完成失败：', data.message);
         }
+        return data;
     } catch (err) {
         console.error('标记教程完成失败：', err);
+        return { success: false };
     }
 }
 
