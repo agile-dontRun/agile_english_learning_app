@@ -32,17 +32,17 @@ const chapter1 = [
             {
                 text: "A: I like to do sports every day, I feel very happy when I play basketball.",
                 isCorrect: false,
-                mentorText: "Bzzzt! 警报！这是典型的“中式流水句”英语！虽然语法没大错，但 native speaker 不会这么生硬地拼接句子。正确的地道表达应该是 “I love doing sports every day—playing basketball makes me really happy.” 太刻板啦，重来！"
+                mentorText: "Bzzzt! Alert! This is a typical \"Chinese flowing sentence\" in English! Although the grammar is not a big mistake, a native speaker would not be so rigid in piecing together sentences. The correct authentic expression should be \"I love doing sports every day - playing basketball makes me really happy.\" It's too rigid, start over!"
             },
             {
                 text: "B: My hobby is very good, I often go to the library to read books.",
                 isCorrect: false,
-                mentorText:"Oh no! 你犯了“中式直译+逻辑混乱”的错误！“My hobby is very good” 完全不符合英文表达习惯——爱好没有“好坏”之分，不能用 good 形容；而且后半句和前半句衔接生硬。想表达喜欢去图书馆看书，直接说 “I often go to the library to read books in my free time.” 就好，别让老师误会你在说废话哦！重来！"
+                mentorText:"Oh no! You made a mistake of 'Chinese literal translation+logical confusion'! My hobby is very good \"is completely inconsistent with English expression habits - hobbies are not\" good \"or\" bad \", and cannot be described as good; And the connection between the second half and the first half is awkward. If you want to express your love for going to the library to read books in my free time, just say \"I often go to the library to read books in my free time.\" Don't let the teacher misunderstand that you are talking nonsense! Start over!"
             },
             {
                 text: "C: I’m really into painting and hanging out with friends—sometimes we practice speaking English together, which I think fits well with this college’s style.",
                 isCorrect: true,
-                response: "Perfect! 地道又贴合场景！“be into” 是 native speaker 常用的表达“喜欢”的短语，比 “like” 更自然；后半句提到和朋友练习英语，贴合邓迪国际学院的中外合作特点，既展示了爱好，又体现了对学院的期待。"
+                response: "Perfect! Authentic and suitable for the scene! 'be into' is a phrase commonly used by native speakers to express' like ', which is more natural than' like '; The latter half of the sentence mentions practicing English with friends, which is in line with the characteristics of Sino foreign cooperation at Dundee International College. It not only demonstrates hobbies but also reflects expectations for the college."
             }
         ]
     },
