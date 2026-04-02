@@ -12,14 +12,14 @@ const chapter2 = [
     {type: "choice",
         options:[
             {
-                text: "A: 'What time do we start in the morning?' (地道)",
+                text: "A: 'What time do we start in the morning?'",
                 isCorrect: true,
                 response: "Great job! This sentence is authentic spoken English—concise, direct and commonly used by native speakers to ask about morning reading start time, which fits the campus scene perfectly!"
             },
             {
                 text: "B: 'What time does the classroom open the door?'",
                 isCorrect: false,
-                mentorText: "Stop！在英语里询问‘几点开始上课’，极少说 'open the door'，这听起来像是你在问这个物理意义上的门几点解锁。直接问 'What time do we start?' 才最自然！重来！"
+                mentorText: "Stop！In English, when asking 'what time does class start', it is rare to say 'open the door', which sounds like you are asking what time the physical door is unlocked. What time do we start? It's the most natural! Start over!"
             }
         ]
     },
