@@ -66,17 +66,17 @@ const chapter4 =[
             {
                 text: "A: My name is Li Ming. Sweep you or you sweep me?",
                 isCorrect: false,
-                mentorText: "哈哈哈哈！中国留学生经典名场面！\"Sweep\" 是用扫帚扫地，绝对不能用来翻译“扫码”！国外一般没有支付宝/微信的扫码支付。如果是扫条形码，那是 \"Scan\"。但买咖啡直接说刷卡（pay by card）或 Apple Pay 就行了。"
+                mentorText: "Ha ha ha ha! Classic scene of Chinese international students \'Sweep' is used to sweep the floor with a broom and should never be translated as' scan code '! Generally, there is no code scanning payment of Alipay/WeChat abroad. If it's scanning a barcode, then it's' Scan '. But just say pay by card or Apple Pay when buying coffee."
             },
             {
                 text: "B: It's Li Ming. I'll pay by card.",
                 isCorrect: true,
-                response:"非常自然！报名字时用 \"It's [名字]\" 比 \"My name is [名字]\" 要口语化得多。"
+                response:"Very natural! When introducing your name, using \"It's [Name]\" is much more conversational than \"My name is [Name]\"."
             },
             {
                 text: "C: I am Li Ming. Here is money.",
                 isCorrect: false,
-                mentorText: "\"Here is the money\" 听起来像黑帮在进行非法交易。如果给现金，直接递过去说 \"Here you go\" 就行啦。"
+                mentorText: "\"Here is the money\" sounds like a gangster conducting an illegal transaction. If giving cash, just hand it over and say \"Here you go\"."
             }
         ]
     },
