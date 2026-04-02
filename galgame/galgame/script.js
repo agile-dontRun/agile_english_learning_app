@@ -48,7 +48,7 @@ function renderStep() {
         dialogueText.innerText = currentData.text;
         
         // 自动更换头像
-        if (currentData.speaker === '旁白' || currentData.speaker === '系统提示') {
+        if (currentData.speaker === 'Narration' || currentData.speaker === 'System Prompt') {
             avatarBox.classList.add('hidden');
             characterSprite.classList.add('hidden'); 
         } else {
