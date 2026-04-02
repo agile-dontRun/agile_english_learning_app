@@ -85,19 +85,19 @@ const chapter4 =[
     {type: "choice", 
         options: [
             {
-                text:"（低着头，拿了咖啡一言不发飞速逃离现场。）",
+                text:"（With his head down, he grabbed his coffee and quickly fled the scene without saying a word",
                 isCorrect: false,
-                mentorText:"社恐犯了是不是？但一声不吭拿了就跑非常不礼貌哦。勇敢点，眼神交流是自信的开始！"
+                mentorText:"Have you committed social anxiety? But it's very impolite to run away without saying a word. Be brave, eye contact is the beginning of confidence!"
             },
             {
                 text:"You too! Thanks!",
                 isCorrect: true,
-                response: "通关大吉！别人祝你 \"Have a good one / Have a nice day\"，最完美、最下意识的回复就是 \"You too! (你也是)\"。再加上一句 Thanks，你已经是个完美的 local (本地人) 了！"
+                response: "Good luck in clearing customs! Others wish you 'Have a good one/Have a nice day', and the most perfect and subconscious response is' You too! 'Adding a thank you, you are already a perfect local!"
             },
             {
                 text: "Bye, bye.",
                 isCorrect: true,
-                response: "\"Bye bye\" 稍微有点幼稚，通常是小孩子或者情侣之间说得多。成年人之间用 \"Bye\", \"See ya\" 或者 \"You too\" 会更加成熟自然."
+                response: "\'bye bye' is a bit childish, usually used by children or couples who talk too much. Using 'bye', 'see ya' or 'you too' among adults will be more mature and natural."
             }
         ]
     },
