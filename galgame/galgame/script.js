@@ -60,9 +60,13 @@ function renderStep() {
                 characterSprite.src = '../frontend/assets/karen.png';
             } else if (currentData.speaker === 'Xiaowang') {
                 characterSprite.classList.remove('hidden'); 
+                avatarImg.src = '../frontend/assets/XiaoWang.png';
+                characterSprite.src = '../frontend/assets/XiaoWang.png';
+            } else if(currentData.speaker === "barista") {
+                characterSprite.classList.remove('hidden');
                 avatarImg.src = '../frontend/assets/coffee_maker.png';
                 characterSprite.src = '../frontend/assets/coffee_maker.png';
-            } else {
+            }else {
                 // 玩家自己说话时隐藏立绘
                 characterSprite.classList.add('hidden');
                 avatarImg.src = '../frontend/assets/player.jpg'; 
@@ -218,6 +222,29 @@ function launchGame(gameName) {
     } else if (gameName === 'match') {
         alert("跳转接口已准备好！日后在这里跳转到 翻牌对战");
     }
+}
+
+// ================= 新增：万能场景跳转函数 =================
+function goToScenario(bgUrl, chapterData) {
+    // 1. 强制把底层的背景图，换成你指定的场景图
+    document.getElementById('bg-image').src = bgUrl;
+    
+    // 2. 调用已有的 startStory 函数，加载对应的剧本并开始播放
+    startStory(chapterData);
+}
+
+// 确保你的 startStory 函数是长这样的：
+function startStory(newChapterData) {
+    storyData = newChapterData; // 替换剧本
+    currentStep = 0;            // 进度条归零
+    homeScreen.classList.add('hidden'); // 隐藏大地图界面！
+    
+    // 【双重保险】：如果剧本的第一句话自带了 bg 属性，也让它生效
+    if (storyData[0] && storyData[0].bg) {
+        document.getElementById('bg-image').src = storyData[0].bg;
+    }
+    
+    renderStep(); // 重新开始渲染剧情
 }
 
 // 绑定全局点击事件
