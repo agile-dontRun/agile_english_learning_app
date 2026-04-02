@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Emma English Speaking</title>
+  <style> 
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background: #f4f7f6;}
+    #chat { height: 400px; border: 1px solid #ccc; padding: 15px; overflow-y: auto; margin-bottom: 20px; background: white; border-radius: 8px; }
+    .msg { margin: 10px 0; padding: 10px 15px; border-radius: 18px; max-width: 80%; line-height: 1.5; }
+    .user { background: #007bff; color: white; align-self: flex-end; margin-left: auto; border-bottom-right-radius: 2px;}
+    .ai { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px;}
+    button { padding: 10px 20px; font-size: 16px; border: none; border-radius: 20px; cursor: pointer; color: white;}
+    #startBtn { background-color: #28a745; }
+    #endBtn { background-color: #dc3545; }
+    #status { margin-top: 10px; color: #666; font-weight: bold;}
+  </style>
+</head>
+<body>
+<h2>Practice English Speaking with AI Teacher Emma</h2>
+  <div id="chat"></div>
+  <button id="startBtn">🎤 Start </button>
+  <button id="endBtn" style="display:none">🛑 End Conversation</button>
+  <div id="status">Ready...</div>
+
+  <script>
+ 
+    const SERVER_URL = 'ws://8.162.9.154:8082'; 
+
+    let ws = null;
+    let audioContext, playbackContext, mediaStream, processor;
+    let isRecording = false;
+
+    // 1.5 second buffer for PCM data, enough for 24000 samples at 16kHz
+    let pcmAccumulator = new Int16Array(48000); 
+    let pcmCount = 0;
+    const SEND_THRESHOLD = 24000; 
+
+    function connectWS() {
+      ws = new WebSocket(SERVER_URL);
+      ws.binaryType = 'arraybuffer';
+
+      ws.onopen = () => {
+        document.getElementById('status').innerHTML = '🟢 Connected to server, calling Emma...';
+        // Connection established, start recording after a short delay to ensure server is ready
+        setTimeout(startRecording, 1000);
+      };
+
+      ws.onmessage = (event) => {
+        if (event.data instanceof ArrayBuffer) {
+          playAIResponse(event.data);
+        } else {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.error) {
+               document.getElementById('status').innerHTML = '❌ ' + msg.error;
+               return;
+            }
+            handleServerEvent(msg);
+          } catch (e) { console.error('Failed to parse message:', e); }
+        }
+      };
+      ws.onclose = () => stopEverything();
+    }
+
+  
+
+    // Add a global variable to track the next available play time for AI responses
+    let nextPlayTime = 0;
+
+    function playAIResponse(binaryData) {
+      if (!playbackContext) {
+        playbackContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        nextPlayTime = playbackContext.currentTime; 
+      }
+      
+      const int16 = new Int16Array(binaryData);
+      const float32 = new Float32Array(int16.length);
+      for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 32768.0;
+      
+      const buffer = playbackContext.createBuffer(1, float32.length, 24000);
+      buffer.copyToChannel(float32, 0);
+      
+      const source = playbackContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(playbackContext.destination);
+      
+    // 🔧 Core fix: If the scheduled play time has fallen behind the current time, reset it to current time
+    if (nextPlayTime < playbackContext.currentTime) {
+        nextPlayTime = playbackContext.currentTime;
+    }
+    
+    // 🔧 Queue playback in order, never overlap!
+    source.start(nextPlayTime);
+    // Update the next play time (current play time + duration of this audio segment)
+      nextPlayTime += buffer.duration;
+    }
+
+    function stopEverything() {
+      isRecording = false;
+      if (ws) ws.close();
+      if (processor) processor.disconnect();
+      if (audioContext && audioContext.state !== 'closed') audioContext.close();
+      if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+      document.getElementById('startBtn').style.display = 'inline-block';
+      document.getElementById('endBtn').style.display = 'none';
+      document.getElementById('status').innerHTML = '✅ Conversation ended. Ready to start again.';
+    }
+
+    document.getElementById('startBtn').onclick = () => {
+      document.getElementById('chat').innerHTML = ''; 
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('endBtn').style.display = 'inline-block';
+      connectWS();
+    };
+    document.getElementById('endBtn').onclick = stopEverything;
+
+    function appendChat(text, role) {
+      const chatBox = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = 'msg ' + role;
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
