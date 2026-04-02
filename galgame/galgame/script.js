@@ -254,6 +254,19 @@ function launchGame(gameName) {
     }
 }
 
+function showHomeScreen() {
+    dialogueBox.classList.add('hidden');
+    optionsContainer.classList.add('hidden');
+    characterSprite.classList.add('hidden');
+    avatarBox.classList.add('hidden');
+    mentorOverlay.classList.add('hidden');
+    mentorSprite.classList.add('hidden');
+    floor6Screen.classList.add('hidden');
+
+    document.getElementById('bg-image').src = '../frontend/assets/home_page/home_bg.jpg';
+    homeScreen.classList.remove('hidden');
+}
+
 // ================= 新增：万能场景跳转函数 =================
 function goToScenario(bgUrl, chapterData) {
     // 1. 强制把底层的背景图，换成你指定的场景图
