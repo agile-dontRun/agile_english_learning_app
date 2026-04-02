@@ -6,17 +6,17 @@ const chapter4 =[
             {
                 text: "A: I am fine, thank you, and you?",
                 isCorrect: false,
-                mentorText:"快停止背诵初中英语课本！在真实的日常交流中，几乎没有人会用这句标准的“机器人回复”。它听起来太正式且生硬了。"
+                mentorText:"Stop reciting junior high school English textbooks quickly! In real daily communication, almost no one would use the standard phrase 'robot reply'. It sounds too formal and stiff."
             },
             {
                 text: "B: Give me coffee, please.",
                 isCorrect: false,
-                mentorText:"太粗鲁了！英语国家非常看重日常礼貌（Politeness）。直接用祈使句 \"Give me...\" 听起来像是在抢劫咖啡店。"
+                mentorText:"Too rude! English-speaking countries highly value daily politeness (Politeness). Using the imperative sentence \"Give me...\" sounds like robbing the coffee shop."
             },
             {
                 text:"C: Good, thanks! How are you?",
                 isCorrect: true,
-                response: "完美！\"Good, thanks\" 或者 \"Not bad\" 是最地道、最放松的回答，同时反问一句 \"How are you?\" 能瞬间拉近距离。"
+                response: "Perfect! \"Good, thanks\" or \"Not bad\" is the most authentic and relaxed response, and asking \"How are you?\" in return instantly closes the gap between you."
             }
         ]      
     },
