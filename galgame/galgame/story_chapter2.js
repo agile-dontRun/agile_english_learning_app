@@ -43,5 +43,5 @@ timePerImage: 800},
             }   
         ]
     },
-        { type: 'dialogue', speaker: 'Karen', text: "这是我们的一楼，接下来带大家去六楼参观一下.", bg:"../frontend/assets/scene2/english_corner.jpg" },
+        { type: 'dialogue', speaker: 'Karen', text: "This is our first floor. Next, we will take you to visit the sixth floor", bg:"../frontend/assets/scene2/english_corner.jpg" },
 ]
