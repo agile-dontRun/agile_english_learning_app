@@ -262,16 +262,35 @@ body {
 }
 
 .interactive-zone {
-    flex: 1; height: 100%; cursor: pointer;
-    display: flex; justify-content: center; align-items: center;
-    transition: background 0.3s;
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.28s ease;
 }
-.interactive-zone:hover { background: rgba(135, 206, 235, 0.4); }
+
+.interactive-zone:hover {
+    background: rgba(135, 206, 235, 0.18);
+}
+
 .zone-text {
-    color: white; font-size: 32px; font-weight: bold; text-align: center;
-    text-shadow: 2px 2px 8px #000; opacity: 0; transition: opacity 0.3s;
+    color: white;
+    font-size: 32px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.35;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.interactive-zone:hover .zone-text { opacity: 1; }
+
+.interactive-zone:hover .zone-text {
+    opacity: 1;
+    transform: translateY(0);
+}
 .disabled { cursor: not-allowed; }
 .disabled:hover { background: rgba(0, 0, 0, 0.5); }
 
