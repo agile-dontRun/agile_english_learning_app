@@ -48,7 +48,7 @@ function renderStep() {
         dialogueText.innerText = currentData.text;
         
         // 自动更换头像
-        if (currentData.speaker === '旁白' || currentData.speaker === '系统提示') {
+        if (currentData.speaker === 'Narration' || currentData.speaker === 'System Prompt') {
             avatarBox.classList.add('hidden');
             characterSprite.classList.add('hidden'); 
         } else {
@@ -160,9 +160,9 @@ function handleChoice(option) {
         mentorSprite.classList.remove('hidden');
         characterSprite.style.filter = "brightness(30%)"; 
         
-        speakerName.innerText = '😎 口语导师';
+        speakerName.innerText = '😎 Oral Tutor';
         speakerName.style.color = '#FF6347'; 
-        dialogueText.innerText = option.mentorText + " (点击屏幕重新选择)";
+        dialogueText.innerText = option.mentorText + " (Click on the screen to select again)";
         avatarBox.classList.add('hidden');
         
         dialogueBox.onclick = resetFromMentor;
