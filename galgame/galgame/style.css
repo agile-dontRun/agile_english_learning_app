@@ -136,9 +136,51 @@ body {
 }
 
 /* ================= 新增补回来的：选项面板样式 ================= */
-#options-container { position: absolute; top: 25%; left: 10%; width: 80%; z-index: 40; display: flex; flex-direction: column; gap: 15px; }
-.option-btn { background: rgba(255, 255, 255, 0.95); border: 3px solid #333; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: left; }
-.option-btn:hover { background: #87CEEB; color: white; border-color: #fff; transform: scale(1.02); }
+#options-container {
+    position: absolute;
+    top: 20%;
+    left: 8%;
+    width: 84%;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.option-btn {
+    background: linear-gradient(
+        to right,
+        rgba(255,255,255,0.96),
+        rgba(244,248,252,0.95)
+    );
+    border: 2px solid rgba(40, 55, 75, 0.35);
+    color: #142235;
+    padding: 18px 20px;
+    font-size: 19px;
+    line-height: 1.5;
+    font-weight: 700;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    text-align: left;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.option-btn:hover {
+    background: linear-gradient(
+        to right,
+        #87CEEB,
+        #b8ecff
+    );
+    color: #0b1c2c;
+    border-color: #ffffff;
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: 0 14px 24px rgba(0,0,0,0.22);
+}
+
+.option-btn:active {
+    transform: scale(0.99);
+}
 
 /* 辅助类 */
 .hidden { display: none !important; }
