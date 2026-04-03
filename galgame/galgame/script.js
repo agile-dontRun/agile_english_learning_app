@@ -66,7 +66,11 @@ function renderStep() {
                 characterSprite.classList.remove('hidden');
                 avatarImg.src = '../frontend/assets/coffee_maker.png';
                 characterSprite.src = '../frontend/assets/coffee_maker.png';
-            }else {
+            } else if (currentData.speaker === "canteen server") {
+                characterSprite.classList.remove('hidden');
+                avatarImg.src = '../frontend/assets/chef.png';
+                characterSprite.src = '../frontend/assets/chef.png';
+            } else {
                 // 玩家自己说话时隐藏立绘
                 characterSprite.classList.add('hidden');
                 avatarImg.src = '../frontend/assets/player.jpg'; 
@@ -218,7 +222,8 @@ function goToHome() {
 
 function launchGame(gameName) {
     if (gameName === 'miner') {
-        alert("跳转接口已准备好！日后在这里跳转到 词汇矿工大对决");
+        //alert("跳转接口已准备好！日后在这里跳转到 词汇矿工大对决");
+        window. location. href = 'mining_index. php';
     } else if (gameName === 'match') {
         alert("跳转接口已准备好！日后在这里跳转到 翻牌对战");
     }
