@@ -34,3 +34,10 @@ try {
         'success' => true,
         'is_tutorial_completed' => (bool)$user['is_tutorial_completed']
     ]);
+
+    } catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => '服务器错误：' . $e->getMessage()
+    ]);
+}
