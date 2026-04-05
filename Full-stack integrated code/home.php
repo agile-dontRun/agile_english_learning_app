@@ -209,6 +209,7 @@ $month_name = date('F Y');
         .dropdown-menu li a { color: #e0e0e0 !important; padding: 15px 20px; text-transform: none; display: block; font-weight: 400; height: auto; text-shadow: none; letter-spacing: 0.5px;}
         .dropdown-menu li a:hover { background-color: var(--oxford-blue) !important; color: var(--white) !important; padding-left: 25px; }
         .navbar-links li:hover .dropdown-menu, .dropdown:hover .dropdown-menu { display: block; }
+}
 
         .navbar-right { display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; position: relative; }
         .user-avatar-img, .user-avatar-placeholder { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--oxford-gold); object-fit: cover; }
@@ -303,6 +304,7 @@ $month_name = date('F Y');
 </head>
 <body>
 
+  
     <nav class="navbar">
         <div class="navbar-left">
             <a href="home.php"><img src="college_logo.png" alt="Spires Academy Logo" class="college-logo"></a>
@@ -343,6 +345,25 @@ $month_name = date('F Y');
         <p>Pursue Excellence, Cultivate Eloquence, and Maintain Intellectual Rigor.</p>
     </header>
 
+    <main class="main-container">
+        <section class="tasks-section">
+            <div class="section-header"><h2>Today's Academic Objectives</h2></div>
+            <div class="task-card">
+                <div class="task-icon">🎧</div>
+                <div class="task-info"><h3>Listening</h3><p>Practice Part 3: Multiple Choice & Table Completion based on academic lectures.</p></div>
+                <div class="task-action"><a href="listening.php" class="btn-go">Begin Task</a></div>
+            </div>
+            <div class="task-card">
+                <div class="task-icon">📖</div>
+                <div class="task-info"><h3>Reading</h3><p>Analyze scholarly articles, extract core arguments, and improve comprehension speed.</p></div>
+                <div class="task-action"><a href="reading.php" class="btn-go">Begin Task</a></div>
+            </div>
+            <div class="task-card">
+                <div class="task-icon">🗣️</div>
+                <div class="task-info"><h3>Speaking</h3><p>Complete a 5-minute academic conversation and receive immediate scoring and feedback.</p></div>
+                <div class="task-action"><a href="emma_server/speakAI.php" class="btn-go">Begin Task</a></div>
+            </div>
+        </section>
    
        
 
