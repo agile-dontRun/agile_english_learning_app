@@ -13,11 +13,167 @@ require_once 'db_connect.php';
 $user_id = $_SESSION['user_id'];
 $today = date('Y-m-d');
 
+// ==========================================
+// A. Retrieve user profile (for navbar avatar)
+// ==========================================
+$username = ''; $nickname = 'Student'; $db_avatar = '';
+$stmt = $conn->prepare("SELECT username, nickname, avatar_url FROM users WHERE user_id = ?");
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $user_data = $stmt->get_result()->fetch_assoc();
+    if ($user_data) {
+        $username = $user_data['username'];
+        $nickname = !empty($user_data['nickname']) ? $user_data['nickname'] : $username;
+        $db_avatar = $user_data['avatar_url'];
+    }
+    $stmt->close();
+}
+
+$avatar_html = '';
+$first_letter = strtoupper(substr($username ? $username : 'U', 0, 1));
+if (!empty($db_avatar)) {
+    $avatar_html = '<img src="' . htmlspecialchars($db_avatar) . '" alt="Avatar" class="user-avatar-img" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
+    $avatar_html .= '<div class="user-avatar-placeholder" style="display:none;">' . htmlspecialchars($first_letter) . '</div>';
+} else {
+    $avatar_html = '<div class="user-avatar-placeholder">' . htmlspecialchars($first_letter) . '</div>';
+}
+
+// ==========================================
+// B. Retrieve user's Calendar ID
+// ==========================================
+$calendar_id = null;
+$cal_stmt = $conn->prepare("SELECT calendar_id FROM checkin_calendars WHERE user_id = ?");
+if ($cal_stmt) {
+    $cal_stmt->bind_param("i", $user_id);
+    $cal_stmt->execute();
+    $cal_res = $cal_stmt->get_result()->fetch_assoc();
+    if ($cal_res) $calendar_id = $cal_res['calendar_id'];
+    $cal_stmt->close();
+}
+
+if (!$calendar_id) {
+    $ins_cal = $conn->prepare("INSERT INTO checkin_calendars (user_id) VALUES (?)");
+    if ($ins_cal) {
+        $ins_cal->bind_param("i", $user_id);
+        $ins_cal->execute();
+        $calendar_id = $ins_cal->insert_id;
+        $ins_cal->close();
+    }
+}
+
+// ==========================================
+// C. Check today's check-in status and monthly records
+// ==========================================
+$isCheckedInToday = false;
+$checked_days = [];
+
+if ($calendar_id) {
+    $checkin_stmt = $conn->prepare("SELECT COUNT(*) FROM daily_checkin_records WHERE calendar_id = ? AND checkin_date = ?");
+    if ($checkin_stmt) {
+        $checkin_stmt->bind_param("is", $calendar_id, $today);
+        $checkin_stmt->execute();
+        if ($checkin_stmt->get_result()->fetch_row()[0] > 0) $isCheckedInToday = true;
+        $checkin_stmt->close();
+    }
+
+    $month = date('m'); $year = date('Y');
+    $month_stmt = $conn->prepare("SELECT DAY(checkin_date) as d FROM daily_checkin_records WHERE calendar_id = ? AND MONTH(checkin_date) = ? AND YEAR(checkin_date) = ?");
+    if ($month_stmt) {
+        $month_stmt->bind_param("iii", $calendar_id, $month, $year);
+        $month_stmt->execute();
+        $res_chk = $month_stmt->get_result();
+        while($r = $res_chk->fetch_assoc()) { $checked_days[] = $r['d']; }
+        $month_stmt->close();
+    }
+}
+
+$year = date('Y');
+$month = date('m');
+$days_in_month = date('t', strtotime("$year-$month-01"));
+$first_day_of_month = date('w', strtotime("$year-$month-01")); 
+$month_name = date('F Y');
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
+        /* ===== 页脚 ===== */
+        .footer { background-color: var(--oxford-blue); color: var(--white); padding: 60px 40px 30px; margin-top: 60px; border-top: 5px solid var(--oxford-gold); }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; margin-bottom: 30px; }
+        .footer-about h3 { color: var(--oxford-gold); font-size: 1.8rem; margin-top: 0; }
+        .footer-about p { font-family: 'Lora', serif; font-size: 15px; line-height: 1.8; opacity: 0.8; }
+        .footer-links h4 { color: var(--white); font-size: 1.2rem; margin-top: 0; letter-spacing: 1px; text-transform: uppercase; }
+        .footer-links ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .footer-links a { color: #aaa; text-decoration: none; transition: 0.3s; font-size: 15px; }
+        .footer-links a:hover { color: var(--oxford-gold); }
+        .footer-bottom { text-align: center; font-size: 13px; opacity: 0.6; font-family: 'Playfair Display', serif; letter-spacing: 1px; }
+
+        @media (max-width: 1024px) { .main-container, .footer-content, .academic-notice { grid-template-columns: 1fr; flex-direction: column; text-align: center; } .btn-notice { margin-top: 20px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="home.php"><img src="college_logo.png" alt="Spires Academy Logo" class="college-logo"></a>
+            <ul class="navbar-links">
+               <li><a href="#" style="color:var(--oxford-gold);">Home</a></li>
+                <li class="dropdown">
+                    <a href="#">Study ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="listening.php">Listening</a></li>
+                        <li><a href="reading.php">Reading</a></li>
+                        <li><a href="emma_server/speakAI.php">Speaking</a></li>
+                        <li><a href="writing.php">Writing</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Games ▾</a>
+                    <ul class="dropdown-menu"><li><a href="galgame/galgame/index.html">Story game</a></li></ul>
+                </li>
+                <li><a href="forum.php">Community</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right dropdown">
+            <?php echo $avatar_html; ?>
+            <span style="font-size:14px; font-weight:600; color:#e0e0e0;"><?php echo htmlspecialchars($nickname); ?> ▾</span>
+            <ul class="dropdown-menu" style="right:0; left:auto; margin-top:0; min-width:220px;">
+                <li style="padding: 20px; background: #f8fafc; cursor:default;">
+                    <div style="color:var(--text-light); font-size:12px; margin-bottom:5px;">Signed in as</div>
+                    <div style="color:var(--oxford-blue); font-weight:bold; font-size:16px;"><?php echo htmlspecialchars($nickname); ?></div>
+                </li>
+                <li><a href="profile.php">My Profile</a></li>
+                <li><a href="logout.php" style="color:#dc3545 !important; font-weight: 600;">Sign Out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Spires Academy</h1>
+        <p>Pursue Excellence, Cultivate Eloquence, and Maintain Intellectual Rigor.</p>
+    </header>
+
+    <main class="main-container">
+        <section class="tasks-section">
+            <div class="section-header"><h2>Today's Academic Objectives</h2></div>
+            <div class="task-card">
+                <div class="task-icon">🎧</div>
+                <div class="task-info"><h3>Listening</h3><p>Practice Part 3: Multiple Choice & Table Completion based on academic lectures.</p></div>
+                <div class="task-action"><a href="listening.php" class="btn-go">Begin Task</a></div>
+            </div>
+            <div class="task-card">
+                <div class="task-icon">📖</div>
+                <div class="task-info"><h3>Reading</h3><p>Analyze scholarly articles, extract core arguments, and improve comprehension speed.</p></div>
+                <div class="task-action"><a href="reading.php" class="btn-go">Begin Task</a></div>
+            </div>
+            <div class="task-card">
+                <div class="task-icon">🗣️</div>
+                <div class="task-info"><h3>Speaking</h3><p>Complete a 5-minute academic conversation and receive immediate scoring and feedback.</p></div>
+                <div class="task-action"><a href="emma_server/speakAI.php" class="btn-go">Begin Task</a></div>
+            </div>
+        </section>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Spires Academy</title>
