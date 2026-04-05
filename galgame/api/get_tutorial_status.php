@@ -8,3 +8,4 @@ if (!isset($_SESSION['user_id'])) {
     ]);
     exit;
 }
+$userId = $_SESSION['user_id'];
