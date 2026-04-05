@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna Academic Writing - Demo</title>
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --dark-blue: #1E3A8A;
+            --light-bg: #F8FAFC;
+            --text-main: #1E293B;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* 顶部导航 */
+        .nav {
+            height: 60px; background: white;
+            display: flex; align-items: center; padding: 0 40px;
+            border-bottom: 1px solid #E2E8F0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .nav-brand { font-weight: 800; color: var(--primary-blue); font-size: 20px; letter-spacing: -0.5px; }
+
+        /* 主容器：左右分栏 */
+        .main-wrapper {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* 左侧：一人高 Luna 老师区域 (45%) */
+        .luna-panel {
+            flex: 0 0 45%;
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            color: white;
+        }
+
+        .luna-avatar {
+            font-size: 350px; /* 巨型形象 */
+            line-height: 1;
+            margin-bottom: -20px;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.4));
+            user-select: none;
+        }
+
+        .luna-speech-bubble {
+            position: absolute;
+            top: 60px; left: 40px; right: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 24px;
+            font-size: 18px;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* 右侧：写作工作区 */
+        .editor-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            padding: 50px;
+            box-sizing: border-box;
+        }
+
+        .topic-card {
+            background: #EFF6FF;
+            border-left: 6px solid var(--primary-blue);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .topic-title { font-weight: 700; font-size: 20px; color: var(--dark-blue); margin-bottom: 8px; }
+        .topic-content { font-size: 16px; color: #334155; line-height: 1.5; }
+
+        .writing-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            flex: 1;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+            font-family: 'Georgia', serif; /* 学术感字体 */
+            resize: none;
+            outline: none;
+            transition: all 0.3s;
+            background: #FCFDFF;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
+        }
+
+        .editor-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats { color: #64748B; font-size: 14px; font-weight: 500; }
+
+        .btn-group { display: flex; gap: 12px; }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            font-size: 15px;
+        }
+
+        .btn-secondary { background: #F1F5F9; color: #475569; }
+        .btn-secondary:hover { background: #E2E8F0; }
+
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); }
+
+        /* 模拟评分结果弹窗 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal {
+            background: white; width: 90%; max-width: 600px;
+            padding: 40px; border-radius: 24px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="nav-brand">LUNA ACADEMIC</div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="luna-panel">
+            <div class="luna-speech-bubble" id="luna-msg">
+                你好！我是你的学术写作导师 Luna。准备好开始今天的挑战了吗？点击“生成题目”我会为你准备一个学术话题。
+            </div>
+            <div class="luna-avatar">👩‍🏫</div>
+        </div>
+
+        <div class="editor-panel">
+            <div class="topic-card">
+                <div class="topic-title">写作题目</div>
+                <div class="topic-content" id="current-topic">请点击下方按钮生成题目...</div>
+            </div>
+
+            <div class="writing-area">
+                <textarea id="writing-input" placeholder="在此输入你的学术论文内容..."></textarea>
+            </div>
+
+            <div class="editor-footer">
+                <div class="stats">
+                    词数统计: <span id="word-count" style="color: var(--primary-blue);">0</span> 字
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="mockGenerate()">生成题目</button>
+                    <button class="btn btn-primary" onclick="mockSubmit()">提交批改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal">
+            <h2 style="color: var(--primary-blue); font-size: 40px; margin-bottom: 10px;">8.5</h2>
+            <h3>非常出色的学术表达！</h3>
+            <p style="color: #64748B; line-height: 1.6; margin-bottom: 30px;">
+                你的论点结构清晰，词汇使用非常专业。Luna 建议在第二段增加更多的连接词以提升逻辑连贯性。
+            </p>
+            <button class="btn btn-primary" style="width: 100%;" onclick="closeModal()">继续练习</button>
+        </div>
+    </div>
+
+    <script>
+        const topics = [
+            "Technology has made the world a better place to live. Do you agree or disagree?",
+            "Discuss the pros and cons of online education compared to traditional classroom learning.",
+            "Government should invest more in public transport rather than building new roads. To what extent do you agree?",
+            "Some people believe that artificial intelligence will replace most human jobs. What is your opinion?"
+        ];
+
+        const writingInput = document.getElementById('writing-input');
+        const wordCount = document.getElementById('word-count');
+        const topicContent = document.getElementById('current-topic');
+        const lunaMsg = document.getElementById('luna-msg');
+
+        // 实时词数统计
+        writingInput.addEventListener('input', () => {
+            const text = writingInput.value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            wordCount.innerText = words;
+        });
+
+        // 模拟生成题目
+        function mockGenerate() {
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            topicContent.innerText = randomTopic;
+            lunaMsg.innerText = "这是一道非常经典的学术题目。请注意保持客观的语气，并使用丰富的论据来支撑你的观点。加油！";
+        }
+
+        // 模拟提交批改
+        function mockSubmit() {
+            if (writingInput.value.trim().length < 20) {
+                alert("请先写一点内容再提交哦！");
+                return;
+            }
+            lunaMsg.innerText = "正在分析你的文章结构和词汇选择... 这种学术写作风格非常棒！";
+            setTimeout(() => {
+                document.getElementById('result-modal').style.display = 'flex';
+            }, 1000);
+        }
+
+        function closeModal() {
+            document.getElementById('result-modal').style.display = 'none';
+            lunaMsg.innerText = "期待你的下一次写作！如果你有任何疑问，随时可以问我。";
+        }
+    </script>
+</body>
+</html>
