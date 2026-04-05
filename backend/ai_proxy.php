@@ -1,116 +1,72 @@
 <?php
 // ai_proxy.php
 header('Content-Type: application/json');
-
 $input = json_decode(file_get_contents('php://input'), true);
-if (!$input || !isset($input['message'])) {
-    echo json_encode(['reply' => 'No message received.']);
-    exit;
+$apiKey = "sk-435980991e53466691e0f61c01909fa1"; 
+
+// 1. 获取历史记录
+$history = $input['history'] ?? [];
+$isFirstTurn = empty($history); // 判断是否是刷新后的第一次开口
+
+// 2. 动态 System Prompt
+$system_content = "你名为 Luna，是一位博学的牛津英语导师。";
+
+if ($isFirstTurn) {
+    // 第一轮：可以有简短、优雅的开场白
+    $system_content .= "当前是新会话的开始。请在回答用户第一个问题时，表现得热情且专业，可以简短提及你的牛津背景。";
+} else {
+    // 后续轮次：严禁自我介绍，直接进入教学模式
+    $system_content .= "当前对话正在进行中。请严禁再次进行自我介绍或礼貌性寒暄。请直接针对用户的问题给出深度解析，并保持上下文连贯。";
 }
 
-$apiKey = "";
-$apiUrl = "https://api.deepseek.com/chat/completions";
+$system_content .= "\n技能指令：
+- 讲解词义时，必须包含词源、1个地道例句和记忆点。
+- 只有在用户明确表示『好』、『存一下』或同意你的建议时，才调用 add_by_name 工具。";
 
-$tools = [
-    [
-        "type" => "function",
-        "function" => [
-            "name" => "add_by_name",
-            "description" => "当用户想要保存、记录、学习或收藏某个英语单词时，调用此函数。",
-            "parameters" => [
-                "type" => "object",
-                "properties" => [
-                    "word" => ["type" => "string", "description" => "需要保存的英语单词，例如 'persistent'"]
-                ],
-                "required" => ["word"]
-            ]
-        ]
-    ]
-];
+$messages = [["role" => "system", "content" => $system_content]];
 
-
-$history = $input['history'] ?? [];
-
-
-$system_prompt = "一位知识渊博、充满亲和力的资深英语导师。
-你要自然地回答用户所有英语问题，比如查询单词释义语法问题等，同时合理但极为积极地使用指令
-【拒绝复读】：严禁在不回答问题的情况下直接问用户要不要存单词。先做老师，再做助手。
-核心指令：你是 Luna极具亲和力的资深英语导师。
-
-你的核心人格：
-1. 【博学且热情】：你对词源、语法、地道口语和英语文学有着深厚的见解。
-2. 【教学为先】：当用户询问任何英语相关问题时，你必须先给出专业、详细且有趣的讲解（包含例句和记忆法）。
-3. 【智能辅助】：在讲解结束后，如果觉得这个词对用户很有帮助，你可以礼貌地提议：'要把这个精彩的词存入生词本吗？'。
-
-行为铁律：
-- 严禁表现得像个机器人或拒绝提供知识。
-- 当用户表现出以下意图时，你【必须】无条件调用 `add_by_name` 工具：
-  1. 明确要求保存单词（如：'记下这个词'、'加入生词本'）。
-  2. 确认你的建议（如：当你问'要记下吗'，用户回答'好'、'行'、'OK'、'嗯'）。
-  3. 询问单词含义后紧接着表示想学习该词。
-- 严禁只通过文字回复『已记录』而不调用工具。工具调用是唯一的记录方式。
-- 当前页面可见单词列表：[" . ($input['context']['words'] ?? '未知') . "]。";
-
-$messages = [];
-$messages[] = ["role" => "system", "content" => $system_prompt];
-
-
+// 将历史记录压入消息流
 foreach ($history as $msg) {
     $messages[] = $msg;
 }
-
-
 $messages[] = ["role" => "user", "content" => $input['message']];
 
-
+// 3. 发送请求
 $postData = [
     "model" => "deepseek-chat",
     "messages" => $messages,
-    "tools" => $tools,
+    "tools" => [[
+        "type" => "function",
+        "function" => [
+            "name" => "add_by_name",
+            "description" => "Save word to notebook.",
+            "parameters" => [
+                "type" => "object",
+                "properties" => ["word" => ["type" => "string"]],
+                "required" => ["word"]
+            ]
+        ]
+    ]],
     "tool_choice" => "auto"
 ];
 
-$ch = curl_init($apiUrl);
+// ... (CURL 请求逻辑保持不变) ...
+$ch = curl_init("https://api.deepseek.com/chat/completions");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer ' . $apiKey
-]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Authorization: Bearer ' . $apiKey]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
-
 $response = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo json_encode(['reply' => 'CURL Error: ' . curl_error($ch)]);
-    exit;
-}
 $result = json_decode($response, true);
 curl_close($ch);
 
-
-$aiMessage = $result['choices'][0]['message'];
-$reply = $aiMessage['content'] ?? "";
+$aiMsg = $result['choices'][0]['message'] ?? [];
+$reply = $aiMsg['content'] ?? "";
 $action = null;
 
-if (isset($aiMessage['tool_calls'])) {
-    $toolCall = $aiMessage['tool_calls'][0];
-    $functionName = $toolCall['function']['name'];
-    $args = json_decode($toolCall['function']['arguments'], true);
-
-    if ($functionName === 'add_by_name') {
-        $word = $args['word'];
-        $action = [
-            'type' => 'call_frontend_function',
-            'function_name' => 'add_by_name',
-            'word' => $word
-        ];
-        if (empty($reply)) {
-            $reply = "好的，我已经把单词 '{$word}' 存入你的生词本了。";
-        }
-    }
+if (!empty($aiMsg['tool_calls'])) {
+    $args = json_decode($aiMsg['tool_calls'][0]['function']['arguments'], true);
+    $action = ['function_name' => 'add_by_name', 'word' => $args['word']];
 }
 
-echo json_encode([
-    'reply' => $reply,
-    'action' => $action
-]);
+echo json_encode(['reply' => $reply, 'action' => $action]);
