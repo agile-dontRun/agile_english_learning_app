@@ -1,0 +1,120 @@
+const songs = window.songList || [];
+
+const audioPlayer = document.getElementById("audioPlayer");
+const coverImage = document.getElementById("coverImage");
+const songTitle = document.getElementById("songTitle");
+const songArtist = document.getElementById("songArtist");
+const songDescription = document.getElementById("songDescription");
+const playBtn = document.getElementById("playBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const progressBar = document.getElementById("progressBar");
+const currentTime = document.getElementById("currentTime");
+const duration = document.getElementById("duration");
+const playlistButtons = Array.from(document.querySelectorAll(".playlist-item"));
+
+let currentIndex = 0;
+
+function formatTime(time) {
+    if (!Number.isFinite(time)) {
+        return "00:00";
+    }
+
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function updatePlaylistState() {
+    playlistButtons.forEach((button, index) => {
+        button.classList.toggle("active", index === currentIndex);
+    });
+}
+
+function loadSong(index, shouldAutoplay = false) {
+    const song = songs[index];
+
+    if (!song) {
+        return;
+    }
+
+    currentIndex = index;
+    coverImage.src = song.cover;
+    songTitle.textContent = song.title;
+    songArtist.textContent = song.artist;
+    songDescription.textContent = song.description;
+    audioPlayer.src = song.audio;
+    progressBar.value = 0;
+    currentTime.textContent = "00:00";
+    duration.textContent = "00:00";
+    updatePlaylistState();
+
+    if (shouldAutoplay) {
+        audioPlayer.play();
+    }
+}
+
+playBtn.addEventListener("click", () => {
+    if (!audioPlayer.src) {
+        loadSong(currentIndex, true);
+        return;
+    }
+
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+    } else {
+        audioPlayer.pause();
+    }
+});
+
+prevBtn.addEventListener("click", () => {
+    const nextIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+nextBtn.addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+playlistButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const index = Number(button.dataset.index);
+        loadSong(index, true);
+    });
+});
+
+audioPlayer.addEventListener("play", () => {
+    playBtn.textContent = "Pause";
+});
+
+audioPlayer.addEventListener("pause", () => {
+    playBtn.textContent = "Play";
+});
+
+audioPlayer.addEventListener("loadedmetadata", () => {
+    duration.textContent = formatTime(audioPlayer.duration);
+});
+
+audioPlayer.addEventListener("timeupdate", () => {
+    if (audioPlayer.duration) {
+        progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    }
+
+    currentTime.textContent = formatTime(audioPlayer.currentTime);
+});
+
+progressBar.addEventListener("input", () => {
+    if (!audioPlayer.duration) {
+        return;
+    }
+
+    audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
+});
+
+audioPlayer.addEventListener("ended", () => {
+    const nextIndex = (currentIndex + 1) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+loadSong(0);
