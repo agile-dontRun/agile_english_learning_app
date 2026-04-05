@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 $input = json_decode(file_get_contents('php://input'), true);
-$apiKey = "sk-435980991e53466691e0f61c01909fa1"; 
+$apiKey = ""; 
 
 // 重新设计的博学 Prompt
 $system_prompt = "你名为 Luna，是一位优雅、博学且极具教学热情的英语专家。
