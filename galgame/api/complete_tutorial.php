@@ -21,3 +21,9 @@ try {
         'success' => true,
         'message' => '教程完成状态已更新'
     ]);
+    } catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => '服务器错误：' . $e->getMessage()
+    ]);
+}
