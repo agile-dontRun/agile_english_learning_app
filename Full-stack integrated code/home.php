@@ -174,6 +174,60 @@ $month_name = date('F Y');
                 <div class="task-action"><a href="emma_server/speakAI.php" class="btn-go">Begin Task</a></div>
             </div>
         </section>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Spires Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --oxford-blue: #002147; 
+            --oxford-blue-light: #003066;
+            --oxford-gold: #c4a661; 
+            --oxford-gold-light: #d4b671;
+            --white: #ffffff; 
+            --bg-light: #f4f7f6;
+            --text-dark: #333333; 
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+        }
+
+        body { margin: 0; padding: 0; font-family: 'Open Sans', Arial, sans-serif; background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; letter-spacing: 0.5px; }
+
+        /* ===== 导航栏 ===== */
+        .navbar { background-color: var(--oxford-blue); color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .navbar-left { display: flex; align-items: center; height: 100%; }
+        .college-logo { height: 50px; width: auto; cursor: pointer; transition: transform 0.3s; }
+
+        .navbar-links { display: flex; gap: 10px; list-style: none; margin: 0 0 0 40px; padding: 0; height: 100%; align-items: center; }
+        .navbar-links > li { display: flex; align-items: center; position: relative; height: 100%; }
+        .navbar-links a { color: #ffffff; text-decoration: none; font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 800; padding: 0 20px; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1.8px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); transition: all 0.3s ease; -webkit-font-smoothing: antialiased; }
+        .navbar-links a:hover { color: var(--oxford-gold); background-color: rgba(255, 255, 255, 0.05); }
+
+        .dropdown-menu { display: none; position: absolute; top: 80px; left: 0; background-color: var(--oxford-blue-light); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); list-style: none !important; padding: 0; margin: 0; border-top: 2px solid var(--oxford-gold); }
+        .dropdown-menu li { list-style: none !important; margin: 0; padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dropdown-menu li a { color: #e0e0e0 !important; padding: 15px 20px; text-transform: none; display: block; font-weight: 400; height: auto; text-shadow: none; letter-spacing: 0.5px;}
+        .dropdown-menu li a:hover { background-color: var(--oxford-blue) !important; color: var(--white) !important; padding-left: 25px; }
+        .navbar-links li:hover .dropdown-menu, .dropdown:hover .dropdown-menu { display: block; }
+
+        .navbar-right { display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; position: relative; }
+        .user-avatar-img, .user-avatar-placeholder { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--oxford-gold); object-fit: cover; }
+        .user-avatar-placeholder { background-color: var(--oxford-gold); color: var(--oxford-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; line-height: 1; box-sizing: border-box; }
+        .navbar-right .dropdown-menu { background-color: var(--white); border-top: none; border-radius: 0 0 8px 8px; right: 0; left: auto; font-family: 'Playfair Display', serif; }
+        .navbar-right:hover .dropdown-menu { display: block; }
+        .navbar-right .dropdown-menu li a { color: var(--oxford-blue) !important; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
+        .navbar-right .dropdown-menu li a:hover { background-color: #f8fafc !important; color: var(--oxford-gold) !important; padding-left: 25px; }
+
+        /* ===== Hero 区域 ===== */
+        .hero {
+            background: url('hero_bg2.png') center/cover no-repeat; 
+            color: var(--white); text-align: center; padding: 140px 20px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 800; margin: 0 0 20px; text-transform: uppercase; letter-spacing: 5px; text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.8); }
+        .hero p { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; font-style: italic; max-width: 800px; margin: 0 auto; text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.8); }
+
+       
 
         <section class="calendar-section">
             <div class="calendar-header"><h3><?php echo $month_name; ?></h3></div>
