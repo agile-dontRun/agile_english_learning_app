@@ -25,13 +25,14 @@
         <div id="home-screen" class="hidden" style="background-image: url('../frontend/assets/home_page/home_bg.jpg');">
             <div class="home-column">
                 <div class="col-title">活 动</div>
-                <button class="home-btn" onclick="startStory([].concat(chapter1, chapter2, chapter3))">重温：新生见面会</button> 
+                <button class="home-btn" onclick="startStory(prologueData, false)">重温：新生见面会</button>
                 <button class="home-btn" onclick="alert('音乐节暂未开放')">音乐节</button> 
             </div>
             <div class="home-column">
                 <div class="col-title">游 戏</div>
                 <button class="home-btn highlight-btn" onclick="goToFloor6()">6楼</button>
                 <button class="home-btn" onclick="window.location.href='../canteen_game/index.php'">食堂小游戏</button>
+                <button class="home-btn" onclick="window.location.href='../word/index.html'">🔍 Word Hunter</button>
             </div>
             <div class="home-column">
                 <div class="col-title">场 景</div>
