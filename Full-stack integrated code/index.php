@@ -68,6 +68,20 @@
         <button type="submit">Log In</button>
     </form>
     </div>
+      
+    @media (max-width: 1024px) {
+        .brand-logo { font-size: 3.5rem; } 
+    }
+
+    @media (max-width: 768px) {
+        .login-page { 
+            flex-direction: column;
+            justify-content: center; padding: 20px; 
+        }
+        .left-side { padding-right: 0; text-align: center; margin-bottom: 40px; }
+        .brand-logo { font-size: 2.8rem; }
+        .login-container { padding: 35px 25px; }
+    }
 </body>
 
 
@@ -89,3 +103,7 @@
     }
     window.onload = function () { showForm("login"); };
 </script>
+
+    
+</script>
+
