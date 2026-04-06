@@ -37,3 +37,4 @@ $stmt->close();
         <h2 class="section-title">Speaking Progress</h2>
         </div>
 </main>
+</header>
