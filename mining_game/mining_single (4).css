@@ -1,0 +1,337 @@
+/* single.css */
+:root {
+  --mine-dirt: #855e42;
+  --header-bg: #f9d860;
+  --player-bg: #8c7457;
+  --p1-main: #3498db;
+  --wood: #a1784f;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", "Microsoft YaHei", sans-serif;
+  background-color: var(--mine-dirt);
+  color: #333;
+  overflow: hidden;
+  user-select: none;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  box-sizing: border-box;
+  background: var(--header-bg);
+  border-bottom: 2px solid #5a3c26;
+  z-index: 10;
+}
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  font-weight: bold;
+  width: 300px;
+}
+.p2-info {
+  align-items: flex-end;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  background-size: cover;
+}
+.icon-money {
+  background: #27ae60;
+  border-radius: 5px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+}
+.icon-level {
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256-114.6-256-256-256zm0 432c-97.2 0-176-78.8-176-176s78.8-176 176-176 176 78.8 176 176-78.8 176-176 176zm80-176c0-44.2-35.8-80-80-80s-80 35.8-80 80 35.8 80 80 80 80-35.8 80-80z"/></svg>')
+    no-repeat center;
+}
+
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 300px;
+}
+.exit-btn {
+  padding: 10px 30px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  background: var(--wood);
+  border: 2px solid #5a3c26;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #5a3c26;
+}
+.exit-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #5a3c26;
+}
+.time-level {
+  font-size: 26px;
+  font-weight: bold;
+}
+.p1-color {
+  color: var(--p1-main);
+}
+.level-num {
+  color: #e74c3c;
+  font-size: 30px;
+}
+
+#game-container {
+  position: relative;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  padding-top: 100px;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, #8c7457, var(--mine-dirt));
+}
+/* 单人视口改为 100% 宽度，并去掉右边框 */
+.viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.controls-hint {
+  position: absolute;
+  top: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: bold;
+  font-size: 20px;
+}
+.miner-look-card{
+  position:absolute;
+  left:30%;
+  top:1px;
+  transform:translateX(-50%);
+  width:150px;
+  z-index:5;
+  animation:miningLookFloat 3.2s ease-in-out infinite;
+  pointer-events:none;
+}
+.miner-look-stage{
+  position:relative;
+  width:100%;
+  height:190px;
+  overflow:hidden;
+}
+.miner-look-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:bottom center;
+  pointer-events:none;
+}
+.miner-look-empty{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(255,255,255,.82);
+  font-size:14px;
+  font-weight:bold;
+  text-align:center;
+  padding:10px;
+}
+@keyframes miningLookFloat{
+  0%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-12px)}
+  100%{transform:translateX(-50%) translateY(0)}
+}
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#quiz-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 400px;
+  background: var(--wood);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #a88158,
+    #a88158 1px,
+    #a1784f 1px,
+    #a1784f 5px
+  );
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.8),
+    inset 0 0 10px #5a3c26;
+  border: 6px solid #5a3c26;
+  z-index: 100;
+  display: none;
+}
+#quiz-modal.active {
+  display: block;
+  animation: popIn 0.3s ease-out;
+}
+#player-indicator {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+#word-display {
+  font-size: 40px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 0 0 20px 0;
+  text-transform: lowercase;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+.opt-btn {
+  padding: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  background: var(--wood);
+  border: 2px solid #5a3c26;
+  border-radius: 12px;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 4px 0 #5a3c26;
+}
+.opt-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #5a3c26;
+}
+
+.correct-flash {
+  background: #2ecc71 !important;
+  color: white !important;
+  border-color: #27ae60 !important;
+}
+.wrong-flash {
+  background: #e74c3c !important;
+  color: white !important;
+  border-color: #c0392b !important;
+}
+
+.progress-wrapper {
+  width: 100%;
+  height: 18px;
+  background: #ddd;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #bbb;
+}
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #27ae60;
+  transition: width 0.3s;
+}
+.target-text {
+  font-size: 20px;
+  color: #7f8c8d;
+  margin: 10px 0 0 0;
+  font-weight: bold;
+}
+
+@keyframes popIn {
+  0% {
+    transform: translate(-50%, -40%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+.shake-animation {
+  animation: violentShake 0.5s;
+  animation-iteration-count: 1;
+}
+@keyframes violentShake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate(-5px, -3px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate(5px, 3px);
+  }
+}
+
+#pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+#pause-overlay.active {
+  display: flex;
+  animation: popIn 0.3s ease-out;
+}
+.pause-box {
+  background: var(--wood);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #a88158,
+    #a88158 1px,
+    #a1784f 1px,
+    #a1784f 5px
+  );
+  border: 6px solid #5a3c26;
+  border-radius: 20px;
+  padding: 40px 60px;
+  text-align: center;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.8),
+    inset 0 0 10px #5a3c26;
+}

@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+
 <nav class="navbar"> </nav>
 <header class="hero">
     <h1>Scholar Profile</h1>
@@ -132,3 +133,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </script>
 </body>
 </html>
+
