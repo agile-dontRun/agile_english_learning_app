@@ -32,6 +32,23 @@
         text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.8); 
     }
     .brand-slogan { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-style: italic; }
+
+    .login-container {
+            width: 100%; max-width: 420px; padding: 50px;
+            background: rgba(255, 255, 255, 0.98); border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 33, 71, 0.2);
+            border-top: 5px solid var(--oxford-gold); /* 金色顶边框装饰 */
+        }
+        input {
+            width: 100%; padding: 15px 20px; margin: 12px 0;
+            border: 1px solid #e0e0e0; border-radius: 12px; transition: 0.3s;
+        }
+        input:focus { border-color: var(--oxford-gold); outline: none; }
+        button {
+            width: 100%; padding: 16px; background-color: var(--oxford-blue);
+            color: white; border-radius: 12px; font-family: 'Playfair Display', serif;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
 </style>
 
 <body>
@@ -43,3 +60,52 @@
         <div class="right-side"> </div>
     </div>
 </body>
+
+    <div class="login-container">
+    <h2 id="header-title">Welcome Back</h2>
+    <form id="login-form" action="login.php" method="POST">
+        <input type="text" name="username" placeholder="Scholar ID / Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Log In</button>
+    </form>
+    </div>
+</body>
+      
+    @media (max-width: 1024px) {
+        .brand-logo { font-size: 3.5rem; } 
+    }
+
+    @media (max-width: 768px) {
+        .login-page { 
+            flex-direction: column;
+            justify-content: center; padding: 20px; 
+        }
+        .left-side { padding-right: 0; text-align: center; margin-bottom: 40px; }
+        .brand-logo { font-size: 2.8rem; }
+        .login-container { padding: 35px 25px; }
+    }
+</body>
+
+
+<script>
+    function showForm(formType) {
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+        const headerTitle = document.getElementById("header-title");
+
+        if (formType === "login") {
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            headerTitle.innerText = "Welcome Back";
+        } else {
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            headerTitle.innerText = "Scholar Enrollment"; 
+        }
+    }
+    window.onload = function () { showForm("login"); };
+</script>
+
+    
+</script>
+
