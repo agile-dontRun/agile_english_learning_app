@@ -1,5 +1,8 @@
 // 第一章剧情数据结构
-let storyData =[].concat(chapter1, chapter2, chapter3);
+const prologueData = [].concat(chapter1, chapter2, chapter3);
+
+let storyData = [];
+let isPlayingTutorial = false;
 
 // 游戏状态变量
 let currentStep = 0;
@@ -20,21 +23,34 @@ const homeScreen = document.getElementById('home-screen');
 const floor6Screen = document.getElementById('floor6-screen');
 
 // 初始化游戏
-function initGame() {
-    renderStep();
+async function initGame() {
+    const data = await getTutorialStatus();
+
+    if (data.success && data.is_tutorial_completed) {
+        // 已完成教程：直接显示主页
+        showHomeScreen();
+    } else {
+        // 未完成教程：开始序章
+        startStory(prologueData, true);
+    }
 }
 
 // 渲染当前剧情步骤
-function renderStep() {
+async function renderStep() {
     // ================= 【修复核心：补回了缺失的 if 条件】 =================
     if (currentStep >= storyData.length) {
-        // 剧情结束了，隐藏对话界面，显示校园大地图！
         dialogueBox.classList.add('hidden');
-        characterSprite.classList.add('hidden'); 
+        characterSprite.classList.add('hidden');
         avatarBox.classList.add('hidden');
-        document.getElementById('bg-image').src = '../frontend/assets/home_page/home_bg.jpg';
-        homeScreen.classList.remove('hidden'); 
-        return; // 结束渲染
+
+        // 如果刚结束的是教程，就写数据库
+        if (isPlayingTutorial) {
+            await markTutorialCompleted();
+            isPlayingTutorial = false;
+        }
+
+        showHomeScreen();
+        return;
     }
     // ===================================================================
 
@@ -202,13 +218,35 @@ function handleExploreChoice(option) {
     advanceStory();
 }
 
-// ================= 界面跳转与游戏启动逻辑 =================
-function startStory(newChapterData) {
-    storyData = newChapterData; 
-    currentStep = 0;            
-    homeScreen.classList.add('hidden'); 
-    renderStep();               
+async function markTutorialCompleted() {
+    try {
+        const res = await fetch('../api/complete_tutorial.php', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data.success) {
+            console.error('标记教程完成失败：', data.message);
+        }
+        return data;
+    } catch (err) {
+        console.error('标记教程完成失败：', err);
+        return { success: false };
+    }
 }
+
+// ================= 界面跳转与游戏启动逻辑 =================
+// function startStory(newChapterData) {
+//     storyData = newChapterData; 
+//     currentStep = 0;            
+//     homeScreen.classList.add('hidden'); 
+//     renderStep();               
+// }
 
 function goToFloor6() {
     homeScreen.classList.add('hidden');
@@ -223,10 +261,23 @@ function goToHome() {
 function launchGame(gameName) {
     if (gameName === 'miner') {
         //alert("跳转接口已准备好！日后在这里跳转到 词汇矿工大对决");
-        window. location. href = 'mining_index. php';
+        window.location.href = '../../mining_index.php';
     } else if (gameName === 'match') {
         alert("跳转接口已准备好！日后在这里跳转到 翻牌对战");
     }
+}
+
+function showHomeScreen() {
+    dialogueBox.classList.add('hidden');
+    optionsContainer.classList.add('hidden');
+    characterSprite.classList.add('hidden');
+    avatarBox.classList.add('hidden');
+    mentorOverlay.classList.add('hidden');
+    mentorSprite.classList.add('hidden');
+    floor6Screen.classList.add('hidden');
+
+    document.getElementById('bg-image').src = '../frontend/assets/home_page/home_bg.jpg';
+    homeScreen.classList.remove('hidden');
 }
 
 // ================= 新增：万能场景跳转函数 =================
@@ -239,17 +290,25 @@ function goToScenario(bgUrl, chapterData) {
 }
 
 // 确保你的 startStory 函数是长这样的：
-function startStory(newChapterData) {
-    storyData = newChapterData; // 替换剧本
-    currentStep = 0;            // 进度条归零
-    homeScreen.classList.add('hidden'); // 隐藏大地图界面！
-    
-    // 【双重保险】：如果剧本的第一句话自带了 bg 属性，也让它生效
+function startStory(newChapterData, tutorialMode = false) {
+    storyData = newChapterData;
+    currentStep = 0;
+    isPlayingTutorial = tutorialMode;
+
+    homeScreen.classList.add('hidden');
+    floor6Screen.classList.add('hidden');
+    dialogueBox.classList.remove('hidden');
+    optionsContainer.classList.add('hidden');
+    mentorOverlay.classList.add('hidden');
+    mentorSprite.classList.add('hidden');
+    characterSprite.style.filter = "brightness(100%)";
+
+    // 如果剧本第一句带背景，优先生效
     if (storyData[0] && storyData[0].bg) {
         document.getElementById('bg-image').src = storyData[0].bg;
     }
-    
-    renderStep(); // 重新开始渲染剧情
+
+    renderStep();
 }
 
 // 绑定全局点击事件
