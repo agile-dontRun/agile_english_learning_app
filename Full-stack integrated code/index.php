@@ -102,6 +102,7 @@
         }
     }
     window.onload = function () { showForm("login"); };
+</script>
 
     
 </script>
