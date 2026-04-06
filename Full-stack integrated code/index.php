@@ -69,3 +69,41 @@
     </form>
     </div>
 </body>
+      
+    @media (max-width: 1024px) {
+        .brand-logo { font-size: 3.5rem; } 
+    }
+
+    @media (max-width: 768px) {
+        .login-page { 
+            flex-direction: column;
+            justify-content: center; padding: 20px; 
+        }
+        .left-side { padding-right: 0; text-align: center; margin-bottom: 40px; }
+        .brand-logo { font-size: 2.8rem; }
+        .login-container { padding: 35px 25px; }
+    }
+</body>
+
+
+<script>
+    function showForm(formType) {
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+        const headerTitle = document.getElementById("header-title");
+
+        if (formType === "login") {
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            headerTitle.innerText = "Welcome Back";
+        } else {
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            headerTitle.innerText = "Scholar Enrollment"; 
+        }
+    }
+    window.onload = function () { showForm("login"); };
+
+    
+</script>
+
