@@ -16,6 +16,8 @@ $avatar_url = !empty($user_data['avatar_url']) ? $user_data['avatar_url'] : 'col
 $stmt->close();
 ?>
 
+
+
 <nav class="navbar"> </nav>
 <header class="hero">
     <h1>Scholar Profile</h1>
@@ -37,4 +39,5 @@ $stmt->close();
         <h2 class="section-title">Speaking Progress</h2>
         </div>
 </main>
-</header>
+
+
