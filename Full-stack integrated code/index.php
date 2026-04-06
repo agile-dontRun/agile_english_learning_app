@@ -68,6 +68,7 @@
         <button type="submit">Log In</button>
     </form>
     </div>
+</body>
       
     @media (max-width: 1024px) {
         .brand-logo { font-size: 3.5rem; } 
