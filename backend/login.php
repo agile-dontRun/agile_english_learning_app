@@ -1,5 +1,4 @@
 <?php
-session_start();
 include 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -7,6 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
     
+  
     $hashed_password = hash('sha256', $password);
     
     $sql = "SELECT * FROM users WHERE username = ? AND password_hash = ?";
@@ -15,59 +15,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $html_header = '
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login Status</title>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <style>
-            body { background-color: #f3f4f6; font-family: sans-serif; }
-        </style>
-    </head>
-    <body>';
-    
-    $html_footer = '</body></html>';
+    echo "<link href='https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Open+Sans:wght@400;600&display=swap' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <style>
+        .swal2-popup { font-family: 'Open Sans', sans-serif !important; border-radius: 15px !important; }
+        .swal2-title { font-family: 'Playfair Display', serif !important; font-weight: 800 !important; color: #002147 !important; }
+        .swal2-confirm { background-color: #002147 !important; font-family: 'Playfair Display', serif !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+    </style>";
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();  
         
+        session_start();
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['nickname'] = $user['nickname'];
         
-        echo $html_header;
         echo "<script>
+            window.onload = function() {
                 Swal.fire({
-                    title: 'Login Successful!',
-                    text: 'Welcome back, " . htmlspecialchars($user['nickname']) . "!',
+                    title: 'Welcome Back, Scholar',
+                    text: 'Authentication successful. Accessing Spires Academy...',
                     icon: 'success',
-                    confirmButtonText: 'Continue',
-                    confirmButtonColor: '#3085d6',
-                    timer: 2000,
-                    timerProgressBar: true
-                }).then((result) => {
+                    confirmButtonText: 'Enter'
+                }).then(() => {
                     window.location.href = 'home.php';
                 });
-              </script>";
-        echo $html_footer;
+            };
+        </script>";
         exit();  
     } else {
-        echo $html_header;
         echo "<script>
+            window.onload = function() {
                 Swal.fire({
-                    title: 'Login Failed',
-                    text: 'Incorrect username or password. Please try again!',
+                    title: 'Authentication Failed',
+                    text: 'The credentials provided do not match our records.',
                     icon: 'error',
-                    confirmButtonText: 'Retry',
-                    confirmButtonColor: '#d33'
-                }).then((result) => {
+                    confirmButtonText: 'Try Again'
+                }).then(() => {
                     window.location.href = 'index.php';
                 });
-              </script>";
-        echo $html_footer;
+            };
+        </script>";
         exit();
     }
 
