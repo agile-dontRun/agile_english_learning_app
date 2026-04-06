@@ -4,6 +4,7 @@ require_once 'memory_common.php';
 $userId = mm_current_user_id();
 $user = mm_get_user($conn, $userId);
 $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
+$walletBalance = coin_get_balance($conn, $userId);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,15 +58,83 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
 
         .menu-panel {
             position: absolute;
-            left: 7%;
+            left: 10%;
             bottom: 4.4%;
             z-index: 3;
-            width: 24.9%;
+            width: 20.9%;
             min-width: 250px;
             max-width: 340px;
             display: flex;
             flex-direction: column;
             gap: clamp(8px, 1vw, 14px);
+        }
+
+        .ming-look-card {
+            position: absolute;
+            left: 30%;
+            top: 65%;
+            transform: translateY(-50%);
+            width: 210px;
+            z-index: 3;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        .ming-look-title {
+            display: none !important;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .ming-look-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 11 / 13;
+            overflow: hidden;
+            animation: memoryFloat 3.2s ease-in-out infinite;
+            transform-origin: center bottom;
+            will-change: transform;
+        }
+
+        .ming-look-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .ming-look-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            text-align: center;
+            color: #996633;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        @keyframes memoryFloat {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-14px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
         }
 
         /* ========== 修改部分：四个按钮统一样式 ========== */
@@ -120,7 +189,7 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
 
         .menu-text strong {
             display: block;
-            font-size: 1.7rem;
+            font-size: 1.4rem;
             margin-bottom: 4px;
             letter-spacing: .2px;
             color: white;               /* 字体白色 */
@@ -150,6 +219,20 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
             backdrop-filter: blur(10px);
             color: #3b2d24;
             font-weight: 700;
+            box-shadow: 0 10px 24px rgba(125, 82, 38, 0.14);
+        }
+
+        .coin-tag {
+            position: absolute;
+            top: 14%;
+            right: 4.4%;
+            z-index: 3;
+            padding: 12px 16px;
+            border-radius: 16px;
+            background: rgba(255, 235, 178, 0.95);
+            border: 2px solid rgba(193, 77, 61, 0.12);
+            color: #7c3f14;
+            font-weight: 900;
             box-shadow: 0 10px 24px rgba(125, 82, 38, 0.14);
         }
 
@@ -189,6 +272,11 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
                 width: 27%;
             }
 
+            .ming-look-card {
+                left: 37%;
+                width: 190px;
+            }
+
             .menu-btn {
                 padding: 13px 10px;
             }
@@ -214,6 +302,11 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
                 bottom: 4.2%;
                 width: 28.5%;
                 min-width: 170px;
+            }
+
+            .ming-look-card {
+                left: 38%;
+                width: 150px;
             }
 
             .welcome-tag {
@@ -266,6 +359,11 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
                 gap: 8px;
             }
 
+            .ming-look-card {
+                left: 39%;
+                width: 120px;
+            }
+
             .welcome-tag {
                 font-size: .76rem;
                 padding: 7px 10px;
@@ -291,8 +389,12 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
                 Welcome, <?= mm_h($nickname) ?>
             </div>
 
+            <div class="coin-tag">
+                Coins: <?= (int)$walletBalance ?>
+            </div>
+
             <!-- TODO: Team integration point: replace # with the target file/path for Exit -->
-            <a class="exit-btn" href="#exit-link-placeholder">
+            <a class="exit-btn" href="/galgame/galgame/index.html">
                 Exit
             </a>
 
@@ -333,7 +435,125 @@ $nickname = $user ? ($user['nickname'] ?: $user['username']) : 'User';
                     <div class="menu-arrow"></div>
                 </a>
             </div>
+
+            <div class="ming-look-card">
+                <div class="ming-look-title" id="ming-look-title" style="display:none !important;">Current Ming Look</div>
+                <div class="ming-look-stage" id="ming-look-stage">
+                    <div class="ming-look-empty" id="ming-look-empty">No active outfit yet</div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        const ACTIVE_OUTFIT_ENDPOINT = "/galgame/dress_up_game/api/get_active_outfit.php";
+        const IMAGE_BASE_PATH = "/galgame/dress_up_game";
+        const dressUpLayerOrder = [
+            "background", "body", "shoes", "top", "pants", "dress", "suit",
+            "eye", "eyebrows", "nose", "mouse", "hair", "character", "glass", "head"
+        ];
+
+        function buildImageCandidates(layer) {
+            const filePath = layer?.file_path || "";
+            const normalizedFilePath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+            return [
+                `${IMAGE_BASE_PATH}${normalizedFilePath}`,
+                layer?.url || ""
+            ].filter(Boolean);
+        }
+
+        function setImageWithFallback(img, candidates, index = 0) {
+            if (!img || index >= candidates.length) {
+                if (img) {
+                    img.remove();
+                }
+                return;
+            }
+
+            const candidate = candidates[index];
+            img.onerror = () => setImageWithFallback(img, candidates, index + 1);
+            img.src = `${candidate}${candidate.includes("?") ? "&" : "?"}t=${Date.now()}`;
+        }
+
+        function resetMingLookStage() {
+            const stage = document.getElementById("ming-look-stage");
+            const empty = document.getElementById("ming-look-empty");
+            if (!stage) {
+                return;
+            }
+
+            Array.from(stage.querySelectorAll(".ming-look-layer")).forEach((node) => node.remove());
+            if (empty) {
+                empty.style.display = "flex";
+            }
+        }
+
+        function renderMingLook(data) {
+            const stage = document.getElementById("ming-look-stage");
+            const empty = document.getElementById("ming-look-empty");
+            const title = document.getElementById("ming-look-title");
+
+            if (!stage || !empty || !title) {
+                return;
+            }
+
+            resetMingLookStage();
+
+            if (!data || !Array.isArray(data.layers) || data.layers.length === 0) {
+                title.innerText = "Current Ming Look";
+                return;
+            }
+
+            empty.style.display = "none";
+            title.innerText = data.name ? "Current Ming Look: " + data.name : "Current Ming Look";
+
+            const layerMap = new Map();
+            for (const layer of data.layers) {
+                if (layer && layer.layer) {
+                    layerMap.set(layer.layer, layer);
+                }
+            }
+
+            for (const layerName of dressUpLayerOrder) {
+                const layer = layerMap.get(layerName);
+                if (!layer) {
+                    continue;
+                }
+
+                const img = document.createElement("img");
+                img.className = "ming-look-layer";
+                img.alt = layer.name || layerName;
+                stage.appendChild(img);
+                setImageWithFallback(img, buildImageCandidates(layer));
+            }
+        }
+
+        async function loadActiveMingLook() {
+            try {
+                const response = await fetch(ACTIVE_OUTFIT_ENDPOINT, {
+                    cache: "no-store"
+                });
+                const rawText = await response.text();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} from ${ACTIVE_OUTFIT_ENDPOINT}: ${rawText.slice(0, 160)}`);
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseError) {
+                    throw new Error(`Non-JSON response from ${ACTIVE_OUTFIT_ENDPOINT}: ${rawText.slice(0, 160)}`);
+                }
+
+                renderMingLook(data);
+            } catch (error) {
+                console.error("Failed to load Ming look:", error);
+                resetMingLookStage();
+            }
+        }
+
+        window.addEventListener("load", loadActiveMingLook);
+    </script>
 </body>
 </html>
