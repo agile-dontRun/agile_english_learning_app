@@ -1,13 +1,10 @@
-// single.js
 
-/** --- 1. 联动数据获取 --- **/
-// 从 sessionStorage 获取玩家在 map.html 选中的地图，如果没有默认进 map1
 const currentMapId = sessionStorage.getItem('selectedMapId') || 'map1';
 const currentMapName = sessionStorage.getItem('selectedMapName') || '新手森林';
 
 let WORD_BANK = [];
 
-/** --- 2. 资源加载 (动态加载对应地图背景) --- **/
+
 const ASSETS = {
     oil: 'oil.png',
     diamond: 'diamond.png',
@@ -19,7 +16,7 @@ const ASSETS = {
     coin: 'coin.png',
     miner: 'miner.png', 
     hook: 'hook.png',   
-    bg: currentMapId + '_bg.png' // 🌟 核心：动态加载玩家选择的地图背景图片
+    bg: currentMapId + '_bg.png' // 
 };
 
 const IMAGES = {};
@@ -44,7 +41,6 @@ function loadAssets(callback) {
     }
 }
 
-// 矿物配置表
 const OBJECTS_CONFIG = {
     oil:      { value: 5000, targetQuestions: 10, weight: 1.2, radius: 45, drawScale: 2.5 }, 
     diamond:  { value: 2000, targetQuestions: 8,  weight: 0.8, radius: 35, drawScale: 3.5 },
@@ -58,7 +54,6 @@ const OBJECTS_CONFIG = {
 
 const STATE = { SWINGING: 0, EXTENDING: 1, DIGGING_QUIZ: 2, RETRACTING_EMPTY: 3, RETRACTING_WITH_STONE: 4 };
 
-/** --- 3. 环境初始化 --- **/
 const p1Canvas = document.getElementById('p1Canvas');
 const ctx1 = p1Canvas.getContext('2d');
 const quizModal = document.getElementById('quiz-modal');
@@ -66,24 +61,21 @@ const gameContainer = document.getElementById('game-container');
 
 let gameState = { isQuizActive: false, currentQuestion: null, currentLevel: 1, currentMistakes: 0, isPaused: false };
 let p1;
-/**
- * 记录矿石收藏
- */
+
 function recordAchievement(oreId) {
     let unlockedList = JSON.parse(localStorage.getItem('myMineAchieve')) || [];
     if (!unlockedList.includes(oreId)) {
         unlockedList.push(oreId);
         localStorage.setItem('myMineAchieve', JSON.stringify(unlockedList));
-        console.log(`✨ 解锁新收藏：${oreId}`);
+        console.log(`✨unlock new  achievement!${oreId}`);
     }
 }
 
-/** --- 4. 玩家类 --- **/
 class Player {
     constructor(id, canvas, ctx) {
         this.id = id; this.canvas = canvas; this.ctx = ctx; this.objects =[];
         
-        // 🌟 核心：从 localStorage 读取全局金币作为初始金币！
+        
         this.score = parseInt(localStorage.getItem('playerCoins')) || 0;
         
         this.TOP_PANEL_HEIGHT = 160; 
@@ -143,22 +135,18 @@ class Player {
     }
 
     collect() {
-        // 获取当前矿石类型（根据你的数据结构调整）
-    const oreType = this.grabbedObject.type;  // 例如 'oil', 'diamond' 等
 
-    // 记录成就（如果尚未解锁）
+    const oreType = this.grabbedObject.type; 
+
     recordAchievement(oreType);
 
-    // 原有逻辑：增加金币，移除物体等
     this.score += this.grabbedObject.value;
     this.objects.splice(this.grabbedObjectIdx, 1); 
-    
-    //金币成就
+
     let stats = JSON.parse(localStorage.getItem('gameStats')) || {};
     stats.stat_total_coins = (stats.stat_total_coins || 0) + this.grabbedObject.value;
     localStorage.setItem('gameStats', JSON.stringify(stats));
 
-    // 保存金币到 localStorage（用于跨页面显示）
     localStorage.setItem('playerCoins', this.score);
 
     updateScoreDisplay();
@@ -168,14 +156,12 @@ class Player {
     }
 }
 
-/** --- 5. 游戏控制与生成逻辑 --- **/
 function initGame() {
     p1Canvas.width = window.innerWidth;
     p1Canvas.height = window.innerHeight;
 
     p1 = new Player(1, p1Canvas, ctx1);
-    
-    // 初始化 UI 显示
+
     document.getElementById('map-name-display').innerText = `[${currentMapName}]`;
     updateScoreDisplay();
 
@@ -184,20 +170,20 @@ function initGame() {
 }
 
 function generateObjects() {
-    // 🌟 核心：根据不同地图生成专属的矿石概率池！
+
     let pool = [];
     if (currentMapId === 'map1') {
-        pool =['coin', 'coin', 'coin', 'silver', 'silver', 'gold']; // 煤矿：钱币和银为主
+        pool =['coin', 'coin', 'coin', 'silver', 'silver', 'gold']; 
     } else if (currentMapId === 'map2') {
-        pool =['oil',  'silver', 'silver','silver', 'silver','coin', 'coin','gold']; // 白银：石油和红宝石多
+        pool =['oil',  'silver', 'silver','silver', 'silver','coin', 'coin','gold'];
     } else if (currentMapId === 'map3') {
-        pool =['gold', 'gold', 'gold', 'gold', 'coin', 'oil', 'ruby']; // 黄金
+        pool =['gold', 'gold', 'gold', 'gold', 'coin', 'oil', 'ruby']; 
     } else if (currentMapId === 'map4') {
-        pool =['emerald', 'emerald', 'silver', 'amethyst', 'diamond','ruby', 'ruby','emerald']; // 钻石
+        pool =['emerald', 'emerald', 'silver', 'amethyst', 'diamond','ruby', 'ruby','emerald'];
     } else if (currentMapId === 'map5') {
-        pool =['diamond', 'diamond', 'amethyst', 'amethyst', 'silver']; // FINAL：顶级宝石
+        pool =['diamond', 'diamond', 'amethyst', 'amethyst', 'silver'];
     } else {
-        pool =['coin', 'silver', 'gold']; // 容错兜底
+        pool =['coin', 'silver', 'gold'];
     }
     
     p1.objects =[];
@@ -229,19 +215,17 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// --- 绘制视图 ---
 function drawPlayerView(p, objects) {
     const ctx = p.ctx;
     const pivotX = p.minerPivotX;
     const pivotY = p.minerPivotY;
     
     ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
-    
-    // 绘制地图背景 (现在会自动使用 map1.png, map2.png...)
+ 
     if (IMAGES.bg && IMAGES.bg.isReady) {
         ctx.drawImage(IMAGES.bg, 0, 0, p.canvas.width, p.canvas.height);
     } else {
-        // Fallback: 如果图片没加载出来，全屏填充备用底色
+
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--mine-dirt');
         ctx.fillRect(0, 0, p.canvas.width, p.canvas.height);
     }
@@ -296,14 +280,13 @@ function drawGameObject(ctx, obj) {
     ctx.restore();
 }
 
-/** --- 6. 答题 UI 交互 --- **/
 function triggerQuiz() {
     if (gameState.isQuizActive) return; 
     gameState.isQuizActive = true; gameState.currentMistakes = 0; 
     
     quizModal.classList.add('active');
     const indicator = document.getElementById('player-indicator');
-    indicator.innerText = `正在挖掘 [${p1.grabbedObject.type.toUpperCase()}]... (容错: 3次)`;
+    indicator.innerText = `mining [${p1.grabbedObject.type.toUpperCase()}]... (chance: 3次)`;
     indicator.style.color = 'var(--p1-main)';
     loadNewWord();
 }
@@ -355,8 +338,7 @@ function handleAnswer(selectedIndex) {
         setTimeout(() => {
             gameContainer.classList.remove('shake-animation');
             if (gameState.currentMistakes >= 3) {
-                
-                // 🌟【新增】记录：如果掉落的是钻石，记录失之交臂成就
+
                 if (p1.grabbedObject && p1.grabbedObject.type === 'diamond') {
                     let stats = JSON.parse(localStorage.getItem('gameStats')) || {};
                     stats.stat_diamond_fail = (stats.stat_diamond_fail || 0) + 1;
@@ -371,7 +353,7 @@ function handleAnswer(selectedIndex) {
                 loadNewWord();
                 const leftChances = 3 - gameState.currentMistakes;
                 const indicator = document.getElementById('player-indicator');
-                indicator.innerText = `正在挖掘 [${p1.grabbedObject.type.toUpperCase()}]... (剩余容错: ${leftChances}次)`;
+                indicator.innerText = `mining [${p1.grabbedObject.type.toUpperCase()}]... (chance: ${leftChances}times)`;
                 indicator.style.color = '#e74c3c'; 
             }
         }, 700);
@@ -383,7 +365,6 @@ function updateScoreDisplay() {
     if (scoreElement && p1) { scoreElement.innerText = p1.score; }
 }
 
-/** --- 7. 输入与暂停控制 --- **/
 window.addEventListener('keydown', (e) => {
     if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
     if (gameState.isPaused || gameState.isQuizActive) return; 
@@ -410,27 +391,25 @@ function togglePause() {
 pauseBtn.addEventListener('click', togglePause);
 resumeBtn.addEventListener('click', togglePause);
 
-// 启动游戏
-// 最底部的启动代码：
 async function fetchWordsAndStart() {
     try {
-        console.log("正在从数据库加载词库...");
+        console.log("loading words...");
         const response = await fetch('api_get_words.php');
         const data = await response.json();
         
         if (data.error) {
-            alert("词库加载错误: " + data.error);
+            alert("loading error: " + data.error);
             return;
         }
         
         WORD_BANK = data;
-        console.log("成功加载词库，单词数量:", WORD_BANK.length);
+        console.log("Success，words number:", WORD_BANK.length);
         
         loadAssets(() => { initGame(); });
         
     } catch (error) {
-        console.error("请求词库失败:", error);
-        alert("网络请求失败，请检查 api_get_words.php 是否正常工作！");
+        console.error("Fail loading:", error);
+        alert("Network is broken");
     }
 }
 

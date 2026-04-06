@@ -89,6 +89,8 @@ $hist_stmt->close();
 ?>
 <!DOCTYPE html>
 
+
+
 <nav class="navbar"> </nav>
 <header class="hero">
     <h1>Scholar Profile</h1>
@@ -153,3 +155,4 @@ $hist_stmt->close();
 </script>
 </body>
 </html>
+
