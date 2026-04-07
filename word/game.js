@@ -1,41 +1,28 @@
 const LEVELS = [
-    { id:1, name:"big",         targets:["big","large","huge","giant","enormous","massive","vast","immense","gigantic","tremendous"], time:0, speed:0.8, totalWords:50 },
-    { id:2, name:"small",       targets:["small","tiny","little","miniature","minute","petite","compact","microscopic","negligible","minuscule"], time:90, speed:1.0, totalWords:50 },
-    { id:3, name:"good",        targets:["good","great","excellent","superb","outstanding","fantastic","wonderful","brilliant","marvelous","exceptional"], time:90, speed:1.2, totalWords:55 },
-    { id:4, name:"bad",         targets:["bad","poor","terrible","awful","horrible","dreadful","nasty","lousy","atrocious","abysmal"], time:90, speed:1.4, totalWords:60 },
-    { id:5, name:"fast",        targets:["fast","quick","rapid","swift","speedy","hasty","hurried","fleet","express","accelerate"], time:75, speed:1.6, totalWords:60 },
-    { id:6, name:"slow",        targets:["slow","sluggish","gradual","leisurely","unhurried","poky","dilatory","tardy","lagging","snail-like"], time:75, speed:1.8, totalWords:65 },
-    { id:7, name:"start",       targets:["start","begin","initiate","launch","commence","trigger","activate","originate","embark","kickoff"], time:75, speed:2.0, totalWords:70 },
-    { id:8, name:"end",         targets:["end","stop","finish","complete","conclude","cease","terminate","halt","quit","abolish"], time:60, speed:2.2, totalWords:70 },
-    { id:9, name:"although",    targets:["although","though","despite","however","nevertheless","nonetheless","whereas","while","albeit","regardless"], time:60, speed:2.4, totalWords:75 },
-    { id:10,name:"destroy",     targets:["destroy","damage","demolish","wreck","ruin","shatter","smash","crush","devastate","obliterate"], time:60, speed:2.6, totalWords:80 }
+    { id:1, name:"big", targets:["big","large","huge","giant","enormous","massive","vast","immense","gigantic","tremendous"], time:0, speed:0.8, totalWords:50 },
+    { id:2, name:"small", targets:["small","tiny","little","miniature","minute","petite","compact","microscopic","negligible","minuscule"], time:90, speed:1.0, totalWords:50 },
+    { id:3, name:"good", targets:["good","great","excellent","superb","outstanding","fantastic","wonderful","brilliant","marvelous","exceptional"], time:90, speed:1.2, totalWords:55 },
+    { id:4, name:"bad", targets:["bad","poor","terrible","awful","horrible","dreadful","nasty","lousy","atrocious","abysmal"], time:90, speed:1.4, totalWords:60 },
+    { id:5, name:"fast", targets:["fast","quick","rapid","swift","speedy","hasty","hurried","fleet","express","accelerate"], time:75, speed:1.6, totalWords:60 },
+    { id:6, name:"slow", targets:["slow","sluggish","gradual","leisurely","unhurried","poky","dilatory","tardy","lagging","snail-like"], time:75, speed:1.8, totalWords:65 },
+    { id:7, name:"start", targets:["start","begin","initiate","launch","commence","trigger","activate","originate","embark","kickoff"], time:75, speed:2.0, totalWords:70 },
+    { id:8, name:"end", targets:["end","stop","finish","complete","conclude","cease","terminate","halt","quit","abolish"], time:60, speed:2.2, totalWords:70 },
+    { id:9, name:"although", targets:["although","though","despite","however","nevertheless","nonetheless","whereas","while","albeit","regardless"], time:60, speed:2.4, totalWords:75 },
+    { id:10,name:"destroy", targets:["destroy","damage","demolish","wreck","ruin","shatter","smash","crush","devastate","obliterate"], time:60, speed:2.6, totalWords:80 }
 ];
 
 const PROGRESS_KEY = 'word_hunter_progress';
 
 function getUnlockedLevel() {
     const saved = localStorage.getItem(PROGRESS_KEY);
-    console.log("Saved progress:", saved);
-    if (saved) {
-        return parseInt(saved);
-    }
-    return 1;
+    return saved ? parseInt(saved) : 1;
 }
 
 function saveProgress(levelCompleted) {
-    const currentUnlocked = getUnlockedLevel();
-    console.log("Current unlocked:", currentUnlocked, "Completed:", levelCompleted);
-    if (levelCompleted + 1 > currentUnlocked) {
-        const newUnlocked = levelCompleted + 1;
-        localStorage.setItem(PROGRESS_KEY, newUnlocked);
-        console.log("Saved new unlocked level:", newUnlocked);
+    const current = getUnlockedLevel();
+    if (levelCompleted + 1 > current) {
+        localStorage.setItem(PROGRESS_KEY, levelCompleted + 1);
     }
-}
-
-function resetProgress() {
-    localStorage.setItem(PROGRESS_KEY, 1);
-    console.log("Progress reset to level 1");
-    renderLevelSelect();
 }
 
 const FALLBACK_DISTRACTORS = [
@@ -73,10 +60,7 @@ const BUILTIN_DEFINITIONS = {
 
 window.onload = function() {
     canvas = document.getElementById('game-canvas');
-    if (!canvas) {
-        console.error("Canvas element not found");
-        return;
-    }
+    if (!canvas) return;
     ctx = canvas.getContext('2d');
     
     levelSelectScreen = document.getElementById('level-select-screen');
@@ -87,7 +71,7 @@ window.onload = function() {
     
     document.getElementById('back-to-select-btn')?.addEventListener('click', showLevelSelect);
     document.getElementById('back-to-main-from-select')?.addEventListener('click', function() {
-        window.location.href = '../galgame/index.html';
+        window.location.href = '../galgame/index.html?view=floor6';
     });
     document.getElementById('back-to-select-after-complete')?.addEventListener('click', function() {
         closeAllModals();
@@ -126,7 +110,6 @@ window.onload = function() {
 function renderLevelSelect() {
     if (!levelGrid) return;
     const unlockedLevel = getUnlockedLevel();
-    console.log("Rendering level select, unlocked level:", unlockedLevel);
     levelGrid.innerHTML = '';
     
     for (let i = 0; i < LEVELS.length; i++) {
@@ -257,8 +240,8 @@ function startGameFromLevel(levelIndex) {
 function showLoadingMessage() {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle = 'white';
-    ctx.font = '24px "Segoe UI"';
+    ctx.fillStyle = '#1f3127';
+    ctx.font = '24px "Trebuchet MS"';
     ctx.textAlign = 'center';
     ctx.fillText('Loading words...', canvasWidth/2, canvasHeight/2);
 }
