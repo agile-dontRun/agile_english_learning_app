@@ -5,10 +5,10 @@ const chapter5 =[
     {
     type: 'transition', 
     images:[
-        '../frontend/assets/scene5/canteen.jpg',   // 走廊第一张图
-        '../frontend/assets/scene5/canteenLobby.jpg',   // 走廊第二张图
+        '../frontend/assets/scene5/canteen.jpg',   // The first picture of the corridor
+        '../frontend/assets/scene5/canteenLobby.jpg',   
     ],
-    timePerImage: 800  // 每张照片停留 800 毫秒 (0.8秒)，你可以调整这个数值控制走路的快慢
+    timePerImage: 800  
     },
     {type:"dialogue", speaker:"canteen server", text:"喧闹的食堂，蒸汽升腾，食堂阿姨挥舞着大勺，面无表情地看着你"},
     {type:"dialogue", speaker:"canteen server", text:"Next! What do you want, hon?"},
@@ -16,22 +16,22 @@ const chapter5 =[
         options:[
             {text:"A: Give me the chicken and rice. Fast, I'm hungry.",
                 isCorrect: false,
-                mentorText: " 兄弟，食堂阿姨惹不起！这种命令口吻（Give me...）在任何国家都是不受欢迎的。即便对方是服务人员，你的礼貌也是你的名片。"
+                mentorText: " Brother, the cafeteria auntie can't afford to provoke you! This command tone (Give me...) is not welcomed in any country. Even if the other party is a service personnel, your politeness is still your business card。"
             },
             {
                 text:"B: Hi! Could I get the chicken and rice, please?",
                 isCorrect: true,
-                response: " 漂亮！\"Could I get...\" 永远是点餐时的万能礼貌句型，哪怕在繁忙的食堂，保持友好的态度（Hi / Please）也会让你收获更好的服务。"
-            },
+                response: " pretty Could I get... \"is always a universal polite sentence pattern when ordering, even in a busy cafeteria, maintaining a friendly attitude (Hi/Please) will bring you better service. "
+},
             {
                 text:"C: I want this, this, and this.",
                 isCorrect: false,
-                mentorText: "指手画脚虽然能完成任务，但显得很没自信。试着说出菜名，比如 \"The curry chicken\" 或者 \"The stir-fried beef\"，这能帮你快速提升英语自信。"
+                mentorText: "Although pointing fingers can complete tasks, it appears very lacking in confidence. Try saying the dish name, such as' The curry chicken 'or' The stir fried beef ', which can help you quickly improve your English confidence. "
             }
         ]
     },
-    {type:"dialogue", speaker:"canteen server", text:"阿姨迅速地把菜盛好，递给你。"},
-    {type: "dialogue", speaker:"旁白", text:"你拿着餐盘，寻找小王的身影，并端着盘子朝她走过去。"},
+    {type:"dialogue", speaker:"canteen server", text:"Auntie quickly prepared the dishes and handed them to you."},
+    {type: "dialogue", speaker:"Narration", text:"You are holding the tray, looking for Xiao Wang's figure, and walking towards her with the tray."},
     {type:"dialogue", speaker:"Xiaowang", text:"Hey! Over here!Did you have fun in the tour?", bg: "../frontend/assets/scene5/canteenTable.jpg"},
     {type:"choice", options:[
         {

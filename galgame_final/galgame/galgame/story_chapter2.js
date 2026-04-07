@@ -2,10 +2,10 @@ const chapter2 = [
    {
     type: 'transition', 
     images:[
-        '../frontend/assets/scene2/lobby2.jpg',   // 走廊第一张图
-        '../frontend/assets/scene2/corridor.jpg',   // 走廊第二张图
+        '../frontend/assets/scene2/lobby2.jpg',   // The first picture of the corridor
+        '../frontend/assets/scene2/corridor.jpg',   // Second picture of the corridor
     ],
-    timePerImage: 800  // 每张照片停留 800 毫秒 (0.8秒)，你可以调整这个数值控制走路的快慢
+    timePerImage: 800  // Each photo stays for 800 milliseconds (0.8 seconds)
     },
     {type: 'dialogue', speaker: "Karen", text: "This is your English Classroom. You'll be having your morning readings and english classes here. So, don't be late!",  bg: "../frontend/assets/scene2/english_classroom.jpg"},
     { type: 'dialogue', speaker: 'Narration', text: 'Do you want to ask specifically when morning reading starts.' },

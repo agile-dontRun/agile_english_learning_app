@@ -9,7 +9,6 @@ const chapter1 = [
                 text: "A: 'Pretty good! Excited to be here.'",
                 isCorrect: true,
                 response: "That's the spirit! ",
-                //score: 5
             },
             {
                 text: "B: 'I am fine, thank you, and you?'",
@@ -23,7 +22,6 @@ const chapter1 = [
             }
         ]
     },
-    //{ type: 'dialogue', speaker: 'Narration', text: '（场景一顺利通过，你松了一口气，跟着队伍继续往前走……）' },
     { type: 'dialogue', speaker: 'Karen', text: "I love your energy. Next up, let's talk about your hobbies! What do you like to do in your free time? Who wants to be the first to share?" },
     { type: 'dialogue', speaker: 'Xiaowang', text: "Hi Karen, I'm Xiangwang. In my free time, I like to watch English movies and read international news. I hope I can improve my English and learn more about different cultures here, since it's an international college."},
     { type: 'dialogue', speaker: 'Karen', text: 'Wonderful choice! Watching movies is a great way to pick up daily English. Thank you, Xiangwang. Now, how about you? [Her gaze turned to you, gentle and waiting for your answer] What do you like to do in your free time?'},
