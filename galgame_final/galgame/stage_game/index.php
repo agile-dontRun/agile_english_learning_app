@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div class="progress-fill" id="progressFill"></div>
         </div>
         <div class="info-card">⭐ Score: <span id="scoreCount">0</span></div>
-        <!-- ====== 🌟 新增：返回校园大门按钮 ====== -->
+        <!-- ====== 🌟 Return to Campus Gate Button ====== -->
         <button class="reset-btn" style="background-color: #d9534f;" 
                 onclick="window.location.href='../galgame/index.html?view=floor6'">
             🔙 Back to 6 floor
