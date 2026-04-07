@@ -46,7 +46,7 @@
             height: calc(100vh - 50px);
         }
 
-        /* Luna 老师占 45% */
+        /* Luna side takes 45% width */
         #luna-side {
             flex: 0 0 45%;
             background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
@@ -79,7 +79,7 @@
             line-height: 1.6;
         }
 
-        /* 写作区域 */
+        /* Writing area */
         #work-side {
             flex: 1;
             display: flex;
@@ -164,7 +164,7 @@
             cursor: pointer;
         }
 
-        /* 弹窗 */
+        /* Modal overlay */
         #result-overlay {
             position: fixed;
             inset: 0;
@@ -241,7 +241,7 @@
         let currentMode = 'ai';
         let activeTopic = "";
 
-        // 切换模式
+        // Switch between AI generation and real past paper mode
         function switchMode(mode, btn) {
             currentMode = mode;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -261,7 +261,7 @@
             }
         }
 
-        // 加载本地真题 JSON
+        // Load a local past paper JSON file
         async function loadLocalPaper(file) {
             if (!file) return;
             const res = await fetch(file);
@@ -271,7 +271,7 @@
             document.getElementById('luna-bubble').innerText = `This is a real ${data.type} task. Good luck!`;
         }
 
-        // AI 出题
+        // Ask AI to generate a new writing topic
         async function generateAITopic() {
             document.getElementById('topic-text').innerText = "Luna is thinking...";
             const res = await fetch('writing_proxy.php', { method: 'POST', body: JSON.stringify({ action: 'get_topic' }) });
@@ -280,7 +280,7 @@
             document.getElementById('topic-text').innerText = activeTopic;
         }
 
-        // 提交研判
+        // Submit essay for evaluation
         async function submitEvaluation() {
             const content = document.getElementById('essay-input').value;
             if (content.length < 50) return alert("Please write at least 50 words.");
@@ -298,7 +298,7 @@
             document.getElementById('result-overlay').style.display = 'flex';
         }
 
-        // 词数统计
+        // Word count tracker
         document.getElementById('essay-input').addEventListener('input', function () {
             const words = this.value.trim().split(/\s+/).filter(x => x).length;
             document.getElementById('word-count').innerText = words;
