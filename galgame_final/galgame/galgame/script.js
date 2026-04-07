@@ -1,13 +1,13 @@
-// 第一章剧情数据结构
+// Chapter 1: Plot Data Structure
 const prologueData = [].concat(chapter1, chapter2, chapter3);
 
 let storyData = [];
 let isPlayingTutorial = false;
 
-// 游戏状态变量
+// Game state variables
 let currentStep = 0;
 
-// 获取DOM元素
+// Get the DOM elements for the new interfaces
 const dialogueBox = document.getElementById("dialogue-box");
 const speakerName = document.getElementById("speaker-name");
 const dialogueText = document.getElementById("dialogue-text");
@@ -41,7 +41,7 @@ const dressUpLayerOrder = [
   "head",
 ];
 
-// 获取新界面的DOM
+// Get the DOM elements for the new interfaces
 const homeScreen = document.getElementById("home-screen");
 const floor6Screen = document.getElementById("floor6-screen");
 
@@ -189,7 +189,7 @@ async function getTutorialStatus() {
 
     return await res.json();
   } catch (err) {
-    console.error("获取教程状态失败：", err);
+    console.error("Failed to get tutorial status:", err);
     return {
       success: false,
       is_tutorial_completed: false,
@@ -210,12 +210,12 @@ async function markTutorialCompleted() {
 
     return await res.json();
   } catch (err) {
-    console.error("标记教程完成失败：", err);
+    console.error("Failed to mark tutorial as completed:", err);
     return { success: false };
   }
 }
 
-// 初始化游戏
+// Initialize game
 async function initGame() {
     await loadPlayerAvatar();
     await loadHomeAvatarLook();
@@ -235,7 +235,7 @@ async function initGame() {
   }
 }
 
-// 渲染当前剧情步骤
+// Render the current plot step
 function renderStep() {
   if (currentStep >= storyData.length) {
     dialogueBox.classList.add("hidden");
@@ -354,7 +354,7 @@ function renderStep() {
   }
 }
 
-// 处理玩家的选择 (带对错判断)
+// Handling player choices (with right or wrong judgments)
 function handleChoice(option) {
   if (option.isCorrect) {
     optionsContainer.classList.add("hidden");
@@ -383,7 +383,7 @@ function handleChoice(option) {
   }
 }
 
-// 导师退场，时光倒流重新选择
+// Mentor exits, time goes back to choose again
 function resetFromMentor(e) {
   e.stopPropagation();
   mentorOverlay.classList.add("hidden");
@@ -394,7 +394,7 @@ function resetFromMentor(e) {
   renderStep();
 }
 
-// 点击对话框推进剧情
+// Click on the dialog box to advance the plot
 function advanceStory() {
   if (!optionsContainer.classList.contains("hidden")) {
     return;
@@ -403,7 +403,7 @@ function advanceStory() {
   renderStep();
 }
 
-// 处理探索选择 (无对错，接入子剧情)
+// Handling exploration selection (no right or wrong, incorporating subplots)
 function handleExploreChoice(option) {
   optionsContainer.classList.add("hidden");
   dialogueBox.classList.remove("hidden");
@@ -414,7 +414,7 @@ function handleExploreChoice(option) {
   advanceStory();
 }
 
-// ================= 界面跳转与游戏启动逻辑 =================
+// ================= Interface jump and game startup logic =================
 function startStory(newChapterData, tutorialMode = false) {
   storyData = newChapterData;
   currentStep = 0;
@@ -454,16 +454,15 @@ function launchGame(gameName) {
   }
 }
 
-// ================= 新增：万能场景跳转函数 =================
+// ================= Universal scene jump function =================
 function goToScenario(bgUrl, chapterData) {
-  // 1. 强制把底层的背景图，换成你指定的场景图
+  // 1. Forcefully replace the underlying background image with the specified scene image
   document.getElementById("bg-image").src = bgUrl;
 
-  // 2. 调用已有的 startStory 函数，加载对应的剧本并开始播放
+  // 2. Call the existing startStory function, load the corresponding script and start playing it
   startStory(chapterData);
 }
 
-// // 确保你的 startStory 函数是长这样的：
 // function startStory(newChapterData) {
 //     storyData = newChapterData;
 //     currentStep = 0;
@@ -481,8 +480,8 @@ function goToScenario(bgUrl, chapterData) {
 //     renderStep();
 // }
 
-// 绑定全局点击事件
+// Bind global click event
 dialogueBox.onclick = advanceStory;
 
-// 启动！
+// Start up
 initGame();

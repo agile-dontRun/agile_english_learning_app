@@ -12,7 +12,7 @@ body {
   overflow: hidden;
 }
 
-/* 游戏容器：固定 800x600 比例 */
+/* Game container: fixed 800x600 aspect ratio */
 #game-container {
   width: 100vw;
   height: 100vh;
@@ -21,7 +21,7 @@ body {
   background-color: #222;
 }
 
-/* 背景图片：自动铺满容器 */
+/* Background image: automatically fill the container */
 #bg-image {
   width: 100%;
   height: 100%;
@@ -30,7 +30,7 @@ body {
   z-index: 1;
 }
 
-/* 立绘层 */
+/* Character sprite layer */
 #character-sprite,
 #mentor-sprite {
   position: absolute;
@@ -46,7 +46,7 @@ body {
   z-index: 20;
 }
 
-/* 导师出场时的屏幕变暗遮罩 */
+/* Mentor overlay when appearing */
 #mentor-overlay {
   position: absolute;
   top: 0;
@@ -57,7 +57,7 @@ body {
   z-index: 10;
 }
 
-/* 对话框容器 */
+/* Dialog box container */
 #dialogue-box {
   display: flex;
   position: absolute;
@@ -75,7 +75,7 @@ body {
   cursor: pointer;
 }
 
-/* 头像容器 */
+/* Speaker avatar container */
 #speaker-avatar-box {
   width: 80px;
   height: 80px;
@@ -83,7 +83,7 @@ body {
   flex-shrink: 0;
 }
 
-/* 头像图片样式 */
+/* Avatar image style */
 #speaker-avatar {
   width: 100%;
   height: 100%;
@@ -93,7 +93,7 @@ body {
   object-position: top;
 }
 
-/* 文字内容 */
+/* text content */
 #text-content {
   flex: 1;
   display: flex;
@@ -116,7 +116,7 @@ body {
   animation: blink 1s infinite;
 }
 
-/* ================= 新增补回来的：选项面板样式 ================= */
+/* ================= Options Panel Style ================= */
 #options-container {
   position: absolute;
   top: 25%;
@@ -145,7 +145,7 @@ body {
   transform: scale(1.02);
 }
 
-/* 辅助类 */
+/* auxiliary class */
 .hidden {
   display: none !important;
 }
