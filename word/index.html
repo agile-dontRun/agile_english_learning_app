@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Word Hunter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+    <div id="level-select-screen" class="screen">
+        <div class="select-header">
+            <h1>WORD HUNTER</h1>
+            <p>select a level to begin</p>
+            <button id="back-to-main-from-select" class="back-main-btn">← back to 6th floor</button>
+        </div>
+        <div id="level-grid" class="level-grid"></div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <div id="top-bar">
+            <div class="level-info"><span class="label">Level</span><span id="level-num">1</span></div>
+            <div class="score-info"><span class="label">✅</span><span id="score">0</span><span class="label">/</span><span id="target-total">10</span></div>
+            <div class="timer-info"><span class="label">⏱️</span><span id="timer">--</span><span class="label">sec</span></div>
+            <button id="back-to-select-btn" class="back-btn">📋 Levels</button>
+        </div>
+        <div id="task-header">
+            <div id="task-title">🎯 Find all words meaning <span id="current-target-desc">"big"</span></div>
+            <div id="task-subtitle">Click correct word bubbles | Wrong click = -2 seconds</div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+        <div id="bottom-bar">
+            <div class="action-buttons">
+                <button id="next-level-btn" class="next-btn" disabled>▶ Next Level</button>
+                <button id="restart-btn" class="restart-btn">🔄 Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="definition-modal" class="modal hidden">
+        <div class="modal-content"><span class="close-modal">&times;</span><h3 id="def-word">word</h3><p id="def-phonetic" class="phonetic"></p><p id="def-meaning" class="meaning"></p></div>
+    </div>
+    <div id="level-complete-modal" class="modal hidden">
+        <div class="modal-content level-complete"><h2>🎉 Level Complete! 🎉</h2><p id="complete-message">Congratulations!</p><button id="continue-btn">Next Level</button><button id="back-to-select-after-complete" class="back-select-btn">📋 Level Select</button></div>
+    </div>
+    <div id="game-over-modal" class="modal hidden">
+        <div class="modal-content game-over"><h2>⏰ Time's Up!</h2><p id="gameover-message">Game Over</p><button id="restart-game-btn">Try Again</button><button id="back-to-select-after-gameover" class="back-select-btn">📋 Level Select</button></div>
+    </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
