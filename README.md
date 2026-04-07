@@ -36,7 +36,7 @@ To ensure high code quality and efficient teamwork, we have adopted an **Agile d
 
 ### 2. Team Roles
 *   **Scrum Master:** @Zeyu Li - Responsible for process coordination and project progress.
-*   **Code Reviewers:** @Lilin Zhu, @Yixuan Pan, @Xiangtian Ren - Responsible for code quality assurance and PR approvals.
+*   **Code Reviewers:** @Lilin Zhu, @Yixuan Pan, @Xiangtian Ren @Zeyuan Huang - Responsible for code quality assurance and PR approvals.
 *   **Developers:** All team members.
 *   **Note:** Merging directly into main is strictly prohibited. All code must pass the review process.
 *   **Note** Each time creating an issue, you should add **label**, **type** and **milestone** for it, small issues should be labeled as "Epic: xxx", type as "Task" and large issue should be labeled as "Type: Epic", type as "feature". All issues during sprint 2 's milestone is "Sprint 2". **Important**
