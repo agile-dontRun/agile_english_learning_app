@@ -15,6 +15,9 @@
             background-color: var(--oxford-blue); 
         }
     </style>
+<<<<<<< 409-ui-align-global-typography-and-oxford-color-palette
+</head>
+=======
 </head>
 
 <style>
@@ -109,3 +112,4 @@
     
 </script>
 
+>>>>>>> main
