@@ -59,6 +59,7 @@
         </div>
         <div class="right-side"> </div>
     </div>
+</body>
 
     <div class="login-container">
     <h2 id="header-title">Welcome Back</h2>
