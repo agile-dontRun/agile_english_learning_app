@@ -9,7 +9,7 @@ $apiUrl = "https://api.deepseek.com/chat/completions";
 $action = $input['action'] ?? '';
 
 if ($action === 'get_topic') {
-    // 逻辑：请求 AI 出一道学术写作题
+    // Logic: ask AI to generate an academic writing topic
     $postData = [
         "model" => "deepseek-chat",
         "messages" => [
@@ -18,7 +18,7 @@ if ($action === 'get_topic') {
         ]
     ];
 } elseif ($action === 'evaluate') {
-    // 逻辑：批改作文
+    // Logic: evaluate the student's essay
     $topic = $input['topic'];
     $content = $input['content'];
     
@@ -53,6 +53,6 @@ $aiContent = $result['choices'][0]['message']['content'];
 if ($action === 'get_topic') {
     echo json_encode(['topic' => $aiContent]);
 } else {
-    // 直接把 AI 返回的 JSON 字符串透传给前端
+    // Pass the AI's JSON string directly to the frontend
     echo $aiContent;
 }
