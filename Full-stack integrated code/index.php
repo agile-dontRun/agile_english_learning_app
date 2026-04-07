@@ -72,6 +72,20 @@
         <button type="submit">Log In</button>
     </form>
     </div>
+    /* Step 5: 新增响应式媒体查询 */
+@media (max-width: 1024px) {
+    .brand-logo { font-size: 3.5rem; } /* 缩小 iPad 端字号 */
+}
+
+@media (max-width: 768px) {
+    .login-page { 
+        flex-direction: column; /* 手机端改为上下堆叠布局 */
+        justify-content: center; padding: 20px; 
+    }
+    .left-side { padding-right: 0; text-align: center; margin-bottom: 40px; }
+    .brand-logo { font-size: 2.8rem; }
+    .login-container { padding: 35px 25px; }
+}
 
     /* Step 4: 新增交互控制函数 */
 <script>
@@ -92,4 +106,5 @@
     }
     window.onload = function () { showForm("login"); };
 </script>
+
 </body>
