@@ -92,3 +92,4 @@
     }
     window.onload = function () { showForm("login"); };
 </script>
+</body>
