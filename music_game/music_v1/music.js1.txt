@@ -1,0 +1,157 @@
+// 歌曲数据列表，从全局变量 window.songList 中读取
+const songs = window.songList || [];
+
+// 获取页面中的各个 DOM 元素
+const audioPlayer = document.getElementById("audioPlayer"); // 音频播放器
+const coverImage = document.getElementById("coverImage"); // 封面图片
+const songTitle = document.getElementById("songTitle"); // 歌曲标题
+const songArtist = document.getElementById("songArtist"); // 歌手名称
+const songDescription = document.getElementById("songDescription"); // 歌曲描述
+const playBtn = document.getElementById("playBtn"); // 播放/暂停按钮
+const prevBtn = document.getElementById("prevBtn"); // 上一首按钮
+const nextBtn = document.getElementById("nextBtn"); // 下一首按钮
+const progressBar = document.getElementById("progressBar"); // 播放进度条
+const currentTime = document.getElementById("currentTime"); // 当前播放时间
+const duration = document.getElementById("duration"); // 总时长
+const playlistButtons = Array.from(document.querySelectorAll(".playlist-item")); // 播放列表按钮数组
+
+// 当前歌曲下标，默认从第 0 首开始
+let currentIndex = 0;
+
+// 将秒数格式化为 mm:ss
+function formatTime(time) {
+    // 如果时间不是有效数字，返回默认值
+    if (!Number.isFinite(time)) {
+        return "00:00";
+    }
+
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+
+    // 不足两位前面补 0
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+// 更新左侧播放列表的激活状态
+function updatePlaylistState() {
+    playlistButtons.forEach((button, index) => {
+        button.classList.toggle("active", index === currentIndex);
+    });
+}
+
+// 加载指定下标的歌曲
+// shouldAutoplay = true 时，加载后自动播放
+function loadSong(index, shouldAutoplay = false) {
+    const song = songs[index];
+
+    // 如果歌曲不存在，直接返回
+    if (!song) {
+        return;
+    }
+
+    // 更新当前歌曲下标
+    currentIndex = index;
+
+    // 更新页面上的歌曲信息
+    coverImage.src = song.cover;
+    songTitle.textContent = song.title;
+    songArtist.textContent = song.artist;
+    songDescription.textContent = song.description;
+
+    // 设置音频源
+    audioPlayer.src = song.audio;
+
+    // 重置进度条和时间显示
+    progressBar.value = 0;
+    currentTime.textContent = "00:00";
+    duration.textContent = "00:00";
+
+    // 更新播放列表高亮状态
+    updatePlaylistState();
+
+    // 如果需要自动播放，则直接开始播放
+    if (shouldAutoplay) {
+        audioPlayer.play();
+    }
+}
+
+// 播放 / 暂停切换函数
+function togglePlay() {
+    // 如果当前还没有音频源，先加载当前歌曲并自动播放
+    if (!audioPlayer.src) {
+        loadSong(currentIndex, true);
+        return;
+    }
+
+    // 根据当前播放状态进行切换
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+    } else {
+        audioPlayer.pause();
+    }
+}
+
+// 点击播放按钮：执行播放/暂停切换
+playBtn.addEventListener("click", togglePlay);
+
+// 点击上一首按钮
+prevBtn.addEventListener("click", () => {
+    const nextIndex = (currentIndex - 1 + songs.length) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+// 点击下一首按钮
+nextBtn.addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+// 点击播放列表中的某一首歌
+playlistButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const index = Number(button.dataset.index);
+        loadSong(index, true);
+    });
+});
+
+// 当音频开始播放时，把按钮文字改成“暂停”
+audioPlayer.addEventListener("play", () => {
+    playBtn.textContent = "暂停";
+});
+
+// 当音频暂停时，把按钮文字改成“播放”
+audioPlayer.addEventListener("pause", () => {
+    playBtn.textContent = "播放";
+});
+
+// 音频元数据加载完成后，显示总时长
+audioPlayer.addEventListener("loadedmetadata", () => {
+    duration.textContent = formatTime(audioPlayer.duration);
+});
+
+// 播放过程中实时更新进度条和当前时间
+audioPlayer.addEventListener("timeupdate", () => {
+    if (audioPlayer.duration) {
+        progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    }
+
+    currentTime.textContent = formatTime(audioPlayer.currentTime);
+});
+
+// 用户拖动进度条时，更新音频播放位置
+progressBar.addEventListener("input", () => {
+    if (!audioPlayer.duration) {
+        return;
+    }
+
+    audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
+});
+
+// 当前歌曲播放结束后，自动播放下一首
+audioPlayer.addEventListener("ended", () => {
+    const nextIndex = (currentIndex + 1) % songs.length;
+    loadSong(nextIndex, true);
+});
+
+// 页面初始化时先加载第 1 首歌
+loadSong(0);
