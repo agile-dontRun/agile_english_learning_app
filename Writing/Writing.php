@@ -1,389 +1,326 @@
+<?php
+/**
+ * Spires Academy - Academic Writing Laboratory
+ * * An advanced immersive writing environment integrated with Professor Luna (AI).
+ * Features: Real-time context-aware feedback, Academic tone scoring, 
+ * and Seamless User Session integration.
+ * * @package Spires_Learning_System
+ * @version 2.4.0
+ */
+
+session_start();
+require_once 'db_connect.php'; 
+
+/* -------------------------------------------------------------------------
+   1. SESSION & SECURITY PROTOCOL
+   ------------------------------------------------------------------------- */
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+/* -------------------------------------------------------------------------
+   2. DATA ACQUISITION: USER PROFILE
+   ------------------------------------------------------------------------- */
+$username = ''; $nickname = 'Scholar'; $db_avatar = '';
+$stmt = $conn->prepare("SELECT username, nickname, avatar_url FROM users WHERE user_id = ?");
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $user_data = $stmt->get_result()->fetch_assoc();
+    if ($user_data) {
+        $username = $user_data['username'];
+        $nickname = !empty($user_data['nickname']) ? $user_data['nickname'] : $username;
+        $db_avatar = $user_data['avatar_url'];
+    }
+    $stmt->close();
+}
+
+// Dynamic Avatar Rendering Logic
+$avatar_html = '';
+$first_letter = strtoupper(substr($username ? $username : 'U', 0, 1));
+if (!empty($db_avatar)) {
+    $avatar_html = '<img src="' . htmlspecialchars($db_avatar) . '" alt="Avatar" class="user-avatar-img" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
+    $avatar_html .= '<div class="user-avatar-placeholder" style="display:none;">' . htmlspecialchars($first_letter) . '</div>';
+} else {
+    $avatar_html = '<div class="user-avatar-placeholder">' . htmlspecialchars($first_letter) . '</div>';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luna Academic Writing Center - Dual Engine</title>
+    <title>Writing Laboratory | Spires Academy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
-        /* Visual Identity: Oxford Blue & Academic White
-           Designed for focus-heavy environments.
-        */
         :root {
-            --primary: #2563EB;
-            --dark: #1E3A8A;
-            --bg: #F8FAFC;
-            --text-slate: #1E293B;
-            --border-gray: #E2E8F0;
+            --oxford-blue: #002147;
+            --oxford-gold: #c4a661;
+            --ivory-white: #ffffff;
+            --paper-bg: #FCFDFF;
+            --shadow-subtle: 0 10px 40px rgba(0,33,71,0.1);
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background: var(--bg);
-            overflow: hidden; /* Prevent body scroll to keep the layout static */
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; background: #f0f2f5; 
+            color: #1a1a1a; overflow-x: hidden; 
         }
 
-        /* Top Navigation Bar */
-        .main-nav {
-            background: #fff;
-            border-bottom: 1px solid var(--border-gray);
-            display: flex;
-            padding: 0 40px;
-            gap: 20px;
-            height: 60px;
-            align-items: center;
+        /* --- 1. NAVIGATION (Oxford Persistent Header) --- */
+        .navbar { 
+            background: var(--oxford-blue); 
+            height: 80px; padding: 0 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .logo-box img { height: 45px; transition: 0.3s; }
+        
+        .nav-links { list-style: none; display: flex; gap: 5px; margin: 0; padding: 0; }
+        .nav-links a { 
+            color: white; text-decoration: none; font-family: 'Playfair Display', serif;
+            font-size: 15px; font-weight: 700; padding: 10px 18px; 
+            text-transform: uppercase; letter-spacing: 1.2px; transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--oxford-gold); }
+
+        .user-meta { display: flex; align-items: center; gap: 12px; color: white; cursor: pointer; position: relative; }
+        .user-avatar-placeholder { width: 38px; height: 38px; border-radius: 50%; background: var(--oxford-gold); color: var(--oxford-blue); display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid #fff; }
+
+        /* --- 2. HERO SECTION --- */
+        .hero {
+            background: linear-gradient(rgba(0,33,71,0.85), rgba(0,33,71,0.85)), url('hero_bg2.png');
+            background-size: cover; background-position: center;
+            height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center;
+        }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 4.5rem; margin: 0; letter-spacing: 4px; text-transform: uppercase; }
+        .hero p { font-family: 'Lora', serif; font-style: italic; font-size: 1.3rem; opacity: 0.9; margin-top: 10px; }
+
+        /* --- 3. WRITING LAB CORE --- */
+        .writing-container {
+            max-width: 1350px; margin: -100px auto 60px;
+            display: flex; gap: 25px; min-height: 700px;
         }
 
-        .nav-item {
-            text-decoration: none;
-            color: #64748B;
-            font-weight: 500;
-            font-size: 14px;
-            padding: 5px 0;
-            transition: color 0.3s;
+        /* Professor Luna Panel (35% Width) */
+        .luna-panel {
+            flex: 0 0 32%;
+            background: linear-gradient(135deg, var(--oxford-blue) 0%, #003366 100%);
+            border-radius: 15px; display: flex; flex-direction: column; 
+            justify-content: flex-end; align-items: center; position: relative;
+            box-shadow: var(--shadow-subtle); border-bottom: 6px solid var(--oxford-gold);
         }
-
-        .nav-item.active {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
+        .luna-speech {
+            position: absolute; top: 40px; left: 30px; right: 30px;
+            background: white; border-radius: 12px; padding: 25px;
+            font-family: 'Playfair Display', serif; font-style: italic; font-size: 17px;
+            line-height: 1.6; color: var(--oxford-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-left: 5px solid var(--oxford-gold);
         }
-
-        /* 45/55 Split Layout */
-        #writing-wrapper {
-            display: flex;
-            width: 100vw;
-            height: calc(100vh - 60px);
+        .luna-speech::after {
+            content: ''; position: absolute; bottom: -15px; left: 50%; 
+            border-width: 15px 15px 0; border-style: solid; border-color: white transparent transparent; transform: translateX(-50%);
         }
+        .luna-img { font-size: 300px; line-height: 1; margin-bottom: -10px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); }
 
-        /* Left Side: Luna Tutor (45% Width) */
-        #luna-side {
-            flex: 0 0 45%;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            position: relative;
-            color: white;
+        /* Scholarly Workspace (65% Width) */
+        .workspace {
+            flex: 1; background: white; border-radius: 15px; 
+            display: flex; flex-direction: column; padding: 45px;
+            box-shadow: var(--shadow-subtle); border-top: 6px solid var(--oxford-blue);
         }
-
-        #luna-avatar {
-            font-size: 350px;
-            line-height: 1;
-            margin-bottom: -15px;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
-            user-select: none;
+        .topic-box { 
+            background: #f8fafc; border: 1px solid #e2e8f0; 
+            padding: 25px; border-radius: 8px; margin-bottom: 30px;
+            border-left: 6px solid var(--oxford-gold);
         }
+        .topic-box h3 { font-family: 'Playfair Display', serif; margin: 0; color: var(--oxford-blue); font-size: 1.4rem; }
 
-        #luna-bubble {
-            position: absolute;
-            top: 50px; left: 40px; right: 40px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            padding: 30px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 17px;
-            line-height: 1.6;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-
-        /* Right Side: Working Area (Remaining Width) */
-        #work-side {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            padding: 40px;
-            box-sizing: border-box;
-        }
-
-        /* Tab Switchers */
-        .mode-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .tab-btn {
-            padding: 10px 24px;
-            border: 1.5px solid var(--primary);
-            border-radius: 10px;
-            cursor: pointer;
-            background: white;
-            color: var(--primary);
-            font-weight: 600;
-            transition: 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        #paper-select {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border-gray);
-            font-size: 15px;
-            color: var(--text-slate);
-            display: none; /* Only visible in Past Paper mode */
-            outline: none;
-        }
-
-        #topic-container {
-            background: #EFF6FF;
-            border-left: 6px solid var(--primary);
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-
-        #topic-text {
-            font-weight: 600;
-            color: var(--text-slate);
-            margin: 0;
-            font-size: 18px;
-            line-height: 1.5;
-        }
-
+        .editor-box { flex: 1; display: flex; flex-direction: column; }
         textarea {
-            flex: 1;
-            border: 1px solid var(--border-gray);
-            border-radius: 16px;
-            padding: 30px;
-            font-size: 19px;
-            line-height: 1.8;
-            font-family: 'Georgia', serif; /* Academic Standard Font */
-            outline: none;
-            resize: none;
-            background: #FCFDFF;
-            transition: border 0.3s;
+            flex: 1; border: 2px solid #e2e8f0; border-radius: 10px;
+            padding: 35px; font-family: 'Lora', serif; font-size: 18px;
+            line-height: 1.9; outline: none; transition: 0.3s;
+            background: var(--paper-bg); color: #2c3e50;
         }
+        textarea:focus { border-color: var(--oxford-gold); background: #fff; }
 
-        textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.05);
+        .lab-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+        .metric { font-family: 'Playfair Display', serif; font-weight: 800; color: var(--oxford-blue); letter-spacing: 1px; font-size: 14px; }
+
+        .btn {
+            padding: 15px 35px; border-radius: 5px; border: none;
+            font-family: 'Playfair Display', serif; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            transition: 0.3s; font-size: 13px;
         }
+        .btn-gold { background: var(--oxford-gold); color: var(--oxford-blue); }
+        .btn-gold:hover { background: var(--oxford-blue); color: white; transform: translateY(-3px); }
+        .btn-blue { background: var(--oxford-blue); color: white; }
+        .btn-blue:hover { background: var(--oxford-gold); color: var(--oxford-blue); transform: translateY(-3px); }
 
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-        }
-
-        .btn-submit {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 45px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        /* Result Modal System */
+        /* --- 4. RESULT MODAL --- */
         #result-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.85);
-            display: none; align-items: center; justify-content: center;
-            z-index: 1000; backdrop-filter: blur(8px);
+            position: fixed; inset: 0; background: rgba(0,33,71,0.9);
+            display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
         }
-
-        #result-card {
-            background: white;
-            width: 800px;
-            padding: 50px;
-            border-radius: 24px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        .result-card {
+            background: white; width: 850px; max-height: 85vh; border-radius: 15px;
+            padding: 50px; overflow-y: auto; border-top: 8px solid var(--oxford-gold);
         }
-
-        .score-display {
-            font-size: 64px;
-            color: var(--primary);
-            text-align: center;
-            font-weight: 800;
-            margin-bottom: 20px;
-        }
+        .score-circle { font-family: 'Playfair Display', serif; font-size: 80px; color: var(--oxford-blue); text-align: center; margin-bottom: 30px; }
     </style>
 </head>
-
 <body>
 
-    <nav class="main-nav">
-        <a href="vocabulary.php" class="nav-item">VOCABULARY</a>
-        <a href="writing.php" class="nav-item active">ACADEMIC WRITING</a>
-        <a href="home.php" class="nav-item">DASHBOARD</a>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo-box"><img src="college_logo.png" alt="Spires Academy"></div>
+            <ul class="nav-links">
+                <li><a href="home.php">Dashboard</a></li>
+                <li><a href="writing.php" style="color:var(--oxford-gold);">Writing Lab</a></li>
+                <li><a href="vocabulary.php">Lexicon</a></li>
+                <li><a href="forum.php">Common Room</a></li>
+            </ul>
+        </div>
+        <div class="user-meta">
+            <?php echo $avatar_html; ?>
+            <span style="font-family:'Playfair Display'; font-weight:800; letter-spacing:1px;"><?php echo htmlspecialchars($nickname); ?></span>
+        </div>
     </nav>
 
-    <div id="writing-wrapper">
-        <div id="luna-side">
-            <div id="luna-bubble">
-                Hello! I am your mentor, Luna. Shall we focus on <b>AI-Generated</b> topics or practice with <b>Official IELTS</b> papers today?
+    <header class="hero">
+        <h1>Writing Lab</h1>
+        <p>Mastering the Art of Academic Persuasion</p>
+    </header>
+
+    <div class="writing-container">
+        <aside class="luna-panel">
+            <div class="luna-speech" id="luna-bubble">
+                Welcome back, Scholar. Are you prepared to tackle a new academic proposition today?
             </div>
-            <div id="luna-avatar">👩‍🏫</div>
-        </div>
+            <div class="luna-img">👩‍🏫</div>
+        </aside>
 
-        <div id="work-side">
-            <div class="mode-tabs">
-                <button class="tab-btn active" id="tab-ai" onclick="switchMode('ai', this)">AI Generation</button>
-                <button class="tab-btn" id="tab-paper" onclick="switchMode('pastpaper', this)">IELTS Past Papers</button>
-            </div>
-
-            <select id="paper-select" onchange="loadLocalPaper(this.value)">
-                <option value="">-- Select a Cambridge IELTS 20 Paper --</option>
-                <option value="data/ielts_cambridge_20_t1.json">Cambridge 20 - Test 1 (Latest)</option>
-                <option value="data/ielts_cambridge_20_t2.json">Cambridge 20 - Test 2 (Latest)</option>
-                <option value="data/ielts_cambridge_20_t3.json">Cambridge 20 - Test 3 (Latest)</option>
-                <option value="data/ielts_1.json">Cambridge 18 - Test 1</option>
-            </select>
-
-            <div id="topic-container">
-                <p id="topic-text">Welcome back. Please select a mode to display your writing prompt.</p>
+        <main class="workspace">
+            <div class="topic-box">
+                <h3 id="topic-text">Topic will be assigned upon generation...</h3>
             </div>
 
-            <textarea id="essay-input" placeholder="Start typing your academic essay here..."></textarea>
+            <div class="editor-box">
+                <textarea id="essay-input" placeholder="Draft your thesis and arguments here..."></textarea>
+            </div>
 
-            <div class="footer">
-                <div style="color: #64748B; font-weight: 500;">Word Count: <span id="word-count" style="color:var(--primary); font-weight:700;">0</span></div>
-                <div style="display:flex; gap:12px;">
-                    <button class="tab-btn" id="gen-btn" onclick="generateAITopic()">Generate Topic</button>
-                    <button class="btn-submit" onclick="submitEvaluation()">Submit for Evaluation</button>
+            <div class="lab-footer">
+                <div class="metric">WORD COUNT: <span id="word-num" style="color:var(--oxford-gold); font-size:1.4rem;">0</span></div>
+                <div style="display:flex; gap:15px;">
+                    <button class="btn btn-gold" onclick="generateTopic()">Generate Topic</button>
+                    <button class="btn btn-blue" id="submit-btn" onclick="submitEssay()">Analyze Essay</button>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <div id="result-overlay">
-        <div id="result-card">
-            <div class="score-display" id="res-score">8.5</div>
-            <div id="res-feedback" style="line-height: 1.7; color: #475569; font-size: 16px;"></div>
-            <button class="btn-submit" style="width: 100%; margin-top:30px;"
-                onclick="document.getElementById('result-overlay').style.display='none'">Thank you, Luna</button>
+        <div class="result-card">
+            <div class="score-circle" id="final-score">--</div>
+            <div id="feedback-content"></div>
+            <button class="btn btn-blue" style="width:100%; margin-top:30px;" onclick="closeResult()">Acknowledge Feedback</button>
         </div>
     </div>
 
     <script>
-        /**
-         * GLOBAL STATE & CONFIG
-         */
-        let currentMode = 'ai';
-        let activeTopic = "";
+        const currentUserId = <?php echo json_encode($user_id); ?>;
+        const essayInput = document.getElementById('essay-input');
+        const lunaBubble = document.getElementById('luna-bubble');
+        const topicText = document.getElementById('topic-text');
+        const wordNum = document.getElementById('word-num');
+        let currentTopic = "";
 
-        /**
-         * UI Logic: Toggle between AI-Gen mode and Past Paper mode.
-         */
-        function switchMode(mode, btn) {
-            currentMode = mode;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        // Scholarly word count implementation
+        essayInput.addEventListener('input', () => {
+            const words = essayInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+            wordNum.innerText = words.length;
+        });
 
-            const select = document.getElementById('paper-select');
-            const genBtn = document.getElementById('gen-btn');
-            const topicDisplay = document.getElementById('topic-text');
-
-            if (mode === 'ai') {
-                select.style.display = 'none';
-                genBtn.style.display = 'block';
-                topicDisplay.innerText = "Mode: AI Intelligence. Click 'Generate' to fetch a new academic prompt.";
-            } else {
-                select.style.display = 'block';
-                genBtn.style.display = 'none';
-                topicDisplay.innerText = "Mode: Past Papers. Please select a specific test from the dropdown above.";
-            }
-        }
-
-        /**
-         * Data Logic: Load static JSON files from the /data directory.
-         */
-        async function loadLocalPaper(file) {
-            if (!file) return;
+        // Interface Logic: Topic Retrieval
+        async function generateTopic() {
+            lunaBubble.innerText = "Accessing the Spires Academy prompt archives...";
             try {
-                const res = await fetch(file);
-                const data = await res.json();
-                activeTopic = data.question;
-                document.getElementById('topic-text').innerText = activeTopic;
-                document.getElementById('luna-bubble').innerText = `You are now practicing ${data.id}. This is a real ${data.type}. Focus on the task requirements!`;
-            } catch (err) {
-                console.error("Failed to load paper:", err);
-                alert("Error loading the requested paper.");
-            }
-        }
-
-        /**
-         * API Logic: Fetch a dynamic prompt from the AI backend.
-         */
-        async function generateAITopic() {
-            const topicDisplay = document.getElementById('topic-text');
-            topicDisplay.innerText = "Luna is formulating a topic... please hold.";
-            
-            try {
-                const res = await fetch('writing_proxy.php', { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'get_topic' }) 
+                const res = await fetch('writing_proxy.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_topic' })
                 });
                 const data = await res.json();
-                activeTopic = data.topic;
-                topicDisplay.innerText = activeTopic;
-                document.getElementById('luna-bubble').innerText = "I've picked a challenging one for you. Let's see how you handle it!";
-            } catch (err) {
-                topicDisplay.innerText = "Connection error. Please try again.";
+                currentTopic = data.topic;
+                topicText.innerText = currentTopic;
+                lunaBubble.innerText = "A stimulating topic. Focus on logical progression and formal register.";
+            } catch (e) {
+                lunaBubble.innerText = "Connection lost to the archives. Please re-attempt.";
             }
         }
 
-        /**
-         * API Logic: Send essay content to Luna for grading and polishing.
-         */
-        async function submitEvaluation() {
-            const content = document.getElementById('essay-input').value.trim();
-            if (content.length < 50) return alert("Your essay is too short for a proper evaluation. (Min 50 words)");
+        // Interface Logic: AI Evaluation
+        async function submitEssay() {
+            const content = essayInput.value.trim();
+            if (content.length < 50) return alert("Academic rigor requires a more substantial draft.");
 
-            document.getElementById('luna-bubble').innerText = "Analyzing your structure, grammar, and lexical resource... I'll have your results shortly.";
+            document.getElementById('submit-btn').disabled = true;
+            lunaBubble.innerText = "Professor Luna is reviewing your manuscript. Please remain patient...";
 
             try {
                 const res = await fetch('writing_proxy.php', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'evaluate', topic: activeTopic, content: content })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'evaluate', 
+                        user_id: currentUserId, 
+                        topic: currentTopic, 
+                        content: content 
+                    })
                 });
                 const data = await res.json();
-
-                // Populate and show the result modal
-                document.getElementById('res-score').innerText = data.score;
-                document.getElementById('res-feedback').innerHTML = `
-                    <p><b>Grammar & Vocab:</b> ${data.grammar}</p>
-                    <p><b>Structure & Logic:</b> ${data.logic}</p>
-                    <div style="background:#F1F5F9; padding:20px; border-radius:12px; margin-top:20px;">
-                        <b>Luna's Academic Polish:</b><br>
-                        <i style="color:#334155;">${data.polished}</i>
-                    </div>
-                `;
-                document.getElementById('result-overlay').style.display = 'flex';
-            } catch (err) {
-                alert("Evaluation failed. Please check your internet connection.");
+                showResult(data);
+                document.getElementById('submit-btn').disabled = false;
+            } catch (e) {
+                lunaBubble.innerText = "The evaluation was interrupted. Let us try once more.";
+                document.getElementById('submit-btn').disabled = false;
             }
         }
 
-        /**
-         * Utility: Real-time Word Counter
-         */
-        document.getElementById('essay-input').addEventListener('input', function () {
-            const words = this.value.trim().split(/\s+/).filter(x => x).length;
-            document.getElementById('word-count').innerText = words;
-        });
+        function showResult(data) {
+            document.getElementById('final-score').innerText = data.score;
+            document.getElementById('feedback-content').innerHTML = `
+                <div style="margin-bottom:25px;">
+                    <h4 style="font-family:'Playfair Display'; border-bottom:2px solid var(--oxford-gold); padding-bottom:5px;">GRAMMATICAL PRECISION</h4>
+                    <p style="font-family:'Lora'; line-height:1.7;">${data.grammar}</p>
+                </div>
+                <div style="margin-bottom:25px;">
+                    <h4 style="font-family:'Playfair Display'; border-bottom:2px solid var(--oxford-gold); padding-bottom:5px;">STRUCTURAL COHERENCE</h4>
+                    <p style="font-family:'Lora'; line-height:1.7;">${data.logic}</p>
+                </div>
+                <div style="background:#f8fafc; padding:30px; border-radius:10px; border-left:5px solid var(--oxford-blue);">
+                    <h4 style="font-family:'Playfair Display'; margin-top:0;">LUNA'S REFINED MANUSCRIPT</h4>
+                    <p style="font-family:'Lora'; font-style:italic;">${data.polished}</p>
+                </div>
+            `;
+            document.getElementById('result-overlay').style.display = 'flex';
+        }
+
+        function closeResult() {
+            document.getElementById('result-overlay').style.display = 'none';
+        }
     </script>
     
     <script src="ai-agent.js?v=<?php echo time(); ?>"></script>
 </body>
-
 </html>
