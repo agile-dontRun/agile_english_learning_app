@@ -21,7 +21,7 @@ $nickname = $_SESSION['nickname'] ?? 'Scholar';
 <head>
     <meta charset="UTF-8">
     <title>Writing Lab | Spires Academy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;600&display=swap" rel="staylesheet">
     
     <style>
         :root {
