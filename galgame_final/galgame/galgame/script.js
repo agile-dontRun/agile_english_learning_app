@@ -1,13 +1,16 @@
-// Chapter 1: Plot Data Structure
+// Chapter 1: main story data for the tutorial / prologue
 const prologueData = [].concat(chapter1, chapter2, chapter3);
 
+// storyData stores the chapter currently being played
 let storyData = [];
+
+// whether the current story is the tutorial
 let isPlayingTutorial = false;
 
-// Game state variables
+// current step index in the story array
 let currentStep = 0;
 
-// Get the DOM elements for the new interfaces
+// ===== Main dialogue / UI elements =====
 const dialogueBox = document.getElementById("dialogue-box");
 const speakerName = document.getElementById("speaker-name");
 const dialogueText = document.getElementById("dialogue-text");
@@ -17,12 +20,21 @@ const mentorSprite = document.getElementById("mentor-sprite");
 const characterSprite = document.getElementById("character-sprite");
 const avatarBox = document.getElementById("speaker-avatar-box");
 const avatarImg = document.getElementById("speaker-avatar");
+
+// ===== Home screen avatar display =====
 const homeAvatarStage = document.getElementById("home-avatar-stage");
 const homeAvatarEmpty = document.getElementById("home-avatar-empty");
+
+// API endpoints for loading avatar / outfit info
 const ACTIVE_PLAYER_AVATAR_ENDPOINT = "../dress_up_game/api/get_active_avatar.php";
 const ACTIVE_OUTFIT_ENDPOINT = "../dress_up_game/api/get_active_outfit.php";
+
+// fallback avatar if player has not customized one yet
 const DEFAULT_PLAYER_AVATAR = "../frontend/assets/player.jpg";
 let currentPlayerAvatar = DEFAULT_PLAYER_AVATAR;
+
+// render order for dress-up layers
+// lower items are drawn first, upper ones later
 const dressUpLayerOrder = [
   "background",
   "body",
@@ -41,10 +53,11 @@ const dressUpLayerOrder = [
   "head",
 ];
 
-// Get the DOM elements for the new interfaces
+// ===== Different major screens =====
 const homeScreen = document.getElementById("home-screen");
 const floor6Screen = document.getElementById("floor6-screen");
 
+// Show home page and hide story-related UI
 function showHomeScreen() {
   dialogueBox.classList.add("hidden");
   optionsContainer.classList.add("hidden");
@@ -59,6 +72,8 @@ function showHomeScreen() {
   homeScreen.classList.remove("hidden");
 }
 
+// Build possible image paths for one dress-up layer
+// This is mainly for fallback: if one path fails, try the next one
 function buildDressUpImageCandidates(layer) {
   const filePath = layer?.file_path || "";
   const normalizedFilePath = filePath.startsWith("/") ? filePath : `/${filePath}`;
@@ -68,6 +83,7 @@ function buildDressUpImageCandidates(layer) {
   ].filter(Boolean);
 }
 
+// Try candidate image URLs one by one until one works
 function setDressUpImageWithFallback(img, candidates, index = 0) {
   if (!img || index >= candidates.length) {
     if (img) {
@@ -78,9 +94,12 @@ function setDressUpImageWithFallback(img, candidates, index = 0) {
 
   const candidate = candidates[index];
   img.onerror = () => setDressUpImageWithFallback(img, candidates, index + 1);
+
+  // add timestamp to avoid browser cache issues
   img.src = `${candidate}${candidate.includes("?") ? "&" : "?"}t=${Date.now()}`;
 }
 
+// Clear all rendered avatar layers on the home page
 function resetHomeAvatarStage() {
   if (!homeAvatarStage) {
     return;
@@ -90,11 +109,13 @@ function resetHomeAvatarStage() {
     node.remove(),
   );
 
+  // show empty placeholder if nothing is rendered
   if (homeAvatarEmpty) {
     homeAvatarEmpty.style.display = "flex";
   }
 }
 
+// Render the player's current outfit on the home screen
 function renderHomeAvatarLook(data) {
   if (!homeAvatarStage) {
     return;
@@ -102,6 +123,7 @@ function renderHomeAvatarLook(data) {
 
   resetHomeAvatarStage();
 
+  // no valid outfit data, keep empty state
   if (!data || !Array.isArray(data.layers) || data.layers.length === 0) {
     return;
   }
@@ -110,6 +132,7 @@ function renderHomeAvatarLook(data) {
     homeAvatarEmpty.style.display = "none";
   }
 
+  // map layers by layer name for easier lookup
   const layerMap = new Map();
   for (const layer of data.layers) {
     if (layer && layer.layer) {
@@ -117,8 +140,11 @@ function renderHomeAvatarLook(data) {
     }
   }
 
+  // render layer by layer in correct order
   for (const layerName of dressUpLayerOrder) {
     const layer = layerMap.get(layerName);
+
+    // skip missing layers and background
     if (!layer || layerName === "background") {
       continue;
     }
@@ -127,10 +153,12 @@ function renderHomeAvatarLook(data) {
     img.className = "home-avatar-layer";
     img.alt = layer.name || layerName;
     homeAvatarStage.appendChild(img);
+
     setDressUpImageWithFallback(img, buildDressUpImageCandidates(layer));
   }
 }
 
+// Load avatar outfit data for the home page
 async function loadHomeAvatarLook() {
   try {
     const response = await fetch(`${ACTIVE_OUTFIT_ENDPOINT}?_=${Date.now()}`, {
@@ -150,6 +178,7 @@ async function loadHomeAvatarLook() {
   }
 }
 
+// Load the player's profile avatar used in dialogue UI
 async function loadPlayerAvatar() {
   try {
     const res = await fetch(`${ACTIVE_PLAYER_AVATAR_ENDPOINT}?_=${Date.now()}`, {
@@ -162,7 +191,9 @@ async function loadPlayerAvatar() {
     }
 
     const data = await res.json();
+
     if (data && data.success && data.avatar_url) {
+      // add timestamp to force refresh if avatar was recently updated
       currentPlayerAvatar = `${data.avatar_url}${data.avatar_url.includes("?") ? "&" : "?"}t=${Date.now()}`;
       return;
     }
@@ -170,13 +201,16 @@ async function loadPlayerAvatar() {
     console.error("Failed to load player avatar:", err);
   }
 
+  // fallback to default avatar
   currentPlayerAvatar = DEFAULT_PLAYER_AVATAR;
 }
 
+// Return current avatar URL safely
 function getPlayerAvatarUrl() {
   return currentPlayerAvatar || DEFAULT_PLAYER_AVATAR;
 }
 
+// Ask backend whether tutorial has already been completed
 async function getTutorialStatus() {
   try {
     const res = await fetch("../api/get_tutorial_status.php", {
@@ -197,6 +231,7 @@ async function getTutorialStatus() {
   }
 }
 
+// Mark tutorial as completed in backend
 async function markTutorialCompleted() {
   try {
     const res = await fetch("../api/complete_tutorial.php", {
@@ -215,7 +250,7 @@ async function markTutorialCompleted() {
   }
 }
 
-// Initialize game
+// Game startup logic
 async function initGame() {
     await loadPlayerAvatar();
     await loadHomeAvatarLook();
@@ -224,24 +259,29 @@ async function initGame() {
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
 
+    // if tutorial is already done, go straight to home page
     if (data.success && data.is_tutorial_completed) {
         showHomeScreen();
 
+        // optional direct jump to floor6 via URL param
         if (view === "floor6") {
             goToFloor6();
         }
-    }   else {
+    } else {
+    // otherwise start tutorial story
     startStory(prologueData, true);
   }
 }
 
-// Render the current plot step
+// Render whatever the current step is
 function renderStep() {
+  // story finished
   if (currentStep >= storyData.length) {
     dialogueBox.classList.add("hidden");
     characterSprite.classList.add("hidden");
     avatarBox.classList.add("hidden");
 
+    // if tutorial just ended, mark it as completed
     if (isPlayingTutorial) {
       markTutorialCompleted();
       isPlayingTutorial = false;
@@ -253,12 +293,14 @@ function renderStep() {
 
   const currentData = storyData[currentStep];
 
+  // ===== Normal dialogue step =====
   if (currentData.type === "dialogue") {
     dialogueBox.classList.remove("hidden");
     optionsContainer.classList.add("hidden");
     speakerName.innerText = currentData.speaker;
     dialogueText.innerText = currentData.text;
 
+    // narration / system lines do not need avatar or character sprite
     if (
       currentData.speaker === "Narration" ||
       currentData.speaker === "System Prompt"
@@ -268,6 +310,7 @@ function renderStep() {
     } else {
       avatarBox.classList.remove("hidden");
 
+      // switch character sprite/avatar depending on speaker
       if (currentData.speaker === "Karen") {
         characterSprite.classList.remove("hidden");
         avatarImg.src = "../frontend/assets/karen.png";
@@ -285,22 +328,28 @@ function renderStep() {
         avatarImg.src = "../frontend/assets/chef.png";
         characterSprite.src = "../frontend/assets/chef.png";
       } else if(currentData.speaker === "😎 Oral Tutor"){
+        // tutor currently does not use normal avatar display
         avatarBox.classList.add("hidden");
         characterSprite.classList.add("hidden");
       } else {
+        // default case: assume the speaker is the player
         characterSprite.classList.add("hidden");
         avatarImg.src = getPlayerAvatarUrl();
       }
     }
 
+    // update background if current step specifies one
     if (currentData.bg) {
       document.getElementById("bg-image").src = currentData.bg;
     }
+
+  // ===== Choice step =====
   } else if (currentData.type === "choice") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.remove("hidden");
     optionsContainer.innerHTML = "";
 
+    // render all choice buttons
     currentData.options.forEach((option) => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
@@ -308,6 +357,8 @@ function renderStep() {
       btn.onclick = () => handleChoice(option);
       optionsContainer.appendChild(btn);
     });
+
+  // ===== Transition step (used for scene switching / walking) =====
   } else if (currentData.type === "transition") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.add("hidden");
@@ -316,6 +367,7 @@ function renderStep() {
     const bgElement = document.getElementById("bg-image");
     const delayTime = currentData.timePerImage || 1000;
 
+    // if no images provided, just skip
     if (!currentData.images || currentData.images.length === 0) {
       advanceStory();
       return;
@@ -323,11 +375,13 @@ function renderStep() {
 
     bgElement.src = currentData.images[0];
 
+    // if only one image, wait once and continue
     if (currentData.images.length === 1) {
       setTimeout(() => {
         advanceStory();
       }, delayTime);
     } else {
+      // otherwise play image sequence like a mini slideshow
       let imgIndex = 0;
       const walkInterval = setInterval(() => {
         imgIndex++;
@@ -339,6 +393,8 @@ function renderStep() {
         }
       }, delayTime);
     }
+
+  // ===== Exploration choice step =====
   } else if (currentData.type === "explore_choice") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.remove("hidden");
@@ -354,9 +410,10 @@ function renderStep() {
   }
 }
 
-// Handling player choices (with right or wrong judgments)
+// Handle normal choices with right / wrong feedback
 function handleChoice(option) {
   if (option.isCorrect) {
+    // correct answer: show player's spoken response
     optionsContainer.classList.add("hidden");
     dialogueBox.classList.remove("hidden");
 
@@ -367,6 +424,7 @@ function handleChoice(option) {
     avatarImg.src = getPlayerAvatarUrl();
     characterSprite.classList.add("hidden");
   } else {
+    // wrong answer: trigger mentor feedback and let player retry
     optionsContainer.classList.add("hidden");
     dialogueBox.classList.remove("hidden");
 
@@ -383,19 +441,22 @@ function handleChoice(option) {
   }
 }
 
-// Mentor exits, time goes back to choose again
+// Close mentor feedback and return to current choice step
 function resetFromMentor(e) {
   e.stopPropagation();
   mentorOverlay.classList.add("hidden");
   mentorSprite.classList.add("hidden");
   characterSprite.style.filter = "brightness(100%)";
   speakerName.style.color = "#87CEEB";
+
+  // restore normal click-to-continue behavior
   dialogueBox.onclick = advanceStory;
   renderStep();
 }
 
-// Click on the dialog box to advance the plot
+// Advance to next story step
 function advanceStory() {
+  // prevent advancing while choices are on screen
   if (!optionsContainer.classList.contains("hidden")) {
     return;
   }
@@ -403,7 +464,8 @@ function advanceStory() {
   renderStep();
 }
 
-// Handling exploration selection (no right or wrong, incorporating subplots)
+// Handle explore choice
+// No correct/incorrect logic here; may inject a sub-story into the main flow
 function handleExploreChoice(option) {
   optionsContainer.classList.add("hidden");
   dialogueBox.classList.remove("hidden");
@@ -411,15 +473,19 @@ function handleExploreChoice(option) {
   if (option.subStory && option.subStory.length > 0) {
     storyData.splice(currentStep + 1, 0, ...option.subStory);
   }
+
   advanceStory();
 }
 
-// ================= Interface jump and game startup logic =================
+// ================= Interface switching + story startup =================
+
+// Start a new story chapter
 function startStory(newChapterData, tutorialMode = false) {
   storyData = newChapterData;
   currentStep = 0;
   isPlayingTutorial = tutorialMode;
 
+  // hide menu-like screens, show story UI
   homeScreen.classList.add("hidden");
   floor6Screen.classList.add("hidden");
   dialogueBox.classList.remove("hidden");
@@ -428,6 +494,7 @@ function startStory(newChapterData, tutorialMode = false) {
   mentorSprite.classList.add("hidden");
   characterSprite.style.filter = "brightness(100%)";
 
+  // set initial background if provided
   if (storyData[0] && storyData[0].bg) {
     document.getElementById("bg-image").src = storyData[0].bg;
   }
@@ -435,16 +502,19 @@ function startStory(newChapterData, tutorialMode = false) {
   renderStep();
 }
 
+// Enter floor 6 game selection screen
 function goToFloor6() {
   homeScreen.classList.add("hidden");
   floor6Screen.classList.remove("hidden");
 }
 
+// Back to home page from floor 6
 function goToHome() {
   floor6Screen.classList.add("hidden");
   homeScreen.classList.remove("hidden");
 }
 
+// Launch mini-game by name
 function launchGame(gameName) {
   if (gameName === "miner") {
     window.location.href = "../../mining_index.php";
@@ -453,15 +523,16 @@ function launchGame(gameName) {
   }
 }
 
-// ================= Universal scene jump function =================
+// ================= Universal scene jump helper =================
 function goToScenario(bgUrl, chapterData) {
-  // 1. Forcefully replace the underlying background image with the specified scene image
+  // first force the target background
   document.getElementById("bg-image").src = bgUrl;
 
-  // 2. Call the existing startStory function, load the corresponding script and start playing it
+  // then start the corresponding chapter data
   startStory(chapterData);
 }
 
+// old version of startStory kept here for reference during development
 // function startStory(newChapterData) {
 //     storyData = newChapterData;
 //     currentStep = 0;
@@ -479,8 +550,8 @@ function goToScenario(bgUrl, chapterData) {
 //     renderStep();
 // }
 
-// Bind global click event
+// Global click binding: click dialogue box to continue story
 dialogueBox.onclick = advanceStory;
 
-// Start up
+// Start the whole game
 initGame();
