@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+// Scan the current folder for local MP3 files
 function getLocalSongs(): array
 {
     $audioFiles = glob(__DIR__ . DIRECTORY_SEPARATOR . '*.mp3') ?: [];
@@ -8,11 +9,13 @@ function getLocalSongs(): array
 
     $songs = [];
 
+    // Build the song list from local file names
     foreach (array_values($audioFiles) as $index => $filePath) {
         $baseName = pathinfo($filePath, PATHINFO_FILENAME);
         $artist = 'Unknown Artist';
         $title = $baseName;
 
+        // If the file name follows "Artist - Title", split it into two parts
         if (str_contains($baseName, ' - ')) {
             [$artist, $title] = explode(' - ', $baseName, 2);
         }
@@ -29,7 +32,10 @@ function getLocalSongs(): array
     return $songs;
 }
 
+// Load all local songs
 $songs = getLocalSongs();
+
+// Fallback data if there are no MP3 files in the folder
 if ($songs === []) {
     $songs[] = [
         'title' => 'No MP3 Found',
@@ -44,16 +50,27 @@ if ($songs === []) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Make the page responsive on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title shown in the browser tab -->
     <title>Campus English Music Festival</title>
+
+    <!-- Main stylesheet for the music festival page -->
     <link rel="stylesheet" href="english_music.css">
 </head>
 <body>
+    <!-- Back button to return to the main game page -->
     <button class="back-to-game-btn" onclick="window.location.href='../index.html'">
         ← Back to game
     </button>
+
+    <!-- Decorative background glow effects -->
     <div class="poster-glow poster-glow-left"></div>
     <div class="poster-glow poster-glow-right"></div>
+
+    <!-- Decorative festival lights -->
     <div class="festival-lights">
         <span></span>
         <span></span>
@@ -64,6 +81,7 @@ if ($songs === []) {
     </div>
 
     <div class="festival-shell">
+        <!-- Top scrolling headline strip -->
         <section class="marquee-strip" aria-label="Festival headline">
             <div class="marquee-track">
                 <span>Campus Night Fest</span>
@@ -77,6 +95,7 @@ if ($songs === []) {
             </div>
         </section>
 
+        <!-- Main hero section -->
         <section class="festival-hero">
             <div class="hero-copy">
                 <span class="hero-badge">Campus Music Festival</span>
@@ -87,12 +106,14 @@ if ($songs === []) {
                     No video, no jump-out link, just direct audio playback inside the page.
                 </p>
 
+                <!-- Small visual tags under the hero text -->
                 <div class="hero-tags">
                     <span>Live House Mood</span>
                     <span>Student Union Stage</span>
                     <span>Open Air Night</span>
                 </div>
 
+                <!-- Summary stats for the page -->
                 <div class="hero-stats">
                     <article class="hero-stat">
                         <strong><?php echo count($songs); ?></strong>
@@ -109,6 +130,7 @@ if ($songs === []) {
                 </div>
             </div>
 
+            <!-- Cover image / poster section -->
             <div class="hero-visual">
                 <div class="hero-frame">
                     <img id="coverImage" src="<?php echo htmlspecialchars($songs[0]['cover'], ENT_QUOTES, 'UTF-8'); ?>" alt="Campus festival singer poster">
@@ -118,13 +140,16 @@ if ($songs === []) {
             </div>
         </section>
 
+        <!-- Main content area: playlist on the left, player on the right -->
         <section class="festival-grid">
+            <!-- Playlist / lineup section -->
             <aside class="lineup-card">
                 <div class="card-heading">
                     <span>Tonight Lineup</span>
                     <strong><?php echo count($songs); ?> Tracks</strong>
                 </div>
 
+                <!-- Render all songs as clickable playlist items -->
                 <ul class="playlist" id="playlist">
                     <?php foreach ($songs as $index => $song): ?>
                         <li>
@@ -144,6 +169,7 @@ if ($songs === []) {
                 </ul>
             </aside>
 
+            <!-- Main player / song detail section -->
             <main class="stage-card">
                 <div class="stage-head">
                     <div>
@@ -154,8 +180,10 @@ if ($songs === []) {
                     <div class="stage-pill">Main Stage</div>
                 </div>
 
+                <!-- Current song description -->
                 <p class="description" id="songDescription"><?php echo htmlspecialchars($songs[0]['description'], ENT_QUOTES, 'UTF-8'); ?></p>
 
+                <!-- Dashboard area with mood, visualizer, and playback desk info -->
                 <div class="stage-dashboard">
                     <div class="dashboard-card">
                         <span class="dashboard-label">Stage Mood</span>
@@ -182,8 +210,10 @@ if ($songs === []) {
                     </div>
                 </div>
 
+                <!-- Audio player area -->
                 <div class="player-strip">
                     <div class="progress-card">
+                        <!-- Hidden native audio element used for playback -->
                         <audio
                             id="audioPlayer"
                             preload="metadata"
@@ -192,17 +222,24 @@ if ($songs === []) {
                         >
                             Your browser does not support the audio element.
                         </audio>
+
+                        <!-- Playback status row -->
                         <div class="player-status-row">
                             <span class="status-chip" id="playState">Ready</span>
                             <span class="status-note">Custom Player</span>
                         </div>
+
+                        <!-- Seek bar -->
                         <input id="progressBar" type="range" min="0" max="0" step="0.1" value="0">
+
+                        <!-- Current time / total duration -->
                         <div class="time-row">
                             <span id="currentTime">00:00</span>
                             <span id="duration">00:00</span>
                         </div>
                     </div>
 
+                    <!-- Audio control buttons -->
                     <div class="controls">
                         <button id="prevBtn" class="icon-btn" type="button" aria-label="Previous track">
                             <span class="icon icon-prev" aria-hidden="true">
@@ -210,11 +247,13 @@ if ($songs === []) {
                                 <span></span>
                             </span>
                         </button>
+
                         <button id="playBtn" class="primary icon-btn play-btn" type="button" aria-label="Play">
                             <span class="icon icon-play" aria-hidden="true">
                                 <span></span>
                             </span>
                         </button>
+
                         <button id="nextBtn" class="icon-btn" type="button" aria-label="Next track">
                             <span class="icon icon-next" aria-hidden="true">
                                 <span></span>
@@ -223,11 +262,13 @@ if ($songs === []) {
                         </button>
                     </div>
 
+                    <!-- Small helper note below the controls -->
                     <p class="helper-note">
                         This version now streams local MP3 files through a seekable PHP audio endpoint.
                     </p>
                 </div>
 
+                <!-- Extra information cards -->
                 <div class="info-panels">
                     <article class="info-card">
                         <span class="mini-label">Festival Notes</span>
@@ -246,9 +287,12 @@ if ($songs === []) {
         </section>
     </div>
 
+    <!-- Export PHP song data to JavaScript -->
     <script>
         window.songList = <?php echo json_encode($songs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
     </script>
+
+    <!-- Main player logic -->
     <script src="english_music.js"></script>
 </body>
 </html>
