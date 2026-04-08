@@ -1,5 +1,5 @@
 <?php
-// 数据库连接配置
+// Database connection configuration
 $host = "localhost";
 $username = "Zll";
 $password = "Xz83MjpM4fm8mEd5";

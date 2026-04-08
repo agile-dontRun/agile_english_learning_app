@@ -6,7 +6,8 @@ header('Content-Type: application/json; charset=utf-8');
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
-        'message' => '未登录'
+        'message' => 'Not logged in
+'
     ]);
     exit();
 }
@@ -21,7 +22,7 @@ $stmt = $conn->prepare("UPDATE users SET is_tutorial_completed = 1 WHERE user_id
 if (!$stmt) {
     echo json_encode([
         'success' => false,
-        'message' => 'SQL prepare 失败'
+        'message' => 'SQL prepare failed'
     ]);
     exit();
 }

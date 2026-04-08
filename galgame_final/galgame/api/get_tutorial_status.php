@@ -35,7 +35,7 @@ $stmt->close();
 if (!$user) {
     echo json_encode([
         'success' => false,
-        'message' => '用户不存在'
+        'message' => 'User does not exit.'
     ]);
     exit();
 }

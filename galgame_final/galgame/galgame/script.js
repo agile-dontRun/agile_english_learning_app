@@ -447,7 +447,6 @@ function goToHome() {
 
 function launchGame(gameName) {
   if (gameName === "miner") {
-    //alert("跳转接口已准备好！日后在这里跳转到 词汇矿工大对决");
     window.location.href = "../../mining_index.php";
   } else if (gameName === "match") {
     window.location.href = "../../memory_home.php";
