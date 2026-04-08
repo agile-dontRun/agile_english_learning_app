@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Total number of questions in one game round
     const TOTAL_QUESTIONS = 8;
+
+    // Initial bootstrap data injected from the backend
     const stageBootstrap = window.STAGE_BOOTSTRAP || { coinBalance: 0, dailyRewardClaimed: false };
     
+    // Store loaded questions and ending messages
     let questions = [];
     let endingMessages = [];
     
+    // Try to read embedded JSON data from the page
     try {
         const questionsData = document.getElementById('questions-data');
         const endingMessagesData = document.getElementById('ending-messages-data');
@@ -19,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Failed to parse data:', e);
     }
     
+    // Main game state variables
     let currentQuestionIndex = 0;
     let currentQuestion = null;
     let gameActive = true;
@@ -33,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastRewardAmount = 0;
     let lastRewardGranted = false;
 
+    // Update the coin count and daily reward status in the UI
     function updateCoinUI() {
         const coinEl = document.getElementById('coinCount');
         if (coinEl) {
@@ -44,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Update the score counter and progress bar display
     function updateScoreDisplay() {
         const scoreCountEl = document.getElementById('scoreCount');
         const progressFillEl = document.getElementById('progressFill');
@@ -55,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (progressTextEl) progressTextEl.innerText = `${currentQuestionIndex}/${TOTAL_QUESTIONS}`;
     }
     
+    // Enable or disable all option buttons
     function disableOptions(disabled) {
         const optionBtns = document.querySelectorAll('.option-btn');
         optionBtns.forEach(btn => {
@@ -62,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Load the next question from the backend
     async function loadQuestion() {
         if (!gameActive || isLoading) return;
         if (currentQuestionIndex >= TOTAL_QUESTIONS) {
@@ -108,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (questionTextEl) questionTextEl.innerHTML = `📖 ${data.question}`;
             if (questionCounterEl) questionCounterEl.innerHTML = `Question ${data.current}/${data.total}`;
             
+            // Render answer buttons for the current question
             if (optionsContainer) {
                 optionsContainer.innerHTML = '';
                 data.options.forEach((opt, idx) => {
@@ -132,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Submit the selected answer to the backend
     async function submitAnswer(answerIndex) {
         if (!gameActive || isWaitingForGif || isLoading) {
             console.log('Cannot submit');
@@ -172,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const feedbackMsgEl = document.getElementById('feedbackMsg');
             
+            // Show result feedback for this answer
             if (data.is_correct) {
                 correctCount = data.correct_count;
                 updateScoreDisplay();
@@ -182,14 +195,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             currentQuestionIndex++;
             coinBalance = Number(data.coin_balance ?? coinBalance);
+
+            // Update daily reward status when the whole game is completed
             if (data.all_done) {
                 dailyRewardClaimed = true;
                 lastRewardAmount = Number(data.reward_amount || 0);
                 lastRewardGranted = Boolean(data.reward_granted);
             }
+
             updateCoinUI();
             updateScoreDisplay();
             
+            // Either finish the game or load the next question after a short delay
             if (data.all_done) {
                 finishGame();
             } else {
@@ -205,12 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Mark the game as finished and start the ending GIF sequence
     function finishGame() {
         gameActive = false;
         quizStarted = false;
         playGifByScore(correctCount);
     }
     
+    // Play a different GIF depending on the final score
     function playGifByScore(score) {
         let gifPath;
         
@@ -241,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gifImage) gifImage.src = gifPath;
         if (gifOverlay) gifOverlay.classList.add('active');
         
+        // Create or update the score text shown on the GIF overlay
         let scoreText = document.getElementById('gifScoreText');
         if (!scoreText && gifOverlay) {
             const gifContent = document.querySelector('.gif-content');
@@ -260,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Replay the GIF a few times before stopping
         if (gifInterval) clearInterval(gifInterval);
         gifInterval = setInterval(() => {
             gifPlayCount++;
@@ -271,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
+    // Close the GIF overlay and show the final result screen
     function closeGifAndShowResult() {
         if (gifInterval) clearInterval(gifInterval);
         const gifOverlay = document.getElementById('gifOverlay');
@@ -278,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showResult();
     }
     
+    // Show the final result summary after the game ends
     function showResult() {
         const quizArea = document.getElementById('quizArea');
         const resultArea = document.getElementById('resultArea');
@@ -287,6 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (quizArea) quizArea.classList.remove('active');
         if (resultArea) resultArea.classList.add('active');
         
+        // Render repeated score blocks as a visual result effect
         if (scoreDisplay) {
             scoreDisplay.innerHTML = '';
             for (let i = 0; i < 7; i++) {
@@ -297,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Choose a final message based on the score
         let message = '';
         if (correctCount === 0) {
             message = '😢 You failed the performance! Keep practicing and try again!';
@@ -311,6 +336,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (endingMessageEl) endingMessageEl.innerHTML = message;
+
+        // Show daily reward settlement information
         if (endingMessageEl) {
             if (lastRewardGranted) {
                 endingMessageEl.innerHTML += `<div style="margin-top:12px;">Daily reward: +${lastRewardAmount} coins</div>`;
@@ -322,10 +349,11 @@ document.addEventListener('DOMContentLoaded', function() {
         gameActive = false;
     }
     
+    // Start a fresh quiz round
     async function startQuiz() {
     console.log('Start quiz clicked');
     
-
+    // Reset backend state before starting a new round
     const formData = new FormData();
     formData.append('action', 'reset');
     
@@ -362,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadQuestion();
 }
     
+    // Reset the game back to the initial state
     async function resetGame() {
         const formData = new FormData();
         formData.append('action', 'reset');
@@ -409,11 +438,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Get important control buttons
     const startBtn = document.getElementById('startQuizBtn');
     const resetBtn = document.getElementById('resetBtn');
     const playAgainBtn = document.getElementById('playAgainBtn');
     const closeGifBtn = document.getElementById('closeGifBtn');
     
+    // Bind the start button
     if (startBtn) {
         startBtn.removeEventListener('click', startQuiz);
         startBtn.addEventListener('click', startQuiz);
@@ -422,26 +453,31 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Start button not found');
     }
     
+    // Bind the reset button
     if (resetBtn) {
         resetBtn.removeEventListener('click', resetGame);
         resetBtn.addEventListener('click', resetGame);
     }
     
+    // Bind the play again button
     if (playAgainBtn) {
         playAgainBtn.removeEventListener('click', resetGame);
         playAgainBtn.addEventListener('click', resetGame);
     }
     
+    // Bind the close GIF button
     if (closeGifBtn) {
         closeGifBtn.removeEventListener('click', closeGifAndShowResult);
         closeGifBtn.addEventListener('click', closeGifAndShowResult);
     }
     
+    // Set a default stage image if none is loaded
     const stageImage = document.getElementById('stageImage');
     if (stageImage && (!stageImage.src || stageImage.src === window.location.href)) {
         stageImage.src = 'stage.jpg';
     }
     
+    // Initialize the coin UI on page load
     updateCoinUI();
     console.log('Game initialized');
 });

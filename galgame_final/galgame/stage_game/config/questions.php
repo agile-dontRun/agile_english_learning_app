@@ -1,10 +1,15 @@
 <?php
+// Store all quiz questions in an array
 $allQuestions = [
     [
         'id' => 1,
+        // The question text
         'question' => 'What does "break a leg" mean in theater?',
+        // Multiple choice options
         'options' => ['A. Break your leg', 'B. Good luck', 'C. Be careful', 'D. Hurry up'],
+        // Index of the correct answer in the options array
         'correct' => 1,
+        // Explanation shown after answering
         'explanation' => '"Break a leg" is a way to wish performers good luck before a show!'
     ],
     [
@@ -198,20 +203,36 @@ $allQuestions = [
     ]
 ];
 
+/**
+ * Return all questions.
+ */
 function getAllQuestions() {
     global $allQuestions;
     return $allQuestions;
 }
 
+/**
+ * Randomly select a given number of questions from the full question set.
+ *
+ * @param array $allQuestions The full list of questions
+ * @param int $count Number of questions to select
+ * @return array Randomly selected questions
+ */
 function getRandomQuestions($allQuestions, $count = 8) {
+    // Create a copy so the original array is not modified
     $questionsCopy = $allQuestions;
+
+    // Shuffle the copied array randomly
     shuffle($questionsCopy);
+
+    // Return the first $count questions after shuffling
     return array_slice($questionsCopy, 0, $count);
 }
 
-
+// Generate 8 random questions for the current game/session
 $questions = getRandomQuestions($allQuestions, 8);
 
+// Ending messages based on the player's final score
 $endingMessages = [
     0 => '😢 Keep practicing! You\'ll do better next time!',
     1 => '💪 Not bad! Keep working hard!',
