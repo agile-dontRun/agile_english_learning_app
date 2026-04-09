@@ -1,87 +1,58 @@
 <?php
-/**
- * Luna Writing Proxy - Academic Gateway v2.5
- * * This script acts as a secure middleware between the Spires Academy frontend 
- * and the DeepSeek Inference Engine. It handles both dynamic topic generation 
- * and multi-criteria academic evaluation.
- * * @package Luna_AI_Middleware
- * @version 2.5.0 (Dual-Mode Supported)
- */
-
+// writing_proxy.php
 header('Content-Type: application/json');
 
-/* -------------------------------------------------------------------------
-   1. REQUEST INTERCEPTION
-   ------------------------------------------------------------------------- */
 $input = json_decode(file_get_contents('php://input'), true);
 $apiKey = "sk-435980991e53466691e0f61c01909fa1"; 
 $apiUrl = "https://api.deepseek.com/chat/completions";
 
-if (!$input) {
-    echo json_encode(['error' => 'Empty request payload. Orchestrator terminated.']);
-    exit;
+$action = $input['action'] ?? '';
+$mode = $input['mode'] ?? 'ai'; // New: Distinguish between AI mode or Past Paper mode
+
+// --- New logic: Handle Past Paper mode ---
+if ($action === 'get_topic' && $mode === 'past') {
+    $filePath = 'ielts_cambridge_19_t1.json'; // Reference the filename you mentioned
+    if (file_exists($filePath)) {
+        $jsonContent = file_get_contents($filePath);
+        $data = json_decode($jsonContent, true);
+        // To adapt to frontend's expectation for 'topic' field, assign question to topic
+        echo json_encode(['topic' => $data['question']]);
+        exit();
+    } else {
+        // If file doesn't exist, return error
+        echo json_encode(['topic' => "Error: Past paper file not found."]);
+        exit();
+    }
 }
 
-$action = $input['action'] ?? '';
-
-/* -------------------------------------------------------------------------
-   2. OPERATIONAL ROUTING
-   ------------------------------------------------------------------------- */
-$postData = [];
-
+// --- Original logic: Handle AI mode and evaluation ---
 if ($action === 'get_topic') {
-    /**
-     * TARGET: Dynamic Prompt Generation
-     * Used when the student selects "AI Generation" mode.
-     */
     $postData = [
         "model" => "deepseek-chat",
         "messages" => [
-            [
-                "role" => "system", 
-                "content" => "You are an elite IELTS Writing Examiner. Provide ONE formal Academic Task 2 prompt. Output only the prompt text. No preamble."
-            ],
-            [
-                "role" => "user", 
-                "content" => "Generate a challenging academic prompt regarding social trends, technology, or global education."
-            ]
-        ],
-        "temperature" => 0.8 // Slightly higher temperature for creative topic variety
+            ["role" => "system", "content" => "You are an IELTS writing examiner. Provide ONE academic writing task 2 prompt. Only return the topic text, no other chat."],
+            ["role" => "user", "content" => "Give me a random academic topic about technology, education or environment."]
+        ]
     ];
-
 } elseif ($action === 'evaluate') {
-    /**
-     * TARGET: Multi-Dimensional Evaluation
-     * Works for both AI-generated topics and Past Paper JSON topics.
-     */
-    $topic   = $input['topic'] ?? 'Unknown Academic Subject';
-    $content = $input['content'] ?? '';
+    $topic = $input['topic'];
+    $content = $input['content'];
     
-    // Constructing a high-precision prompt for the scoring engine
-    $evaluationSystemPrompt = "You are Professor Luna, a senior academic writing tutor from Oxford. "
-                            . "Your tone is scholarly, encouraging, yet critically rigorous. "
-                            . "You must output a valid JSON object.";
-
-    $evaluationUserPrompt = "### TASK DESCRIPTION\nTopic: $topic\n\n"
-                          . "### STUDENT MANUSCRIPT\n$content\n\n"
-                          . "### INSTRUCTIONS\n"
-                          . "Analyze the manuscript based on IELTS criteria. Return JSON with keys: "
-                          . "'score' (0-10), 'grammar' (accuracy feedback), 'logic' (cohesion feedback), 'polished' (full scholarly rewrite).";
+    $prompt = "Topic: $topic\nStudent Essay: $content\n
+    Please evaluate this essay. Return a JSON format with keys: 
+    'score' (0-10), 'grammar' (feedback on grammar/vocab), 'logic' (feedback on structure), 'polished' (a high-quality rewritten version of the essay).";
 
     $postData = [
         "model" => "deepseek-chat",
         "messages" => [
-            ["role" => "system", "content" => $evaluationSystemPrompt],
-            ["role" => "user", "content" => $evaluationUserPrompt]
+            ["role" => "system", "content" => "You are a professional writing tutor Luna. Provide feedback in a supportive but strict academic tone. Output MUST be a valid JSON."],
+            ["role" => "user", "content" => $prompt]
         ],
-        // Force the model to output a strictly formatted JSON object
         "response_format" => ["type" => "json_object"]
     ];
 }
 
-/* -------------------------------------------------------------------------
-   3. REMOTE INFERENCE EXECUTION (CURL)
-   ------------------------------------------------------------------------- */
+// --- Underlying request logic (no changes) ---
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -90,32 +61,15 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer ' . $apiKey
 ]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
-
 $response = curl_exec($ch);
-
-// Log network-level errors for infrastructure auditing
-if (curl_errno($ch)) {
-    echo json_encode(['error' => 'Inference Engine Connection Timeout: ' . curl_error($ch)]);
-    curl_close($ch);
-    exit;
-}
-
 $result = json_decode($response, true);
 curl_close($ch);
-
-/* -------------------------------------------------------------------------
-   4. PAYLOAD DELIVERY
-   ------------------------------------------------------------------------- */
-if (!isset($result['choices'][0]['message']['content'])) {
-    echo json_encode(['error' => 'Inference Engine returned an empty payload. Please verify API quotas.']);
-    exit;
-}
 
 $aiContent = $result['choices'][0]['message']['content'];
 
 if ($action === 'get_topic') {
     echo json_encode(['topic' => $aiContent]);
 } else {
-    // Forward the structured evaluation JSON back to the Spires Academy UI
     echo $aiContent;
 }
+?>
