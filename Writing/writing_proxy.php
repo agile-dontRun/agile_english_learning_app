@@ -3,29 +3,29 @@
 header('Content-Type: application/json');
 
 $input = json_decode(file_get_contents('php://input'), true);
-$apiKey = ""; 
+$apiKey = "sk-435980991e53466691e0f61c01909fa1"; 
 $apiUrl = "https://api.deepseek.com/chat/completions";
 
 $action = $input['action'] ?? '';
-$mode = $input['mode'] ?? 'ai'; // 新增：区分 ai 模式或 past 模式
+$mode = $input['mode'] ?? 'ai'; // New: Distinguish between AI mode or Past Paper mode
 
-// --- 新增逻辑：处理 Past Paper 模式 ---
+// --- New logic: Handle Past Paper mode ---
 if ($action === 'get_topic' && $mode === 'past') {
-    $filePath = 'ielts_cambridge_19_t1.json'; // 引用你提到的文件名
+    $filePath = 'ielts_cambridge_19_t1.json'; // Reference the filename you mentioned
     if (file_exists($filePath)) {
         $jsonContent = file_get_contents($filePath);
         $data = json_decode($jsonContent, true);
-        // 为了适配前端对 'topic' 字段的接收，将 question 赋值给 topic
+        // To adapt to frontend's expectation for 'topic' field, assign question to topic
         echo json_encode(['topic' => $data['question']]);
         exit();
     } else {
-        // 如果文件不存在，反馈错误
+        // If file doesn't exist, return error
         echo json_encode(['topic' => "Error: Past paper file not found."]);
         exit();
     }
 }
 
-// --- 原有逻辑：处理 AI 模式和评估 ---
+// --- Original logic: Handle AI mode and evaluation ---
 if ($action === 'get_topic') {
     $postData = [
         "model" => "deepseek-chat",
@@ -52,7 +52,7 @@ if ($action === 'get_topic') {
     ];
 }
 
-// --- 底层请求逻辑（不做更改） ---
+// --- Underlying request logic (no changes) ---
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -72,3 +72,4 @@ if ($action === 'get_topic') {
 } else {
     echo $aiContent;
 }
+?>
