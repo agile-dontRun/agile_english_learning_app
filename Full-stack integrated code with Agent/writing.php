@@ -55,7 +55,7 @@ if (!empty($db_avatar)) {
 
         body { margin: 0; padding: 0; font-family: 'Open Sans', Arial, sans-serif; background-color: var(--bg-light); color: var(--text-dark); overflow: hidden; }
         
-        /* 导航栏样式（完全同步自 listening.php） */
+        /* Navbar style (completely synced from listening.php) */
         .navbar { background-color: var(--oxford-blue); color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .navbar-left { display: flex; align-items: center; height: 100%; }
         .college-logo { height: 50px; width: auto; cursor: pointer; transition: transform 0.3s; }
@@ -97,7 +97,7 @@ if (!empty($db_avatar)) {
         .navbar-right .dropdown-menu li a:hover { background-color: #f8fafc !important; color: var(--oxford-gold) !important; padding-left: 25px; }
 
 
-        /* Writing 界面专有样式 */
+        /* Writing interface specific style */
         #writing-wrapper { display: flex; width: 100vw; height: calc(100vh - 80px); }
 
         #luna-side {
@@ -124,7 +124,7 @@ if (!empty($db_avatar)) {
         }
         .btn-mode:hover, .btn-mode.active { background: var(--oxford-gold); color: var(--oxford-blue); }
         
-        /* 针对下拉选择框的额外样式优化 */
+        /* Additional style optimization for dropdown selectors */
         select.btn-mode {
             appearance: none;
             -webkit-appearance: none;
@@ -166,7 +166,7 @@ if (!empty($db_avatar)) {
         }
         .btn-submit:hover { background: var(--oxford-gold); color: var(--oxford-blue); }
 
-        /* 结果弹窗样式统一 */
+        /* Unified result popup style */
         #result-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 33, 71, 0.9); backdrop-filter: blur(5px);
@@ -283,7 +283,7 @@ if (!empty($db_avatar)) {
             document.getElementById('past-paper-select').classList.toggle('active', mode === 'past');
             
             if (mode === 'ai') {
-                document.getElementById('past-paper-select').value = ""; // 重置下拉框
+                document.getElementById('past-paper-select').value = ""; // Reset dropdown
                 lunaBubble.innerText = "I'll generate a fresh topic using AI for you.";
             } else {
                 lunaBubble.innerText = "Excellent choice. We'll use official Cambridge past papers.";
@@ -303,7 +303,7 @@ if (!empty($db_avatar)) {
             }
         }
 
-        // 1. AI 逻辑 (保持原样)
+        // 1. AI logic (keep as is)
         async function generateAITopic() {
             lunaBubble.innerText = "Consulting the curriculum for a challenging topic...";
             try {
@@ -320,12 +320,12 @@ if (!empty($db_avatar)) {
             }
         }
 
-        // 2. Past Paper 逻辑 (基于选项加载)
+        // 2. Past Paper logic (load based on selection)
         async function loadPastPaper(fileId) {
             lunaBubble.innerText = "Retrieving the selected past paper archives...";
             
-            // 为了演示，这里保持原有的逻辑不变。
-            // 真实使用时，可以通过 fetch('writing_proxy.php', {... file_id: fileId}) 传递给后端获取不同的json
+            // For demonstration, keep the original logic unchanged.
+            // In actual usage, it can be passed to the backend via fetch('writing_proxy.php', {... file_id: fileId}) to get different json files
             const pastPaperData = {
                 "id": fileId,
                 "type": "Academic Task 2",
@@ -336,64 +336,4 @@ if (!empty($db_avatar)) {
             setTimeout(() => {
                 currentTopic = pastPaperData.question;
                 topicText.innerText = `[${pastPaperData.type}] ${currentTopic}`;
-                lunaBubble.innerText = "This is a classic 'Discuss Both Views' task. Remember to balance both sides before your conclusion.";
-            }, 500);
-        }
-
-        // 词数统计
-        essayInput.addEventListener('input', () => {
-            const words = essayInput.value.trim().split(/\s+/).filter(w => w.length > 0);
-            wordNum.innerText = words.length;
-        });
-
-        // 提交逻辑 (保持原样)
-        async function submitEssay() {
-            const content = essayInput.value.trim();
-            if (content.length < 50) return alert("Your essay is a bit too short for a proper evaluation.");
-
-            document.getElementById('submit-btn').disabled = true;
-            lunaBubble.innerText = "Carefully reading your work... I'll have your score and feedback in a moment.";
-
-            try {
-                const res = await fetch('writing_proxy.php', {
-                    method: 'POST',
-                    body: JSON.stringify({ 
-                        action: 'evaluate', 
-                        topic: currentTopic, 
-                        content: content 
-                    })
-                });
-                const data = await res.json();
-                showResult(data);
-            } catch (e) {
-                alert("Evaluation server is busy. Please try again.");
-            } finally {
-                document.getElementById('submit-btn').disabled = false;
-            }
-        }
-
-        function showResult(data) {
-            document.getElementById('final-score').innerText = data.score;
-            document.getElementById('feedback-content').innerHTML = `
-                <div class="feedback-title">Criterion 1: Lexical Resource & Grammar</div>
-                <p style="color:var(--text-light); line-height:1.6;">${data.grammar}</p>
-                
-                <div class="feedback-title">Criterion 2: Coherence & Task Response</div>
-                <p style="color:var(--text-light); line-height:1.6;">${data.logic}</p>
-                
-                <div style="background:#f4f7f6; padding:20px; border-radius:4px; margin-top:20px; border:1px dashed var(--oxford-gold);">
-                    <div class="feedback-title" style="margin-top:0; border:none; color:var(--oxford-gold);">Luna's Polished Exemplar</div>
-                    <p style="font-family:'Lora', serif; font-style:italic; color:var(--oxford-blue);">${data.polished}</p>
-                </div>
-            `;
-            document.getElementById('result-overlay').style.display = 'flex';
-            lunaBubble.innerText = `Evaluation complete. You scored a ${data.score}. Look through my suggestions carefully!`;
-        }
-
-        function closeResult() {
-            document.getElementById('result-overlay').style.display = 'none';
-        }
-    </script>
-    <script src="ai-agent.js?v=1.4"></script>
-</body>
-</html>
+                luna
