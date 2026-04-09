@@ -55,7 +55,7 @@ if (!empty($db_avatar)) {
 
         body { margin: 0; padding: 0; font-family: 'Open Sans', Arial, sans-serif; background-color: var(--bg-light); color: var(--text-dark); overflow: hidden; }
         
-        /* Navbar style (completely synced from listening.php) */
+        /* Navbar Styles */
         .navbar { background-color: var(--oxford-blue); color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .navbar-left { display: flex; align-items: center; height: 100%; }
         .college-logo { height: 50px; width: auto; cursor: pointer; transition: transform 0.3s; }
@@ -77,7 +77,6 @@ if (!empty($db_avatar)) {
             letter-spacing: 1.8px; 
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease; 
-            -webkit-font-smoothing: antialiased;
         }
         .navbar-links a:hover { color: var(--oxford-gold); background-color: rgba(255, 255, 255, 0.05); }
 
@@ -90,14 +89,14 @@ if (!empty($db_avatar)) {
         .navbar-right { display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; position: relative; }
         .user-avatar-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--oxford-gold); object-fit: cover; }
         .user-avatar-placeholder { width: 40px; height: 40px; border-radius: 50%; background-color: var(--oxford-gold); color: var(--oxford-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--oxford-gold); line-height: 1; box-sizing: border-box; }
-        .navbar-right .dropdown-menu { background-color: var(--white); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; font-family: 'Playfair Display', serif; }
-        .navbar-right .dropdown-menu li div[style*="font-size:12px"] { font-family: 'Playfair Display', serif !important; font-style: italic; letter-spacing: 0.5px; color: #888 !important; }
-        .navbar-right .dropdown-menu li div[style*="font-size:16px"] { font-family: 'Playfair Display', serif !important; font-weight: 800; color: var(--oxford-blue) !important; letter-spacing: 1px; text-transform: uppercase; }
-        .navbar-right .dropdown-menu li a { font-family: 'Playfair Display', serif !important; font-weight: 700; font-size: 15px; color: var(--oxford-blue) !important; letter-spacing: 0.5px; transition: all 0.2s ease; }
+        .navbar-right .dropdown-menu { background-color: var(--white); border-top: none; border-radius: 0 0 8px 8px; font-family: 'Playfair Display', serif; }
+        .navbar-right .dropdown-menu li div[style*="font-size:12px"] { font-family: 'Playfair Display', serif !important; font-style: italic; color: #888 !important; }
+        .navbar-right .dropdown-menu li div[style*="font-size:16px"] { font-family: 'Playfair Display', serif !important; font-weight: 800; color: var(--oxford-blue) !important; text-transform: uppercase; }
+        .navbar-right .dropdown-menu li a { font-family: 'Playfair Display', serif !important; font-weight: 700; font-size: 15px; color: var(--oxford-blue) !important; transition: all 0.2s ease; }
         .navbar-right .dropdown-menu li a:hover { background-color: #f8fafc !important; color: var(--oxford-gold) !important; padding-left: 25px; }
 
 
-        /* Writing interface specific style */
+        /* Writing Interface Styles */
         #writing-wrapper { display: flex; width: 100vw; height: calc(100vh - 80px); }
 
         #luna-side {
@@ -123,19 +122,8 @@ if (!empty($db_avatar)) {
             transition: 0.3s;
         }
         .btn-mode:hover, .btn-mode.active { background: var(--oxford-gold); color: var(--oxford-blue); }
-        
-        /* Additional style optimization for dropdown selectors */
-        select.btn-mode {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            text-align: center;
-            outline: none;
-        }
-        select.btn-mode option {
-            background-color: var(--oxford-blue);
-            color: var(--white);
-        }
+        select.btn-mode { appearance: none; text-align: center; outline: none; }
+        select.btn-mode option { background-color: var(--oxford-blue); color: var(--white); }
 
         #work-side { flex: 1; display: flex; flex-direction: column; background: var(--white); padding: 40px; box-sizing: border-box; }
         
@@ -166,18 +154,50 @@ if (!empty($db_avatar)) {
         }
         .btn-submit:hover { background: var(--oxford-gold); color: var(--oxford-blue); }
 
-        /* Unified result popup style */
-        #result-overlay {
+        /* Modal Overlays */
+        .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 33, 71, 0.9); backdrop-filter: blur(5px);
             display: none; align-items: center; justify-content: center; z-index: 2000;
         }
-        #result-card { background: white; width: 850px; max-height: 85vh; border-radius: 8px; padding: 40px; overflow-y: auto; border-top: 8px solid var(--oxford-gold); }
+        .modal-card { background: white; width: 850px; max-height: 85vh; border-radius: 8px; padding: 40px; overflow-y: auto; border-top: 8px solid var(--oxford-gold); }
         .score-box { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--oxford-blue); font-weight: 800; text-align: center; margin-bottom: 20px; }
         .feedback-title { font-family: 'Playfair Display', serif; font-weight: 800; color: var(--oxford-blue); border-bottom: 1px solid var(--oxford-gold); padding-bottom: 10px; margin: 20px 0 10px; text-transform: uppercase; font-size: 14px; }
+        
+        /* History Card Hover Effect */
+        .history-card-item { transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .history-card-item:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: var(--oxford-gold); transform: translateY(-2px); }
+
+        /* Global Loading Spinner Styles */
+        #global-loading {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 33, 71, 0.85); backdrop-filter: blur(8px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; /* Ensure it covers everything */
+            color: var(--white); text-align: center;
+        }
+        .spinner {
+            width: 70px; height: 70px;
+            border: 6px solid rgba(196, 166, 97, 0.2); /* Faded Gold */
+            border-top: 6px solid var(--oxford-gold); /* Solid Gold */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading-message {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px; letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
+
+    <div id="global-loading">
+        <div class="spinner"></div>
+        <div id="loading-message">Loading...</div>
+    </div>
 
     <nav class="navbar">
         <div class="navbar-left">
@@ -197,7 +217,7 @@ if (!empty($db_avatar)) {
                 <li class="dropdown">
                     <a href="#">Games ▾</a>
                     <ul class="dropdown-menu">
-                        <li><a href="galgame/galgame/index.html">Story game</a></li>
+                        <li><a href="galgame/galgame/index.html">Story Game</a></li>
                     </ul>
                 </li>
                 <li><a href="forum.php">Community</a></li>
@@ -238,6 +258,9 @@ if (!empty($db_avatar)) {
                     <option value="ielts_cambridge_20_t2">IELTS Cambridge 20 - Test 2</option>
                     <option value="ielts_cambridge_20_t3">IELTS Cambridge 20 - Test 3</option>
                 </select>
+                
+                <div style="border-top: 1px solid rgba(196, 166, 97, 0.3); margin: 10px 0;"></div>
+                <button class="btn-mode" style="background: rgba(255,255,255,0.05); border-style: dashed;" onclick="viewHistory()">📚 View My Archives</button>
             </div>
         </div>
 
@@ -260,12 +283,21 @@ if (!empty($db_avatar)) {
         </div>
     </div>
 
-    <div id="result-overlay">
-        <div id="result-card">
-            <div style="text-align: right;"><button onclick="closeResult()" style="cursor:pointer; background:none; border:none; font-size:30px;">&times;</button></div>
+    <div id="result-overlay" class="overlay">
+        <div class="modal-card">
+            <div style="text-align: right;"><button onclick="closeResult()" style="cursor:pointer; background:none; border:none; font-size:30px; color:#888;">&times;</button></div>
             <div class="score-box" id="final-score">0.0</div>
             <div id="feedback-content"></div>
             <button class="btn-submit" style="width:100%; margin-top:30px;" onclick="closeResult()">Return to Desk</button>
+        </div>
+    </div>
+    
+    <div id="history-overlay" class="overlay">
+        <div class="modal-card" style="background: #fdfaf2;">
+            <div style="text-align: right;"><button onclick="closeHistory()" style="cursor:pointer; background:none; border:none; font-size:30px; color:#888;">&times;</button></div>
+            <h2 style="font-family: 'Playfair Display', serif; color: var(--oxford-blue); font-weight: 800; margin-top: 0; border-bottom: 2px solid var(--oxford-gold); padding-bottom: 10px; text-transform: uppercase;">My Writing Archives</h2>
+            <div id="history-list" style="margin-top: 20px;">
+                </div>
         </div>
     </div>
 
@@ -274,16 +306,30 @@ if (!empty($db_avatar)) {
         const lunaBubble = document.getElementById('luna-bubble');
         const topicText = document.getElementById('topic-text');
         const wordNum = document.getElementById('word-num');
+        const loadingOverlay = document.getElementById('global-loading');
+        const loadingMessage = document.getElementById('loading-message');
+        
         let currentTopic = "";
-        let currentMode = "ai"; // ai or past
+        let currentMode = "ai"; 
+        let userHistory = []; 
 
+        // Helper functions for loading state
+        function showLoading(msg) {
+            loadingMessage.innerText = msg;
+            loadingOverlay.style.display = 'flex';
+        }
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+
+        // Handle Mode Changes
         function setMode(mode) {
             currentMode = mode;
             document.getElementById('btn-ai').classList.toggle('active', mode === 'ai');
             document.getElementById('past-paper-select').classList.toggle('active', mode === 'past');
             
             if (mode === 'ai') {
-                document.getElementById('past-paper-select').value = ""; // Reset dropdown
+                document.getElementById('past-paper-select').value = ""; 
                 lunaBubble.innerText = "I'll generate a fresh topic using AI for you.";
             } else {
                 lunaBubble.innerText = "Excellent choice. We'll use official Cambridge past papers.";
@@ -303,9 +349,9 @@ if (!empty($db_avatar)) {
             }
         }
 
-        // 1. AI logic (keep as is)
+        // 1. AI Logic
         async function generateAITopic() {
-            lunaBubble.innerText = "Consulting the curriculum for a challenging topic...";
+            showLoading("Consulting Luna for a challenging topic...");
             try {
                 const res = await fetch('writing_proxy.php', {
                     method: 'POST',
@@ -317,23 +363,153 @@ if (!empty($db_avatar)) {
                 lunaBubble.innerText = "Topic ready! Focus on academic cohesion and signposting words.";
             } catch (e) {
                 alert("Failed to connect to Luna's server.");
+            } finally {
+                hideLoading();
             }
         }
 
-        // 2. Past Paper logic (load based on selection)
+        // 2. Past Paper Logic
         async function loadPastPaper(fileId) {
-            lunaBubble.innerText = "Retrieving the selected past paper archives...";
+            showLoading("Retrieving the requested past paper archives...");
+            try {
+                const res = await fetch('writing_proxy.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'get_topic',
+                        mode: 'past',
+                        file_id: fileId 
+                    })
+                });
+                const data = await res.json();
+                currentTopic = data.topic;
+                topicText.innerText = `[Past Paper] ${currentTopic}`;
+                lunaBubble.innerText = "This is an official Cambridge task. Remember to address all parts of the prompt clearly.";
+            } catch (e) {
+                alert("Failed to load the past paper. Ensure the JSON files exist on the server.");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Word count event listener
+        essayInput.addEventListener('input', () => {
+            const words = essayInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+            wordNum.innerText = words.length;
+        });
+
+        // 3. Submission Logic
+        async function submitEssay() {
+            const content = essayInput.value.trim();
+            if (content.length < 50) return alert("Your essay is a bit too short for a proper evaluation.");
+
+            showLoading("Luna is evaluating your essay. This might take a moment...");
             
-            // For demonstration, keep the original logic unchanged.
-            // In actual usage, it can be passed to the backend via fetch('writing_proxy.php', {... file_id: fileId}) to get different json files
-            const pastPaperData = {
-                "id": fileId,
-                "type": "Academic Task 2",
-                "question": "Some people think that competition at work, at school and in daily life is a good thing. Others believe that we should try to cooperate more, rather than competing against each other. Discuss both these views and give your own opinion.",
-                "keywords": ["competition", "cooperation", "workplace", "education", "daily life"]
-            };
+            try {
+                const res = await fetch('writing_proxy.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'evaluate', 
+                        topic: currentTopic, 
+                        content: content 
+                    })
+                });
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                alert("Evaluation server is busy. Please try again.");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 4. Display Feedback Results
+        function showResult(data, isHistory = false) {
+            document.getElementById('final-score').innerText = data.score;
             
-            setTimeout(() => {
-                currentTopic = pastPaperData.question;
-                topicText.innerText = `[${pastPaperData.type}] ${currentTopic}`;
-                luna
+            let feedbackHTML = `
+                ${isHistory ? `<div style="background:#f8fafc; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; border-left: 4px solid var(--oxford-blue);"><strong>Topic:</strong> ${data.topic || currentTopic}</div>` : ''}
+                
+                <div class="feedback-title">Criterion 1: Lexical Resource & Grammar</div>
+                <p style="color:var(--text-light); line-height:1.6;">${data.grammar || data.grammar_feedback || 'N/A'}</p>
+                
+                <div class="feedback-title">Criterion 2: Coherence & Task Response</div>
+                <p style="color:var(--text-light); line-height:1.6;">${data.logic || data.logic_feedback || 'N/A'}</p>
+                
+                <div style="background:#f4f7f6; padding:20px; border-radius:4px; margin-top:20px; border:1px dashed var(--oxford-gold);">
+                    <div class="feedback-title" style="margin-top:0; border:none; color:var(--oxford-gold);">Luna's Polished Exemplar</div>
+                    <p style="font-family:'Lora', serif; font-style:italic; color:var(--oxford-blue);">${data.polished || data.polished_content || 'N/A'}</p>
+                </div>
+            `;
+            
+            if (isHistory && data.content) {
+                feedbackHTML += `
+                <div style="margin-top: 30px;">
+                    <div class="feedback-title" style="font-size: 12px; color: #888; border-bottom: none;">Your Original Submission</div>
+                    <div style="background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; color: var(--text-dark); font-size: 14px; max-height: 150px; overflow-y: auto; white-space: pre-wrap;">${data.content}</div>
+                </div>`;
+            }
+
+            document.getElementById('feedback-content').innerHTML = feedbackHTML;
+            document.getElementById('result-overlay').style.display = 'flex';
+            
+            lunaBubble.innerText = isHistory 
+                ? `Reviewing your past submission. You scored ${data.score}. Always good to reflect on past work!` 
+                : `Evaluation complete. You scored a ${data.score}. Look through my suggestions carefully!`;
+        }
+
+        // 5. Fetch and Display History
+        async function viewHistory() {
+            showLoading("Accessing your personal writing archives...");
+            
+            try {
+                const res = await fetch('writing_proxy.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_history' })
+                });
+                const data = await res.json();
+                userHistory = data.history || [];
+                
+                const listDiv = document.getElementById('history-list');
+                if (userHistory.length === 0) {
+                    listDiv.innerHTML = "<p style='color:var(--text-light); font-style:italic;'>No writing records found yet. Submit your first essay to start building your archive!</p>";
+                } else {
+                    listDiv.innerHTML = userHistory.map((item, index) => `
+                        <div class="history-card-item" style="background: white; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--oxford-blue);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                                <div style="color: var(--oxford-blue); font-size: 18px; font-weight: 800; font-family:'Playfair Display', serif;">Score: ${item.score}</div>
+                                <div style="color: #888; font-size: 13px;">${new Date(item.created_at).toLocaleString()}</div>
+                            </div>
+                            <div style="font-family:'Lora', serif; font-weight:bold; color:var(--text-dark); margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                                ${item.topic}
+                            </div>
+                            <button onclick="openHistoricalResult(${index})" style="background:transparent; border:1px solid var(--oxford-gold); color:var(--oxford-gold); padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:600; font-size:12px; transition:0.2s;">View Full Feedback</button>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('history-overlay').style.display = 'flex';
+                lunaBubble.innerText = "Here are your past writing records.";
+            } catch (e) {
+                alert("Failed to load history.");
+                lunaBubble.innerText = "I had trouble fetching your archives. Please try again.";
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Open a single historical record for detailed view
+        function openHistoricalResult(index) {
+            closeHistory();
+            const item = userHistory[index];
+            showResult(item, true);
+        }
+
+        // Close modal functions
+        function closeResult() {
+            document.getElementById('result-overlay').style.display = 'none';
+        }
+        function closeHistory() {
+            document.getElementById('history-overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
