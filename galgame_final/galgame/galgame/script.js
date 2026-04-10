@@ -7,6 +7,11 @@ let storyData = [];
 // whether the current story is the tutorial
 let isPlayingTutorial = false;
 
+let bgmAudio = null;
+let currentBgmSrc = "";
+
+let sfxAudio = null;
+
 // current step index in the story array
 let currentStep = 0;
 
