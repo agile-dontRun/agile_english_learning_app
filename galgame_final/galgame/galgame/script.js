@@ -341,7 +341,17 @@ function renderStep() {
   }
 
   const currentData = storyData[currentStep];
+  if (currentData.bgm) {
+  playBgm(currentData.bgm, currentData.loop !== false);
+}
 
+if (currentData.stopBgm) {
+  stopBgm();
+}
+
+if (currentData.sfx) {
+  playSfx(currentData.sfx);
+}
   // ===== Normal dialogue step =====
   if (currentData.type === "dialogue") {
     dialogueBox.classList.remove("hidden");
