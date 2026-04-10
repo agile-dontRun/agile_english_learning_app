@@ -1,0 +1,410 @@
+/* Reset default spacing and use border-box for easier layout control */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Full-screen page setup and main background style */
+body {
+  width: 100vw;
+  height: 100vh;
+  font-family: "Comic Sans MS", "Microsoft YaHei", sans-serif;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Main game container with mining background image */
+#game-container {
+  width: 100%;
+  height: 100%;
+  background-image: url("bg_min.jpg");
+  background-size: cover;
+  background-position: center;
+  background-color: #87ceeb;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Top bar that contains the back button and coin display */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 30px 0;
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+/* Back button style */
+.back-btn {
+  padding: 10px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 3px solid #555;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #555;
+  transition: all 0.1s;
+}
+
+/* Pressed-down effect when clicking the back button */
+.back-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #555;
+}
+
+/* Coin display container on the top right */
+.coin-display {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px 20px;
+  border-radius: 25px;
+  border: 2px solid #ffd700;
+}
+
+/* Coin icon style */
+.coin-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+/* Coin amount text style */
+.coin-amount {
+  color: #ffd700;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Center area used for title and main menu content */
+.center-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  min-height: 0;
+}
+
+/* Main title text shown near the top center */
+.game-title {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+  font-size: 48px;
+  color: #fff;
+  text-shadow:
+    3px 3px 0 #8b4513,
+    -1px -1px 0 #8b4513,
+    1px -1px 0 #8b4513,
+    -1px 1px 0 #8b4513,
+    1px 1px 0 #8b4513;
+  letter-spacing: 5px;
+  margin: 0;
+  white-space: nowrap;
+  z-index: 11;
+}
+
+/* Vertical button group for game menu options */
+.menu-buttons {
+  position: fixed;
+  left: 190px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 50px;
+  z-index: 1000;
+  flex-wrap: nowrap;
+}
+
+/* Shared style for all main menu buttons */
+.menu-btn {
+  padding: 30px 60px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  background-color: #ff8c00;
+  border: 4px solid #fff;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #cc7000,
+    0 10px 10px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.1s;
+}
+
+/* Hover effect for menu buttons */
+.menu-btn:hover {
+  background-color: #ffa500;
+  transform: translateY(-2px);
+}
+
+/* Pressed-down effect for menu buttons */
+.menu-btn:active {
+  transform: translateY(6px);
+  box-shadow:
+    0 0 0 #cc7000,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Card area used to display the current Ming look preview */
+.ming-look-card {
+  position: fixed;
+  left: 50%;
+  top: 52%;
+  transform: translateX(-50%);
+  width: 255px;
+  z-index: 1001;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Title is hidden in this layout */
+.ming-look-title {
+  display: none !important;
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Main stage where Ming look layers are rendered */
+.ming-look-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 11 / 13;
+  overflow: hidden;
+  animation: miningFloat 3.2s ease-in-out infinite;
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+/* Each visual layer of the Ming look */
+.ming-look-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Fallback text shown when no active Ming look is available */
+.ming-look-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  color: #996633;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Floating animation for the Ming look preview */
+@keyframes miningFloat {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-14px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Adjust menu button layout for medium-sized screens */
+@media (max-width: 1200px) {
+  .menu-buttons {
+    left: 100px;
+    gap: 30px;
+  }
+
+  .menu-btn {
+    padding: 20px 40px;
+    font-size: 20px;
+  }
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+  .menu-buttons {
+    left: 20px;
+    gap: 16px;
+  }
+
+  .menu-btn {
+    padding: 12px 22px;
+    font-size: 16px;
+  }
+
+  .game-title {
+    top: 10px;
+    font-size: 32px;
+  }
+
+  .back-btn {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+
+  .coin-amount {
+    font-size: 18px;
+  }
+
+  .ming-look-card {
+    left: 50%;
+    top: 93%;
+    transform: translateX(-50%);
+    width: 176px;
+  }
+}
+
+/* ===== Loading Screen ===== */
+/* Full-screen loading overlay shown before the page is fully ready */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("bg_min.jpg") center/cover no-repeat;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* Hidden state of the loading screen */
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Inner loading panel */
+.loading-inner {
+  width: min(520px, 86vw);
+  text-align: center;
+  padding: 36px 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Main loading title */
+.loading-title {
+  font-size: 44px;
+  color: #fff;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 0 #8b4513;
+}
+
+/* Loading subtitle text */
+.loading-subtitle {
+  font-size: 18px;
+  color: #f5f5f5;
+  margin-bottom: 22px;
+}
+
+/* Outer loading progress bar */
+.loading-bar {
+  width: 100%;
+  height: 22px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Filled part of the loading progress bar */
+.loading-bar-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s linear;
+  background: linear-gradient(90deg, #ffd54f, #ff9800);
+}
+
+/* Loading percentage text */
+.loading-percent {
+  margin-top: 14px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* ===== BGM Button ===== */
+/* Floating button used to toggle background music */
+.bgm-toggle {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2000;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.68);
+  border: 2px solid #ffd700;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+/* Hover effect for the BGM button */
+.bgm-toggle:hover {
+  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Click effect for the BGM button */
+.bgm-toggle:active {
+  transform: translateY(0);
+}
+
+/* Smaller loading text and BGM button on mobile devices */
+@media (max-width: 768px) {
+  .loading-title {
+    font-size: 30px;
+  }
+
+  .loading-subtitle {
+    font-size: 15px;
+  }
+
+  .loading-percent {
+    font-size: 18px;
+  }
+
+  .bgm-toggle {
+    right: 14px;
+    bottom: 14px;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}
