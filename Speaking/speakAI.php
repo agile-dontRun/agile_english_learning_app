@@ -60,7 +60,7 @@ if (!empty($db_avatar)) {
             min-height: 100vh;
         }
 
-        /* ===== 1. Navigation Bar (Replicated from speakAI/Listening.php) ===== */
+        /* ===== 1. Navigation bar (replicated from speakAI/Listening.php) ===== */
         .navbar { background-color: var(--oxford-blue); color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .navbar-left { display: flex; align-items: center; height: 100%; }
         .college-logo { height: 50px; width: auto; cursor: pointer; transition: transform 0.3s; }
@@ -75,14 +75,14 @@ if (!empty($db_avatar)) {
         }
         .navbar-links a:hover { color: var(--oxford-gold); background-color: rgba(255, 255, 255, 0.05); }
 
-        /* Dropdown Menu */
+        /* Dropdown menu */
         .dropdown-menu { display: none; position: absolute; top: 80px; left: 0; background-color: var(--oxford-blue-light); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); list-style: none !important; padding: 0; margin: 0; border-top: 2px solid var(--oxford-gold); }
         .dropdown-menu li { list-style: none !important; margin: 0; padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .dropdown-menu li a { color: #e0e0e0 !important; padding: 15px 20px; text-transform: none; justify-content: flex-start; width: 100%; box-sizing: border-box; text-decoration: none !important; display: block; font-weight: 400; height: auto; text-shadow: none; letter-spacing: 0.5px;}
         .dropdown-menu li a:hover { background-color: var(--oxford-blue) !important; color: var(--white) !important; padding-left: 25px; }
         .navbar-links li:hover .dropdown-menu { display: block; }
 
-        /* Right Side User */
+        /* Right user section */
         .navbar-right { display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; position: relative; }
         .user-avatar-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--oxford-gold); object-fit: cover; }
         .user-avatar-placeholder { width: 40px; height: 40px; border-radius: 50%; background-color: var(--oxford-gold); color: var(--oxford-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--oxford-gold); line-height: 1; box-sizing: border-box; }
@@ -91,7 +91,7 @@ if (!empty($db_avatar)) {
         .navbar-right .dropdown-menu li a { color: var(--oxford-blue) !important; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
         .navbar-right .dropdown-menu li a:hover { background-color: #f8fafc !important; color: var(--oxford-gold) !important; }
 
-        /* ===== 2. Hero Section (Replicated from speakAI.php) ===== */
+        /* ===== 2. Hero section (replicated from speakAI.php) ===== */
         .hero {
             background: url('../hero_bg2.png') center/cover no-repeat; 
             color: var(--white); text-align: center; padding: 100px 20px;
@@ -104,7 +104,7 @@ if (!empty($db_avatar)) {
         }
         .hero p { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; font-style: italic; max-width: 800px; margin: 0 auto; text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.8); }
 
-        /* ===== 3. Main Layout (Emma Tools Section) ===== */
+        /* ===== 3. Main layout (Emma tool area) ===== */
         .main-content { 
             flex: 1; display: flex; max-width: 1400px; width: 100%; margin: -40px auto 40px; 
             background: var(--white); border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
@@ -119,7 +119,7 @@ if (!empty($db_avatar)) {
         
         .chat-panel { flex: 1.5; display: flex; flex-direction: column; background-color: #fcfdfe; }
 
-        /* AI Voice Orb */
+        /* AI orb */
         .ai-orb-container { position: relative; margin-bottom: 40px; }
         .ai-orb {
             width: 180px; height: 180px;
@@ -144,7 +144,7 @@ if (!empty($db_avatar)) {
         #startBtn:hover { background-color: var(--oxford-gold-light); transform: translateY(-2px); }
         #endBtn { background-color: #dc3545; color: white; }
 
-        /* Chat Bubbles */
+        /* Chat bubbles */
         #chat { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         .msg { max-width: 80%; padding: 18px 25px; border-radius: 8px; line-height: 1.7; font-size: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .user { background-color: var(--oxford-blue); color: var(--white); align-self: flex-end; border-top-right-radius: 2px; }
@@ -165,7 +165,7 @@ if (!empty($db_avatar)) {
                         <li><a href="../reading.php">Reading</a></li>
                         <li><a href="#" style="color:var(--oxford-gold)!important; font-weight:bold;">Speaking</a></li>
                         <li><a href="../writing.php">Writing</a></li>
-                        <li><a href="../Vocabulary.php">Vocabulary</a></li>
+                        <li><a href="../vocabulary.php">Vocabulary</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -215,9 +215,10 @@ if (!empty($db_avatar)) {
     </main>
 
     <script>
-        // ======= Note: Core functional logic from original index.php preserved here, no modifications =======
-        // Core integration logic (noise reduction and Python 3.6 compatibility fixed)
-        const SERVER_URL = 'ws://8.162.9.154:8082/ws/english_tutor';
+        // ======= Note: kept core logic from original index.php unchanged =======
+        // Core integration logic (noise fixed and Python 3.6 compatibility)
+        // Dynamically get the current host and use a secure wss protocol
+        const SERVER_URL = `wss://${window.location.host}/ws/english_tutor`;
         const aiOrb = document.getElementById('aiOrb');
         const chatBox = document.getElementById('chat');
         const startBtn = document.getElementById('startBtn');
@@ -278,19 +279,19 @@ if (!empty($db_avatar)) {
             source.onended = () => { if (playbackCtx.currentTime >= nextPlayTime - 0.1) aiOrb.classList.remove('speaking'); };
         }
 
-        // Global variable to track current AI bubble
+        // Define a global variable inside <script> to track the current AI bubble
         let currentAiBubble = null; 
         
         function handleText(text) {
-            // 1. When user starts speaking (interrupt signal), reset current bubble
+            // 1. When user starts speaking (interrupt signal), reset the current bubble
             if (text === "__INTERRUPT__") {
                 currentAiBubble = null;
                 return;
             }
         
-            // 2. Handle user's own recognition results (recommend adding this logic in audio_manager.py)
+            // 2. Handle the user's own recognition result
             if (text.startsWith("USER_MSG:")) {
-                currentAiBubble = null; // User speaking, AI bubble ends
+                currentAiBubble = null;
                 const userText = text.replace("USER_MSG:", "");
                 const bubble = document.createElement('div');
                 bubble.className = 'msg user';
@@ -300,25 +301,25 @@ if (!empty($db_avatar)) {
                 return;
             }
         
-            // 3. Handle AI's text fragment append logic
-            // If no AI bubble is currently displayed, create a new one
+            // 3. Handle AI text fragment append logic
+            // If there is no active AI bubble, create a new one
             if (!currentAiBubble) {
                 currentAiBubble = document.createElement('div');
                 currentAiBubble.className = 'msg ai';
                 currentAiBubble.innerHTML = `<b>AI:</b> `;
-                currentAiBubble.setAttribute('data-raw-content', ""); // Store unformatted raw text
+                currentAiBubble.setAttribute('data-raw-content', "");
                 chatBox.appendChild(currentAiBubble);
             }
         
-            // Get old content and append new fragment
+            // Get previous content and append the new fragment
             let fullContent = currentAiBubble.getAttribute('data-raw-content') + text;
             currentAiBubble.setAttribute('data-raw-content', fullContent);
         
-            // Update bubble content in real-time, maintaining [Score: X/10] highlighting
+            // Update bubble content in real time and keep [Score: X/10] highlighted
             const highlightedText = fullContent.replace(/(\[Score:.*?\])/g, '<b style="color:var(--oxford-gold)">$1</b>');
             currentAiBubble.innerHTML = `<b>AI:</b> ${highlightedText}`;
             
-            // Auto-scroll to bottom
+            // Auto-scroll to the bottom
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
