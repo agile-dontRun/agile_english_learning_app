@@ -586,16 +586,37 @@ function collectStoryImages(story) {
   return [...result];
 }
 
-function preloadImages(imageUrls) {
-  return Promise.all(
+async function preloadImages(imageUrls) {
+  const total = imageUrls.length;
+
+  if (total === 0) {
+    updateLoadingProgress(1, 1, "Loading complete");
+    return;
+  }
+
+  let loaded = 0;
+  updateLoadingProgress(0, total, "Loading campus scenes...");
+
+  await Promise.all(
     imageUrls.map((url) => {
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => resolve(url); // 防止一张图失败卡死整个流程
+
+        const finish = () => {
+          loaded += 1;
+          updateLoadingProgress(loaded, total, `Loading scene ${loaded}/${total}...`);
+          resolve(url);
+        };
+
+        img.onload = finish;
+        img.onerror = () => {
+          console.warn("Preload failed:", url);
+          finish();
+        };
+
         img.src = url;
       });
-    })
+    }),
   );
 }
 
