@@ -66,10 +66,6 @@ body {
   z-index: 10;
 }
 
-/* #game-container.preload {
-  visibility: hidden;
-} */
-
 /* Main dialogue box at the bottom of the screen */
 #dialogue-box {
   display: flex;
@@ -418,7 +414,9 @@ body {
   font-weight: bold;
   letter-spacing: 0.5px;
 }
-
+/*#game-container.preload {*/
+/*  visibility: hidden;*/
+/*}*/
 /* Slight hover feedback for the dress-up label */
 #home-avatar-entry:hover #home-avatar-label {
   background: #ffd778;
@@ -491,7 +489,6 @@ body {
   font-weight: bold;
   color: #ffffff;
 }
-
 /* Floating animation for the dress-up entry:
    makes the avatar area feel a bit more lively */
 @keyframes homeAvatarFloat {
