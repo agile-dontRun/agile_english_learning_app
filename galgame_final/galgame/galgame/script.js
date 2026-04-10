@@ -456,19 +456,28 @@ if (currentData.type === "dialogue") {
 
   // ===== Transition step (used for scene switching / walking) =====
   } else if (currentData.type === "transition") {
-    dialogueBox.classList.add("hidden");
-    optionsContainer.classList.add("hidden");
-    characterSprite.classList.add("hidden");
+  isSceneBusy = true;
 
-    const bgElement = document.getElementById("bg-image");
-    const delayTime = currentData.timePerImage || 1000;
+  dialogueBox.classList.add("hidden");
+  optionsContainer.classList.add("hidden");
+  characterSprite.classList.add("hidden");
 
-    // if no images provided, just skip
-    if (!currentData.images || currentData.images.length === 0) {
-      advanceStory();
-      return;
-    }
+  const delayTime = currentData.timePerImage || 1000;
 
+  if (!currentData.images || currentData.images.length === 0) {
+    isSceneBusy = false;
+    advanceStory();
+    return;
+  }
+
+  for (const imgUrl of currentData.images) {
+    await setBackgroundImage(imgUrl);
+    await wait(delayTime);
+  }
+
+  isSceneBusy = false;
+  advanceStory();
+}
     bgElement.src = currentData.images[0];
 
     // if only one image, wait once and continue
