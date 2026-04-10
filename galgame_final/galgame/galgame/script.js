@@ -329,12 +329,16 @@ async function markTutorialCompleted() {
 // Game startup logic
 async function initGame() {
   try {
+    updateLoadingProgress(0, 1, "Loading player profile...");
     await loadPlayerAvatar();
+
+    updateLoadingProgress(0, 1, "Loading avatar outfit...");
     await loadHomeAvatarLook();
 
-    
     const storyImages = collectStoryImages(prologueData);
     await preloadImages(storyImages);
+
+    updateLoadingProgress(1, 1, "Loading complete");
 
     const data = await getTutorialStatus();
     const params = new URLSearchParams(window.location.search);
@@ -350,10 +354,11 @@ async function initGame() {
       startStory(prologueData, true);
     }
   } finally {
-    document.getElementById("game-container").classList.remove("preload");
+    setTimeout(() => {
+      hideLoadingScreen();
+    }, 250);
   }
 }
-
 let isSceneBusy = false;
 
 function wait(ms) {
