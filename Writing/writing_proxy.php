@@ -16,7 +16,7 @@ if (!$input) {
     exit();
 }
 
-$apiKey = "sk-435980991e53466691e0f61c01909fa1"; 
+$apiKey = ""; 
 $apiUrl = "https://api.deepseek.com/chat/completions";
 
 $action = $input['action'] ?? '';
