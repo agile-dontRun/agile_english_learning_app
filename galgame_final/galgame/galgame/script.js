@@ -252,6 +252,7 @@ async function markTutorialCompleted() {
 
 // Game startup logic
 async function initGame() {
+  try {
     await loadPlayerAvatar();
     await loadHomeAvatarLook();
 
@@ -259,17 +260,17 @@ async function initGame() {
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
 
-    // if tutorial is already done, go straight to home page
     if (data.success && data.is_tutorial_completed) {
-        showHomeScreen();
+      showHomeScreen();
 
-        // optional direct jump to floor6 via URL param
-        if (view === "floor6") {
-            goToFloor6();
-        }
+      if (view === "floor6") {
+        goToFloor6();
+      }
     } else {
-    // otherwise start tutorial story
-    startStory(prologueData, true);
+      startStory(prologueData, true);
+    }
+  } finally {
+    document.getElementById("game-container").classList.remove("preload");
   }
 }
 
