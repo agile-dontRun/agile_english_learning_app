@@ -1,6 +1,6 @@
 const chapter4 =[
     {type: 'dialogue', speaker: 'Narration', text: 'You walked into a coffee shop on campus and wanted to order a cup of coffee to refresh yourself.'},
-    {type: 'dialogue', speaker: 'barista', text: "(With a smile on her face) Hi there! How's it going today?" },
+    {type: 'dialogue', speaker: 'barista', text: "(With a smile on her face) Hi there! How's it going today?", bgm: "../frontend/assets/audio/starbucks.mp3" },
     {type: 'choice',
         options :[
             {
