@@ -66,6 +66,10 @@ body {
   z-index: 10;
 }
 
+#game-container.preload {
+  visibility: hidden;
+}
+
 /* Main dialogue box at the bottom of the screen */
 #dialogue-box {
   display: flex;
