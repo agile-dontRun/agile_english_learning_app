@@ -327,6 +327,41 @@ async function initGame() {
   }
 }
 
+let isSceneBusy = false;
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function setBackgroundImage(url) {
+  return new Promise((resolve) => {
+    if (!url) {
+      resolve();
+      return;
+    }
+
+    const bg = document.getElementById("bg-image");
+    const img = new Image();
+
+    img.onload = async () => {
+      bg.src = url;
+
+      
+      await wait(50);
+
+    
+      requestAnimationFrame(() => resolve());
+    };
+
+    img.onerror = () => {
+      console.error("Background load failed:", url);
+      resolve();
+    };
+
+    img.src = url;
+  });
+}
+
 // Render whatever the current step is
 async function renderStep() {
   // story finished
