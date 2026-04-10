@@ -15,95 +15,6 @@ let sfxAudio = null;
 // current step index in the story array
 let currentStep = 0;
 
-// lock: prevent advancing while scene/background is still switching
-let isSceneBusy = false;
-
-// ===== Utility helpers =====
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function collectStoryImages(story) {
-  const result = new Set();
-
-  story.forEach((step) => {
-    if (step.bg) result.add(step.bg);
-    if (Array.isArray(step.images)) {
-      step.images.forEach((img) => result.add(img));
-    }
-  });
-
-  return [...result];
-}
-
-async function preloadImages(imageUrls) {
-  const total = imageUrls.length;
-
-  if (total === 0) {
-    updateLoadingProgress(1, 1, "Loading complete");
-    return;
-  }
-
-  let loaded = 0;
-  updateLoadingProgress(0, total, "Loading campus scenes...");
-
-  await Promise.all(
-    imageUrls.map((url) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-
-        const finish = () => {
-          loaded += 1;
-          updateLoadingProgress(
-            loaded,
-            total,
-            `Loading scene ${loaded}/${total}...`
-          );
-          resolve(url);
-        };
-
-        img.onload = finish;
-        img.onerror = () => {
-          console.warn("Preload failed:", url);
-          finish();
-        };
-
-        img.src = url;
-      });
-    })
-  );
-}
-
-// Switch background only after the next image is ready
-function setBackgroundImage(url) {
-  return new Promise((resolve) => {
-    if (!url) {
-      resolve();
-      return;
-    }
-
-    const bg = document.getElementById("bg-image");
-    const img = new Image();
-
-    img.onload = async () => {
-      bg.src = url;
-
-      // small wait to let browser finish decode/render
-      await wait(50);
-
-      // wait one frame so the image is more likely painted on screen
-      requestAnimationFrame(() => resolve());
-    };
-
-    img.onerror = () => {
-      console.error("Background load failed:", url);
-      resolve();
-    };
-
-    img.src = url;
-  });
-}
-
 // ===== Main dialogue / UI elements =====
 const dialogueBox = document.getElementById("dialogue-box");
 const speakerName = document.getElementById("speaker-name");
@@ -115,27 +26,6 @@ const characterSprite = document.getElementById("character-sprite");
 const avatarBox = document.getElementById("speaker-avatar-box");
 const avatarImg = document.getElementById("speaker-avatar");
 
-const loadingScreen = document.getElementById("loading-screen");
-const loadingBarInner = document.getElementById("loading-bar-inner");
-const loadingPercent = document.getElementById("loading-percent");
-const loadingSubtitle = document.getElementById("loading-subtitle");
-
-function updateLoadingProgress(current, total, label = "Loading campus scenes...") {
-  const safeTotal = Math.max(total, 1);
-  const percent = Math.round((current / safeTotal) * 100);
-
-  if (loadingBarInner) {
-    loadingBarInner.style.width = `${percent}%`;
-  }
-
-  if (loadingPercent) {
-    loadingPercent.innerText = `${percent}%`;
-  }
-
-  if (loadingSubtitle) {
-    loadingSubtitle.innerText = label;
-  }
-}
 // ===== Home screen avatar display =====
 const homeAvatarStage = document.getElementById("home-avatar-stage");
 const homeAvatarEmpty = document.getElementById("home-avatar-empty");
@@ -149,6 +39,7 @@ const DEFAULT_PLAYER_AVATAR = "../frontend/assets/player.jpg";
 let currentPlayerAvatar = DEFAULT_PLAYER_AVATAR;
 
 // render order for dress-up layers
+// lower items are drawn first, upper ones later
 const dressUpLayerOrder = [
   "background",
   "body",
@@ -188,15 +79,14 @@ function showHomeScreen() {
 }
 
 // Build possible image paths for one dress-up layer
+// This is mainly for fallback: if one path fails, try the next one
 function buildDressUpImageCandidates(layer) {
   const filePath = layer?.file_path || "";
-  const normalizedFilePath = filePath.startsWith("/")
-    ? filePath
-    : `/${filePath}`;
-
-  return [`/galgame/dress_up_game${normalizedFilePath}`, layer?.url || ""].filter(
-    Boolean,
-  );
+  const normalizedFilePath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+  return [
+    `/galgame/dress_up_game${normalizedFilePath}`,
+    layer?.url || "",
+  ].filter(Boolean);
 }
 
 // Try candidate image URLs one by one until one works
@@ -215,16 +105,60 @@ function setDressUpImageWithFallback(img, candidates, index = 0) {
   img.src = `${candidate}${candidate.includes("?") ? "&" : "?"}t=${Date.now()}`;
 }
 
+function playBgm(src, loop = true) {
+  if (!src) return;
+
+  if (currentBgmSrc === src && bgmAudio) {
+    return; // 同一个背景音就不重复播放
+  }
+
+  stopBgm();
+
+  bgmAudio = new Audio(src);
+  bgmAudio.loop = loop;
+  bgmAudio.volume = 0.4;
+  bgmAudio.play().catch((err) => {
+    console.warn("BGM failed to play:", err);
+  });
+
+  currentBgmSrc = src;
+}
+
+function stopBgm() {
+  if (bgmAudio) {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+    bgmAudio = null;
+  }
+  currentBgmSrc = "";
+}
+
+function playSfx(src, volume = 0.8) {
+  if (!src) return;
+
+  if (sfxAudio) {
+    sfxAudio.pause();
+    sfxAudio.currentTime = 0;
+  }
+
+  sfxAudio = new Audio(src);
+  sfxAudio.volume = volume;
+  sfxAudio.play().catch((err) => {
+    console.warn("SFX failed to play:", err);
+  });
+}
+
 // Clear all rendered avatar layers on the home page
 function resetHomeAvatarStage() {
   if (!homeAvatarStage) {
     return;
   }
 
-  Array.from(homeAvatarStage.querySelectorAll(".home-avatar-layer")).forEach(
-    (node) => node.remove(),
+  Array.from(homeAvatarStage.querySelectorAll(".home-avatar-layer")).forEach((node) =>
+    node.remove(),
   );
 
+  // show empty placeholder if nothing is rendered
   if (homeAvatarEmpty) {
     homeAvatarEmpty.style.display = "flex";
   }
@@ -238,6 +172,7 @@ function renderHomeAvatarLook(data) {
 
   resetHomeAvatarStage();
 
+  // no valid outfit data, keep empty state
   if (!data || !Array.isArray(data.layers) || data.layers.length === 0) {
     return;
   }
@@ -246,6 +181,7 @@ function renderHomeAvatarLook(data) {
     homeAvatarEmpty.style.display = "none";
   }
 
+  // map layers by layer name for easier lookup
   const layerMap = new Map();
   for (const layer of data.layers) {
     if (layer && layer.layer) {
@@ -253,9 +189,11 @@ function renderHomeAvatarLook(data) {
     }
   }
 
+  // render layer by layer in correct order
   for (const layerName of dressUpLayerOrder) {
     const layer = layerMap.get(layerName);
 
+    // skip missing layers and background
     if (!layer || layerName === "background") {
       continue;
     }
@@ -304,6 +242,7 @@ async function loadPlayerAvatar() {
     const data = await res.json();
 
     if (data && data.success && data.avatar_url) {
+      // add timestamp to force refresh if avatar was recently updated
       currentPlayerAvatar = `${data.avatar_url}${data.avatar_url.includes("?") ? "&" : "?"}t=${Date.now()}`;
       return;
     }
@@ -311,6 +250,7 @@ async function loadPlayerAvatar() {
     console.error("Failed to load player avatar:", err);
   }
 
+  // fallback to default avatar
   currentPlayerAvatar = DEFAULT_PLAYER_AVATAR;
 }
 
@@ -361,17 +301,9 @@ async function markTutorialCompleted() {
 
 // Game startup logic
 async function initGame() {
-   try {
-    updateLoadingProgress(0, 1, "Loading player profile...");
+  try {
     await loadPlayerAvatar();
-
-    updateLoadingProgress(0, 1, "Loading avatar outfit...");
     await loadHomeAvatarLook();
-
-    const storyImages = collectStoryImages(prologueData);
-    await preloadImages(storyImages);
-
-    updateLoadingProgress(1, 1, "Loading complete");
 
     const data = await getTutorialStatus();
     const params = new URLSearchParams(window.location.search);
@@ -387,25 +319,19 @@ async function initGame() {
       startStory(prologueData, true);
     }
   } finally {
-    setTimeout(() => {
-      hideLoadingScreen();
-    }, 250);
+    document.getElementById("game-container").classList.remove("preload");
   }
 }
 
-function hideLoadingScreen() {
-  if (!loadingScreen) return;
-  loadingScreen.classList.add("hidden-loading");
-}
-
 // Render whatever the current step is
-async function renderStep() {
+function renderStep() {
   // story finished
   if (currentStep >= storyData.length) {
     dialogueBox.classList.add("hidden");
     characterSprite.classList.add("hidden");
     avatarBox.classList.add("hidden");
 
+    // if tutorial just ended, mark it as completed
     if (isPlayingTutorial) {
       markTutorialCompleted();
       isPlayingTutorial = false;
@@ -416,32 +342,25 @@ async function renderStep() {
   }
 
   const currentData = storyData[currentStep];
-
   if (currentData.bgm) {
-    playBgm(currentData.bgm, currentData.loop !== false);
-  }
+  playBgm(currentData.bgm, currentData.loop !== false);
+}
 
-  if (currentData.stopBgm) {
-    stopBgm();
-  }
+if (currentData.stopBgm) {
+  stopBgm();
+}
 
-  if (currentData.sfx) {
-    playSfx(currentData.sfx);
-  }
-
+if (currentData.sfx) {
+  playSfx(currentData.sfx);
+}
   // ===== Normal dialogue step =====
   if (currentData.type === "dialogue") {
-    isSceneBusy = true;
-
-    if (currentData.bg) {
-      await setBackgroundImage(currentData.bg);
-    }
-
     dialogueBox.classList.remove("hidden");
     optionsContainer.classList.add("hidden");
     speakerName.innerText = currentData.speaker;
     dialogueText.innerText = currentData.text;
 
+    // narration / system lines do not need avatar or character sprite
     if (
       currentData.speaker === "Narration" ||
       currentData.speaker === "System Prompt"
@@ -451,6 +370,7 @@ async function renderStep() {
     } else {
       avatarBox.classList.remove("hidden");
 
+      // switch character sprite/avatar depending on speaker
       if (currentData.speaker === "Karen") {
         characterSprite.classList.remove("hidden");
         avatarImg.src = "../frontend/assets/karen.png";
@@ -467,23 +387,29 @@ async function renderStep() {
         characterSprite.classList.remove("hidden");
         avatarImg.src = "../frontend/assets/chef.png";
         characterSprite.src = "../frontend/assets/chef.png";
-      } else if (currentData.speaker === "😎 Oral Tutor") {
+      } else if(currentData.speaker === "😎 Oral Tutor"){
+        // tutor currently does not use normal avatar display
         avatarBox.classList.add("hidden");
         characterSprite.classList.add("hidden");
       } else {
+        // default case: assume the speaker is the player
         characterSprite.classList.add("hidden");
         avatarImg.src = getPlayerAvatarUrl();
       }
     }
 
-    isSceneBusy = false;
+    // update background if current step specifies one
+    if (currentData.bg) {
+      document.getElementById("bg-image").src = currentData.bg;
+    }
 
-    // ===== Choice step =====
+  // ===== Choice step =====
   } else if (currentData.type === "choice") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.remove("hidden");
     optionsContainer.innerHTML = "";
 
+    // render all choice buttons
     currentData.options.forEach((option) => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
@@ -492,32 +418,43 @@ async function renderStep() {
       optionsContainer.appendChild(btn);
     });
 
-    // ===== Transition step =====
+  // ===== Transition step (used for scene switching / walking) =====
   } else if (currentData.type === "transition") {
-    isSceneBusy = true;
-
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.add("hidden");
     characterSprite.classList.add("hidden");
-    avatarBox.classList.add("hidden");
 
+    const bgElement = document.getElementById("bg-image");
     const delayTime = currentData.timePerImage || 1000;
 
+    // if no images provided, just skip
     if (!currentData.images || currentData.images.length === 0) {
-      isSceneBusy = false;
       advanceStory();
       return;
     }
 
-    for (const imgUrl of currentData.images) {
-      await setBackgroundImage(imgUrl);
-      await wait(delayTime);
+    bgElement.src = currentData.images[0];
+
+    // if only one image, wait once and continue
+    if (currentData.images.length === 1) {
+      setTimeout(() => {
+        advanceStory();
+      }, delayTime);
+    } else {
+      // otherwise play image sequence like a mini slideshow
+      let imgIndex = 0;
+      const walkInterval = setInterval(() => {
+        imgIndex++;
+        if (imgIndex < currentData.images.length) {
+          bgElement.src = currentData.images[imgIndex];
+        } else {
+          clearInterval(walkInterval);
+          advanceStory();
+        }
+      }, delayTime);
     }
 
-    isSceneBusy = false;
-    advanceStory();
-
-    // ===== Exploration choice step =====
+  // ===== Exploration choice step =====
   } else if (currentData.type === "explore_choice") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.remove("hidden");
@@ -536,6 +473,7 @@ async function renderStep() {
 // Handle normal choices with right / wrong feedback
 function handleChoice(option) {
   if (option.isCorrect) {
+    // correct answer: show player's spoken response
     optionsContainer.classList.add("hidden");
     dialogueBox.classList.remove("hidden");
 
@@ -546,20 +484,47 @@ function handleChoice(option) {
     avatarImg.src = getPlayerAvatarUrl();
     characterSprite.classList.add("hidden");
   } else {
+    // wrong answer: trigger mentor feedback and let player retry
     optionsContainer.classList.add("hidden");
     dialogueBox.classList.remove("hidden");
 
     mentorOverlay.classList.remove("hidden");
+    // mentorSprite.classList.remove("hidden");
     characterSprite.style.filter = "brightness(30%)";
 
     speakerName.innerText = "😎 Oral Tutor";
     speakerName.style.color = "#FF6347";
-    dialogueText.innerText =
-      option.mentorText + " (Click on the screen to select again)";
+    dialogueText.innerText = option.mentorText + " (Click on the screen to select again)";
     avatarBox.classList.add("hidden");
 
     dialogueBox.onclick = resetFromMentor;
   }
+}
+
+function collectStoryImages(story) {
+  const result = new Set();
+
+  story.forEach(step => {
+    if (step.bg) result.add(step.bg);
+    if (Array.isArray(step.images)) {
+      step.images.forEach(img => result.add(img));
+    }
+  });
+
+  return [...result];
+}
+
+function preloadImages(imageUrls) {
+  return Promise.all(
+    imageUrls.map((url) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(url); // 防止一张图失败卡死整个流程
+        img.src = url;
+      });
+    })
+  );
 }
 
 // Close mentor feedback and return to current choice step
@@ -570,25 +535,23 @@ function resetFromMentor(e) {
   characterSprite.style.filter = "brightness(100%)";
   speakerName.style.color = "#87CEEB";
 
+  // restore normal click-to-continue behavior
   dialogueBox.onclick = advanceStory;
   renderStep();
 }
 
 // Advance to next story step
 function advanceStory() {
-  if (isSceneBusy) {
-    return;
-  }
-
+  // prevent advancing while choices are on screen
   if (!optionsContainer.classList.contains("hidden")) {
     return;
   }
-
   currentStep++;
   renderStep();
 }
 
 // Handle explore choice
+// No correct/incorrect logic here; may inject a sub-story into the main flow
 function handleExploreChoice(option) {
   optionsContainer.classList.add("hidden");
   dialogueBox.classList.remove("hidden");
@@ -607,8 +570,8 @@ function startStory(newChapterData, tutorialMode = false) {
   storyData = newChapterData;
   currentStep = 0;
   isPlayingTutorial = tutorialMode;
-  isSceneBusy = false;
 
+  // hide menu-like screens, show story UI
   homeScreen.classList.add("hidden");
   floor6Screen.classList.add("hidden");
   dialogueBox.classList.remove("hidden");
@@ -616,6 +579,11 @@ function startStory(newChapterData, tutorialMode = false) {
   mentorOverlay.classList.add("hidden");
   mentorSprite.classList.add("hidden");
   characterSprite.style.filter = "brightness(100%)";
+
+  // set initial background if provided
+  if (storyData[0] && storyData[0].bg) {
+    document.getElementById("bg-image").src = storyData[0].bg;
+  }
 
   renderStep();
 }
@@ -643,53 +611,30 @@ function launchGame(gameName) {
 
 // ================= Universal scene jump helper =================
 function goToScenario(bgUrl, chapterData) {
+  // first force the target background
   document.getElementById("bg-image").src = bgUrl;
+
+  // then start the corresponding chapter data
   startStory(chapterData);
 }
 
-// Audio controls
-function playBgm(src, loop = true) {
-  if (!src) return;
+// old version of startStory kept here for reference during development
+// function startStory(newChapterData) {
+//     storyData = newChapterData;
+//     currentStep = 0;
+//     isPlayingTutorial = tutorialMode;
 
-  if (currentBgmSrc === src && bgmAudio) {
-    return;
-  }
+//     homeScreen.classList.add('hidden');
+//     floor6Screen.classList.add('hidden');
+//     dialogueBox.classList.remove('hidden');
+//     optionsContainer.classList.add('hidden');
 
-  stopBgm();
+//     if (storyData[0] && storyData[0].bg) {
+//         document.getElementById('bg-image').src = storyData[0].bg;
+//     }
 
-  bgmAudio = new Audio(src);
-  bgmAudio.loop = loop;
-  bgmAudio.volume = 0.4;
-  bgmAudio.play().catch((err) => {
-    console.warn("BGM Playback failed:", err);
-  });
-
-  currentBgmSrc = src;
-}
-
-function stopBgm() {
-  if (bgmAudio) {
-    bgmAudio.pause();
-    bgmAudio.currentTime = 0;
-    bgmAudio = null;
-  }
-  currentBgmSrc = "";
-}
-
-function playSfx(src, volume = 0.8) {
-  if (!src) return;
-
-  if (sfxAudio) {
-    sfxAudio.pause();
-    sfxAudio.currentTime = 0;
-  }
-
-  sfxAudio = new Audio(src);
-  sfxAudio.volume = volume;
-  sfxAudio.play().catch((err) => {
-    console.warn("SFX Playback failed:", err);
-  });
-}
+//     renderStep();
+// }
 
 // Global click binding: click dialogue box to continue story
 dialogueBox.onclick = advanceStory;
