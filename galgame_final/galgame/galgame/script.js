@@ -328,7 +328,7 @@ async function initGame() {
 }
 
 // Render whatever the current step is
-function renderStep() {
+async function renderStep() {
   // story finished
   if (currentStep >= storyData.length) {
     dialogueBox.classList.add("hidden");
