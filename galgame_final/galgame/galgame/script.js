@@ -305,6 +305,10 @@ async function initGame() {
     await loadPlayerAvatar();
     await loadHomeAvatarLook();
 
+    
+    const storyImages = collectStoryImages(prologueData);
+    await preloadImages(storyImages);
+
     const data = await getTutorialStatus();
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
