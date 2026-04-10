@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <!-- Basic page setup -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Page title shown in the browser tab -->
+    <title>Freshman Survival Guide</title>
+
+    <!-- Main stylesheet for this page -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Main game container: everything in the visual novel lives here -->
+    <div id="game-container">
+      <!-- Background image of the current scene -->
+      <img
+        id="bg-image"
+        src="../frontend/assets/scene1/lobby1.jpg"
+        alt="Background"
+      />
+
+      <!-- Character sprite shown on the screen during dialogues -->
+      <img
+        id="character-sprite"
+        src="../frontend/assets/karen.png"
+        alt="Character"
+      />
+
+      <!-- Dark overlay used when mentor feedback appears -->
+      <div id="mentor-overlay" class="hidden"></div>
+
+      <!-- Mentor image; currently hidden by default -->
+      <img
+        id="mentor-sprite"
+        class="hidden"
+        src="https://via.placeholder.com/300x500/FF6347/ffffff?text=Mentor"
+        alt="Mentor"
+      />
+
+      <!-- ================= Home screen ================= -->
+      <!-- This is the main menu after tutorial / story completion -->
+      <div
+        id="home-screen"
+        class="hidden"
+        style="background-image: url('../frontend/assets/home_page/home_bg.jpg')"
+      >
+        <!-- Left column: review / activity content -->
+        <div class="home-column">
+          <div class="col-title">Activity</div>
+
+          <!-- Replay the freshman meeting story -->
+          <button class="home-btn" onclick="startStory(prologueData, false)">
+            Review: Freshman Meeting
+          </button>
+
+          <!-- Jump to music game -->
+          <button class="home-btn" onclick="window.location.href='music_game/english_music.php'">
+            music festival
+          </button>
+        </div>
+
+        <!-- Middle column: mini-games -->
+        <div class="home-column">
+          <div class="col-title">Games</div>
+
+          <!-- Enter the 6th floor scene selection page -->
+          <button class="home-btn" onclick="goToFloor6()">
+            6th floor of DIICSU college
+          </button>
+
+          <!-- Jump to cafeteria mini-game -->
+          <button
+            class="home-btn"
+            onclick="window.location.href = '../canteen_game/index.php'"
+          >
+            Cafeteria mini games
+          </button>
+
+          <!-- Temporarily hidden game entry -->
+          <!--<button-->
+          <!--  class="home-btn"-->
+          <!--  onclick="window.location.href = '../word/index.html'"-->
+          <!-->-->
+          <!--  Word Hunter-->
+          <!--</button>-->
+        </div>
+
+        <!-- Right column: daily-life dialogue scenes -->
+        <div class="home-column">
+          <div class="col-title">Daily scenes</div>
+
+          <!-- Jump directly to canteen scenario -->
+          <button
+            class="home-btn"
+            onclick="goToScenario('../frontend/assets/scene5/canteen.jpg', chapter5)"
+          >
+            Cafeteria (after freshman meeting)
+          </button>
+
+          <!-- Jump directly to coffee house scenario -->
+          <button
+            class="home-btn"
+            onclick="goToScenario('../frontend/assets/scene4/starbucks.jpg', chapter4)"
+          >
+            coffee house
+          </button>
+        </div>
+
+        <!-- Back to the main English learning website -->
+        <button
+          id="back-to-main-site-btn"
+          onclick="window.location.href = '../../home.php'"
+        >
+          Return to English learning website
+        </button>
+
+        <!-- Dress-up game entry -->
+        <!-- Clicking this sends the user to the dress-up page and remembers how to come back -->
+        <button
+          id="home-avatar-entry"
+          onclick="window.location.href = '../dress_up_game/dress_up_index.php?return=/galgame/galgame/index.html'"
+          aria-label="Open dress up game"
+        >
+          <!-- Avatar preview area -->
+          <div id="home-avatar-stage">
+            <div id="home-avatar-empty">Dress Up</div>
+          </div>
+
+          <!-- Label under the avatar preview -->
+          <span id="home-avatar-label">Dress Up</span>
+        </button>
+      </div>
+
+      <!-- ================= 6th floor game selection screen ================= -->
+      <div
+        id="floor6-screen"
+        class="hidden"
+        style="background-image: url('../frontend/assets/home_page/6f_bg.jpg')"
+      >
+        <!-- Entry to Gold Word Miner -->
+        <div class="interactive-zone" onclick="launchGame('miner')">
+          <div class="zone-text">Enter<br />Gold Word Miner</div>
+        </div>
+
+        <!-- Entry to stage / auditorium game -->
+        <div
+          class="interactive-zone"
+          onclick="window.location.href = '../stage_game/index.php'"
+        >
+          <div class="zone-text">Enter<br />auditorium</div>
+        </div>
+
+        <!-- Entry to memory card game -->
+        <div class="interactive-zone" onclick="launchGame('match')">
+          <div class="zone-text">Enter<br />Flip Card Memory Challenge</div>
+        </div>
+
+        <!-- Entry to Word Hunter -->
+        <div
+          class="interactive-zone"
+          onclick="window.location.href = '../word/index.html'"
+        >
+          <div class="zone-text">Enter<br />Word Hunter</div>
+        </div>
+
+        <!-- Return from 6th floor back to home screen -->
+        <button id="back-to-home-btn" onclick="goToHome()">
+          Return to the campus gate
+        </button>
+      </div>
+
+      <!-- ================= Dialogue UI ================= -->
+      <!-- Main dialogue box shown during story scenes -->
+      <div id="dialogue-box">
+        <!-- Speaker avatar shown on the left -->
+        <div id="speaker-avatar-box">
+          <img
+            id="speaker-avatar"
+            src="https://via.placeholder.com/80/ffffff/000000?text=Me"
+            alt="Avatar"
+          />
+        </div>
+
+        <!-- Speaker name + dialogue text -->
+        <div id="text-content">
+          <div id="speaker-name">Narration</div>
+          <div id="dialogue-text">Click to continue ..</div>
+        </div>
+
+        <!-- Small indicator telling player they can continue -->
+        <div id="next-indicator">▶</div>
+      </div>
+
+      <!-- Choice buttons will be generated here dynamically -->
+      <div id="options-container" class="hidden"></div>
+    </div>
+
+    <!-- Story data files -->
+    <script src="story_chapter1.js"></script>
+    <script src="story_chapter2.js"></script>
+    <script src="story_chapter3.js"></script>
+    <script src="story_chapter4.js"></script>
+    <script src="story_chapter5.js"></script>
+
+    <!-- Main game logic -->
+    <script src="script.js"></script>
+  </body>
+</html>

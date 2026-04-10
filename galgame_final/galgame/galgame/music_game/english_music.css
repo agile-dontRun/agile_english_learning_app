@@ -1,0 +1,933 @@
+/* ========== Theme variables ==========
+   Centralized color palette and shadow settings for the music festival page */
+:root {
+    --paper: #f7f1de;
+    --paper-deep: #efe2b9;
+    --ink: #1f3127;
+    --ink-soft: #55645e;
+    --grass: #8bb174;
+    --grass-deep: #4f7a53;
+    --sunset: #ef7b45;
+    --sunset-deep: #cf5422;
+    --tape: #ffe28a;
+    --cream-card: rgba(255, 248, 226, 0.82);
+    --line: rgba(31, 49, 39, 0.12);
+    --shadow: 0 28px 70px rgba(38, 58, 44, 0.18);
+}
+
+/* Basic box model reset */
+* {
+    box-sizing: border-box;
+}
+
+/* Page background:
+   uses layered gradients to create a warm outdoor festival feeling */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 215, 120, 0.35), transparent 20%),
+        radial-gradient(circle at 85% 15%, rgba(139, 177, 116, 0.28), transparent 22%),
+        linear-gradient(180deg, #fff8e8 0%, #f8f1d8 34%, #e8efcf 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* When music is playing, start the equalizer animation */
+body.is-playing .visualizer span {
+    animation-play-state: running;
+}
+
+/* Small tilt/lift effect for the main poster when audio is playing */
+body.is-playing .hero-frame {
+    transform: rotate(1deg) translateY(-4px);
+}
+
+/* Floating "back to game" button in the top-left corner */
+.back-to-game-btn {
+    position: fixed;
+    top: 28px;
+    left: 24px;
+    z-index: 20;
+
+    border: 1px solid rgba(31, 49, 39, 0.14);
+    background: rgba(255, 248, 226, 0.9);
+    color: var(--ink);
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(38, 58, 44, 0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+/* Hover state: brighter and more festival-like */
+.back-to-game-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--sunset-deep) 100%);
+    color: #fff;
+    box-shadow: 0 16px 30px rgba(207, 84, 34, 0.2);
+}
+
+.back-to-game-btn:active {
+    transform: translateY(0);
+}
+
+/* Background glow decorations */
+.poster-glow {
+    position: fixed;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.38;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Warm orange glow on the left */
+.poster-glow-left {
+    top: 40px;
+    left: -120px;
+    background: rgba(239, 123, 69, 0.42);
+}
+
+/* Green glow on the right */
+.poster-glow-right {
+    right: -120px;
+    bottom: 60px;
+    background: rgba(139, 177, 116, 0.4);
+}
+
+/* Main page wrapper */
+.festival-shell {
+    position: relative;
+    z-index: 1;
+    width: min(1220px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 36px;
+}
+
+/* Decorative lights at the top of the page */
+.festival-lights {
+    position: fixed;
+    inset: 14px 24px auto;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+/* Each single bulb */
+.festival-lights span {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 6px rgba(255, 249, 223, 0.32), 0 0 28px currentColor;
+}
+
+/* Orange bulbs */
+.festival-lights span:nth-child(1),
+.festival-lights span:nth-child(4) {
+    color: #ff8a52;
+    background: #ff8a52;
+}
+
+/* Yellow bulbs */
+.festival-lights span:nth-child(2),
+.festival-lights span:nth-child(5) {
+    color: #ffd866;
+    background: #ffd866;
+}
+
+/* Green bulbs */
+.festival-lights span:nth-child(3),
+.festival-lights span:nth-child(6) {
+    color: #8bb174;
+    background: #8bb174;
+}
+
+/* Scrolling text strip like a concert marquee */
+.marquee-strip {
+    overflow: hidden;
+    margin-bottom: 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(31, 49, 39, 0.12);
+    background: rgba(31, 49, 39, 0.92);
+    color: #fff7e7;
+    box-shadow: 0 14px 40px rgba(31, 49, 39, 0.14);
+}
+
+/* The actual scrolling row */
+.marquee-track {
+    display: flex;
+    gap: 28px;
+    width: max-content;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: marqueeMove 24s linear infinite;
+}
+
+/* Add separator dots between scrolling items */
+.marquee-track span::before {
+    content: "\2022";
+    margin-right: 28px;
+    color: var(--sunset);
+}
+
+/* Shared card style for main sections */
+.festival-hero,
+.lineup-card,
+.stage-card {
+    background: var(--cream-card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+}
+
+/* Hero area: main festival intro section */
+.festival-hero {
+    border-radius: 34px;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 28px;
+    align-items: center;
+    position: relative;
+}
+
+/* Decorative dashed border inside hero card */
+.festival-hero::before {
+    content: "";
+    position: absolute;
+    inset: 16px;
+    border: 2px dashed rgba(79, 122, 83, 0.18);
+    border-radius: 26px;
+    pointer-events: none;
+}
+
+/* Left text area in the hero section */
+.hero-copy {
+    padding-right: 12px;
+}
+
+/* Reusable pill-like badges */
+.hero-badge,
+.hero-tags span,
+.stage-pill,
+.mini-label,
+.card-heading strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+/* Main badge in hero area */
+.hero-badge {
+    padding: 8px 16px;
+    background: var(--ink);
+    color: #fff8ef;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Date styling */
+.hero-date {
+    margin: 16px 0 10px;
+    color: var(--grass-deep);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+/* Main title */
+.hero-copy h1 {
+    margin: 0;
+    font-size: clamp(34px, 6vw, 68px);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+}
+
+/* Supporting description below the title */
+.hero-text {
+    max-width: 620px;
+    margin: 18px 0 0;
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+}
+
+/* Tag list under the hero text */
+.hero-tags {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Single tag */
+.hero-tags span {
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(31, 49, 39, 0.09);
+    color: var(--ink);
+    font-size: 13px;
+}
+
+/* Key stats row */
+.hero-stats {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+/* Each stat card */
+.hero-stat {
+    padding: 18px 16px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(31, 49, 39, 0.09);
+}
+
+.hero-stat strong {
+    display: block;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.hero-stat span {
+    display: block;
+    margin-top: 6px;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+/* Right visual area in hero section */
+.hero-visual {
+    display: flex;
+    justify-content: center;
+}
+
+/* Main poster / image frame */
+.hero-frame {
+    position: relative;
+    width: min(100%, 390px);
+    transition: transform 0.35s ease;
+    transform: rotate(2deg);
+}
+
+/* Soft color wash behind the poster */
+.hero-frame::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(239, 123, 69, 0.14), rgba(139, 177, 116, 0.18));
+    z-index: 0;
+}
+
+/* Hero image itself */
+.hero-frame img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: block;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 24px;
+    border: 8px solid rgba(255, 251, 239, 0.95);
+    box-shadow: 0 26px 60px rgba(62, 79, 53, 0.24);
+}
+
+/* Decorative sticker labels attached to the frame */
+.frame-sticker {
+    position: absolute;
+    z-index: 2;
+    padding: 10px 16px;
+    background: var(--tape);
+    color: #764800;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 24px rgba(118, 72, 0, 0.14);
+}
+
+/* Top-left sticker */
+.sticker-top {
+    top: -10px;
+    left: -8px;
+    transform: rotate(-8deg);
+}
+
+/* Bottom-right sticker */
+.sticker-bottom {
+    right: -6px;
+    bottom: 16px;
+    transform: rotate(6deg);
+}
+
+/* Two-column main content area:
+   left = playlist, right = player / details */
+.festival-grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+}
+
+/* Shared padding/radius for the lower cards */
+.lineup-card,
+.stage-card {
+    border-radius: 30px;
+    padding: 24px;
+}
+
+/* Header area inside cards */
+.card-heading,
+.stage-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* Eyebrow / small label text */
+.card-heading span,
+.eyebrow {
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Small badge on card headers */
+.card-heading strong {
+    min-width: 88px;
+    padding: 8px 12px;
+    background: var(--paper-deep);
+    color: var(--sunset-deep);
+    font-size: 12px;
+}
+
+/* Playlist container */
+.playlist {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+/* Single playlist item */
+.playlist-item {
+    width: 100%;
+    padding: 14px;
+    border-radius: 22px;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.66);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover / active track */
+.playlist-item:hover,
+.playlist-item.active {
+    transform: translateY(-2px);
+    border-color: rgba(239, 123, 69, 0.34);
+    box-shadow: 0 14px 32px rgba(207, 84, 34, 0.12);
+}
+
+/* Track number bubble */
+.playlist-order {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--sunset-deep) 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* Song title + subtext */
+.playlist-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.playlist-meta strong {
+    font-size: 15px;
+}
+
+/* Shared soft text styling */
+.playlist-meta small,
+.description,
+.info-card p {
+    color: var(--ink-soft);
+    line-height: 1.7;
+}
+
+/* Stage title */
+.stage-head h2 {
+    margin: 6px 0 6px;
+    font-size: clamp(30px, 4.8vw, 54px);
+    line-height: 1;
+}
+
+/* Artist / performer name */
+.artist {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--grass-deep);
+}
+
+/* Small dark pill label on the right */
+.stage-pill {
+    padding: 10px 16px;
+    background: var(--ink);
+    color: #fff;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+/* Main song/stage description */
+.description {
+    margin: 18px 0 0;
+    font-size: 16px;
+    max-width: 760px;
+}
+
+/* Dashboard area under the main stage content */
+.stage-dashboard {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr 1.1fr;
+    gap: 14px;
+}
+
+/* Generic dashboard/info cards */
+.dashboard-card {
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(31, 49, 39, 0.08);
+}
+
+/* Small section label */
+.dashboard-label {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dashboard-card strong {
+    display: block;
+    font-size: 20px;
+    line-height: 1.15;
+}
+
+.dashboard-card p {
+    margin: 10px 0 0;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    font-size: 14px;
+}
+
+/* Special dashboard card containing the visualizer */
+.visualizer-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Equalizer bar container */
+.visualizer {
+    min-height: 94px;
+    display: flex;
+    align-items: end;
+    gap: 8px;
+}
+
+/* Individual equalizer bars */
+.visualizer span {
+    flex: 1;
+    min-height: 16px;
+    border-radius: 999px 999px 10px 10px;
+    background: linear-gradient(180deg, #ffd45f 0%, #ef7b45 45%, #cf5422 100%);
+    animation: equalizer 1s ease-in-out infinite alternate;
+    animation-play-state: paused;
+}
+
+/* Slight variation makes the bars feel more natural */
+.visualizer span:nth-child(2) { animation-duration: 0.9s; }
+.visualizer span:nth-child(3) { animation-duration: 1.15s; }
+.visualizer span:nth-child(4) { animation-duration: 0.78s; }
+.visualizer span:nth-child(5) { animation-duration: 1.25s; }
+.visualizer span:nth-child(6) { animation-duration: 0.95s; }
+.visualizer span:nth-child(7) { animation-duration: 1.1s; }
+.visualizer span:nth-child(8) { animation-duration: 0.86s; }
+
+/* Audio player section below the dashboard */
+.player-strip {
+    margin-top: 22px;
+    display: grid;
+    gap: 18px;
+}
+
+/* Progress area / audio state card */
+.progress-card {
+    padding: 16px 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(31, 49, 39, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+/* Hide native audio element from the page */
+.audio-player {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Row showing current status and note */
+.player-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+/* Reusable capsule styles */
+.status-chip,
+.status-note {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* Play state badge */
+.status-chip {
+    padding: 8px 12px;
+    background: #ebf4d9;
+    color: var(--grass-deep);
+}
+
+/* Informational text on the right */
+.status-note {
+    padding: 8px 0;
+    color: var(--ink-soft);
+}
+
+/* Progress bar color */
+#progressBar {
+    width: 100%;
+    accent-color: var(--sunset);
+}
+
+/* Current time / total time row */
+.time-row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+/* Player control buttons container */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Base button style */
+.controls button {
+    border: none;
+    background: #edf4e6;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.controls button:hover {
+    transform: translateY(-2px);
+    opacity: 0.96;
+}
+
+/* Primary action button, usually play */
+.controls .primary {
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--sunset-deep) 100%);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(207, 84, 34, 0.22);
+}
+
+/* Square-ish icon button */
+.icon-btn {
+    width: 92px;
+    height: 92px;
+    border-radius: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 22px rgba(31, 49, 39, 0.08);
+}
+
+/* Main play button is larger and circular */
+.play-btn {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+}
+
+/* Shared icon container */
+.icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CSS-drawn play icon */
+.icon-play {
+    width: 28px;
+    height: 34px;
+    margin-left: 5px;
+}
+
+.icon-play span {
+    width: 0;
+    height: 0;
+    border-top: 17px solid transparent;
+    border-bottom: 17px solid transparent;
+    border-left: 28px solid currentColor;
+}
+
+/* CSS-drawn pause icon */
+.icon-pause {
+    width: 28px;
+    height: 34px;
+    gap: 8px;
+}
+
+.icon-pause span {
+    width: 9px;
+    height: 34px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+/* Previous / next icons */
+.icon-prev,
+.icon-next {
+    width: 34px;
+    height: 28px;
+}
+
+.icon-prev span,
+.icon-next span {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+}
+
+.icon-prev span {
+    border-right: 16px solid currentColor;
+}
+
+.icon-next span {
+    border-left: 16px solid currentColor;
+}
+
+.icon-prev span:first-child {
+    left: 0;
+}
+
+.icon-prev span:last-child {
+    left: 12px;
+}
+
+.icon-next span:first-child {
+    right: 0;
+}
+
+.icon-next span:last-child {
+    right: 12px;
+}
+
+/* Small helper text below controls */
+.helper-note {
+    margin: -4px 0 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+/* Bottom information cards */
+.info-panels {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+/* Card that spans full width */
+.wide-card {
+    grid-column: 1 / -1;
+}
+
+/* Shared style for lower info cards */
+.info-card {
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.66);
+    border: 1px solid rgba(31, 49, 39, 0.08);
+}
+
+/* Mini pill label in info cards */
+.mini-label {
+    padding: 7px 12px;
+    background: #ebf4d9;
+    color: var(--grass-deep);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.info-card p {
+    margin: 12px 0 0;
+}
+
+/* ================= Responsive design ================= */
+
+/* Tablet and below:
+   collapse main grids into single column */
+@media (max-width: 980px) {
+    .festival-hero,
+    .festival-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-copy {
+        padding-right: 0;
+    }
+
+    .hero-stats,
+    .stage-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile layout adjustments */
+@media (max-width: 640px) {
+    .festival-shell {
+        width: min(100% - 20px, 1220px);
+        padding: 20px 0 26px;
+    }
+
+    .festival-hero,
+    .lineup-card,
+    .stage-card {
+        border-radius: 24px;
+        padding: 18px;
+    }
+
+    .festival-hero::before {
+        inset: 10px;
+        border-radius: 18px;
+    }
+
+    .hero-tags,
+    .controls,
+    .info-panels {
+        gap: 10px;
+    }
+
+    .marquee-strip {
+        margin-bottom: 14px;
+    }
+
+    .marquee-track {
+        font-size: 12px;
+    }
+
+    .stage-head,
+    .card-heading {
+        flex-direction: column;
+    }
+
+    .info-panels {
+        grid-template-columns: 1fr;
+    }
+
+    .controls button {
+        flex: 0 0 auto;
+    }
+
+    .icon-btn {
+        width: 78px;
+        height: 78px;
+        border-radius: 24px;
+    }
+
+    .play-btn {
+        width: 96px;
+        height: 96px;
+    }
+}
+
+/* Marquee scrolling animation */
+@keyframes marqueeMove {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+/* Equalizer animation for the fake audio bars */
+@keyframes equalizer {
+    from {
+        height: 18px;
+        opacity: 0.75;
+    }
+    to {
+        height: 84px;
+        opacity: 1;
+    }
+}

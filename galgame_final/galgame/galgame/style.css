@@ -1,0 +1,435 @@
+/* style.css */
+
+/* Global reset:
+   keep layout behavior predictable and remove default browser spacing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Microsoft YaHei", sans-serif;
+}
+
+/* Fullscreen black background for the whole page */
+body {
+  background-color: #000;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Main game container:
+   fills the whole screen and acts as the positioning reference for all layers */
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  border: none;
+  background-color: #222;
+}
+
+/* Background image:
+   always covers the entire container like a scene background */
+#bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Character sprite layer:
+   both the main character and mentor use similar positioning */
+#character-sprite,
+#mentor-sprite {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 80%;
+  transition: all 0.3s;
+  z-index: 2;
+}
+
+/* Mentor appears slightly more to the right and above normal sprite layer */
+#mentor-sprite {
+  left: 70%;
+  z-index: 20;
+}
+
+/* Dark overlay shown when mentor feedback pops up */
+#mentor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+/* Main dialogue box at the bottom of the screen */
+#dialogue-box {
+  display: flex;
+  position: absolute;
+  bottom: 30px;
+  left: 5%;
+  width: 90%;
+  height: auto;
+  min-height: 140px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border: 3px solid #87ceeb;
+  border-radius: 12px;
+  padding: 20px;
+  z-index: 30;
+  cursor: pointer;
+}
+
+/* Container for the speaker avatar on the left side of the dialogue box */
+#speaker-avatar-box {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+/* Avatar image style:
+   circular, cropped nicely, and aligned more toward the top */
+#speaker-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Text area inside the dialogue box */
+#text-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Speaker name */
+#speaker-name {
+  font-size: 22px;
+  color: #ffd700;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+/* Dialogue content */
+#dialogue-text {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* Small blinking arrow telling the player they can continue */
+#next-indicator {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  animation: blink 1s infinite;
+}
+
+/* ================= Choice buttons ================= */
+
+/* Choice panel shown in the middle of the screen */
+#options-container {
+  position: absolute;
+  top: 25%;
+  left: 10%;
+  width: 80%;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual choice button */
+.option-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #333;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+/* Hover effect for choices:
+   slightly larger, highlighted, and easier to notice */
+.option-btn:hover {
+  background: #87ceeb;
+  color: white;
+  border-color: #fff;
+  transform: scale(1.02);
+}
+
+/* Utility class used throughout the page */
+.hidden {
+  display: none !important;
+}
+
+/* Reusable blink animation for the continue arrow */
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ================= Home screen + floor 6 screen ================= */
+
+/* These two full-screen panels are layered above the normal story scene */
+#home-screen,
+#floor6-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 50;
+  display: flex;
+}
+
+/* Column layout on the home screen */
+.home-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  background: rgba(0, 0, 0, 0.4);
+  border-right: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+/* Remove divider line from the last column */
+.home-column:last-child {
+  border-right: none;
+}
+
+/* Title at the top of each home screen column */
+.col-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 30px;
+  letter-spacing: 5px;
+  text-shadow: 2px 2px 4px #000;
+}
+
+/* Standard button style used on the home screen */
+.home-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #333;
+  padding: 12px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 25px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 60%;
+}
+
+/* Home button hover effect */
+.home-btn:hover {
+  background: #87ceeb;
+  color: #000;
+  transform: scale(1.05);
+}
+
+/* Extra highlight style for important buttons */
+.highlight-btn {
+  border: 3px solid #ff6347;
+  box-shadow: 0 0 10px #ff6347;
+}
+
+/* ================= Floor 6 interactive zones ================= */
+
+/* Each game entry area on the floor 6 page */
+.interactive-zone {
+  flex: 1;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s;
+}
+
+/* Light overlay appears when hovering a zone */
+.interactive-zone:hover {
+  background: rgba(135, 206, 235, 0.4);
+}
+
+/* Hidden text inside each zone, revealed on hover */
+.zone-text {
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 8px #000;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Show zone label when hovering */
+.interactive-zone:hover .zone-text {
+  opacity: 1;
+}
+
+/* Disabled area style */
+.disabled {
+  cursor: not-allowed;
+}
+
+/* Keep disabled area dark instead of highlighting it */
+.disabled:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* ================= Navigation buttons ================= */
+
+/* Button for returning from floor 6 to home */
+#back-to-home-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 60;
+}
+
+/* Hover style for back-to-home button */
+#back-to-home-btn:hover {
+  background: #ff6347;
+}
+
+/* Button for returning to the main website */
+#back-to-main-site-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hover style for main-site return button */
+#back-to-main-site-btn:hover {
+  background: #ffd700;
+  color: #000;
+}
+
+/* ================= Dress-up avatar entry ================= */
+
+/* Floating dress-up entry button shown on the home page */
+#home-avatar-entry {
+  position: absolute;
+  left: 18px;
+  bottom: 12px;
+  z-index: 65;
+  width: 150px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: homeAvatarFloat 3.2s ease-in-out infinite;
+}
+
+/* Avatar preview frame */
+#home-avatar-stage {
+  width: 100%;
+  height: 195px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 235, 0.18) 0%,
+    rgba(255, 250, 235, 0.05) 100%
+  );
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+}
+
+/* Each dress-up layer is stacked absolutely on top of each other */
+.home-avatar-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  pointer-events: none;
+}
+
+/* Placeholder text shown when no outfit/avatar is loaded yet */
+#home-avatar-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  color: rgba(255, 250, 240, 0.92);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Label below the dress-up preview */
+#home-avatar-label {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 249, 232, 0.92);
+  border: 2px solid rgba(126, 87, 50, 0.22);
+  color: #5f3b1c;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Slight hover feedback for the dress-up label */
+#home-avatar-entry:hover #home-avatar-label {
+  background: #ffd778;
+}
+
+/* Floating animation for the dress-up entry:
+   makes the avatar area feel a bit more lively */
+@keyframes homeAvatarFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
