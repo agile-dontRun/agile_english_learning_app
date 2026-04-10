@@ -1,0 +1,59 @@
+Word Miner VS (Vocabulary Miner Battle) Core Design Document
+
+I. Game Overview
+Core Play: A two-player, on-screen or online competitive "Gold Miner" style quiz game.
+Core Objective: Transform the dull process of memorizing vocabulary int a competitive, strategic, and rewarding casual game. Players control a mining machine t grab stones and answer English vocabulary questions during the process t complete the mining.
+
+II. Core Gameplay Mechanism
+1. Mining and Answering
+  Trigger Mechanism: Players control the mining machine's hook t grab stones. When a stone is grabbed, it does not immediately pull back but triggers a [Multiple Choice Question] (given the English word, select the Chinese definition).
+  Progress Bar Mechanism:
+   Correct Answer: The stone's progress bar increases, and the mining machine pulls the stone up a certain distance.
+   Incorrect Answer: The mining machine undergoes a "violent shake" animation, the progress bar retreats (reduces by one), and the stone drops down a certain distance.
+  Multi-level Stone Settings (sorted by value and rarity):
+   Small Stones (e.g., ordinary stones, copper): Require answering 3 questions correctly in a row t dig out.
+   Large Stones (e.g., silver, jade): Require answering 5 questions correctly in a row t dig out.
+   Rare Stones (e.g., gold, agate, diamond): Require answering 10 questions correctly in a row t dig out.
+2. Absolute Fairness and Synchronization
+  Mirror Mining Area: In a single game, both players face the same stone distribution and types of stones.
+  Pre-set Vocabulary Bank: The sequence of words bound t each specific stone is generated uniformly by the server at the start of the game. When both players grab the same stone from the same position, the words and their order that pop up are exactly the same.
+  Strategic Game: Players need t decide based on their vocabulary level and remaining time whether t dig "short-time but cheap small stones" or "long-time but extremely valuable large stones."
+
+III. Maps and Difficulty System
+  Difficulty-bound Maps: Different mining area scenes correspond t different vocabulary difficulty levels.
+   For example: [Abandoned Mine] corresponds t high school exam vocabulary; [Mysterious Ruins] corresponds t CET-4 and CET-6 vocabulary; [Alien Crater] corresponds t IELTS/TOEFL vocabulary.
+  Increasing Returns: The more difficult the map, the higher the probability of rare stones appearing, and the greater the upper limit of the single-game earnings.
+
+IV. Economy and Progression System
+The stones dug out are converted int coins (Coins) after the game, which are used t purchase out-of-game progression and upgrades:
+1. Mining Machine Upgrades
+   Swing Speed: After upgrading, the hook's left and right swing speed increases, making it easier t aim precisely.
+   Processing Core: [Core Experience Optimization] Shortens the animation transition interval between each question. Advanced mining machines have a faster pop-up speed for the next question after answering correctly, thus significantly increasing the digging efficiency of skilled players.
+2. Personalization Cosmetics
+   Miner character's clothes, hats, exclusive actions, etc. (purely for appearance display, n numerical bonuses, used t consume excess coins).
+
+V. Item System and Buff Mechanism
+  Stone Detector: A consumable item purchased outside the game.
+  Function: Used during the game preparation stage, it increases the probability of rare stones appearing in the current game. Shared Buff: Since both players' maps are exactly the same, if one player uses a detector, both players' maps will become richer. If both players use detectors, the buff effect can stack (doubling the drop rate), adding t the surprise of teaming up or random matching.
+
+VI. Collectibles and Easter Eggs
+1. Mineral Atlas (Achievement System)
+  Establish an achievement system similar t a "museum". When players dig up a certain mineral for the first time (especially rare ones like agate and jade), they can light up the atlas, satisfying their collecting addiction.
+2. Hidden Resource: Oil
+  Trigger Condition: There is a very low probability of "oil mining points" appearing on any map.
+  Mining Limitation: Ordinary mining machines' hooks cannot extract oil. Players must purchase a specific **[Drilling Machine Accessory]** from the store t collect oil in-game.
+  Value: Oil is of great value and is one of the ultimate goals pursued by players in the later stages.
+
+VII. Endgame: Word Garden
+  Gameplay Loop: When players have an excess of gold coins in the later stages, they can enter the "Word Garden" system.
+  Mechanism: Spend a large amount of gold coins t purchase seeds of rare plants. The growth of the plants may als require players t review their previous "error books" t water and fertilize them. Create a completely unique and beautiful virtual garden of their own. 
+??‍💻 Action Items for the Development Team:
+  For the Frontend/UI:
+    Design physical feedback animations for the hook's swing, grab, pull (correct answer), and shake and drop (wrong answer).
+    The answer UI must be extremely responsive with n lag, as it will affect the player's experience when competing in speed.
+  For the Backend:
+    Online synchronization is key. Ensure that both players in a match use the same random seed t generate the map and word sequence t guarantee absolute fairness.
+    Design an economic value table (ore value, upgrade cost, etc.) and balance the values in the later stage.
+  For the Database:
+    Create a new table structure t record the player's: gold balance, current mining machine level, item inventory, ore atlas unlock progress, and owned garden plants.
+    Add a "difficulty level" tag t the existing word table t link it with different maps.

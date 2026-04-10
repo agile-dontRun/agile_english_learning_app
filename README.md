@@ -22,3 +22,22 @@ In week 2 & 3
 week 2: complete 1 and 2 ,explore the feasibility of an AI assistent
 week 3: complete 3 6 7 8 features; 
         integration testing. (Tursday)
+----------------------------------------------
+Update from 2026/3/31
+---
+## 🛠 Project Workflow & Collaboration
+To ensure high code quality and efficient teamwork, we have adopted an **Agile development process** starting from March 31, 2026.
+
+### 1. Workflow
+*   **Task Management:** All tasks are tracked via **GitHub Issues** and the **Project Board**.
+*   **Branching:** Developers must create a **new branch** for every small task.
+*   **Pull Requests (PR):** After finishing a task, create a PR to merge code into `main`.
+*   **Code Review:** Every PR requires approval from a **Code Reviewer** to ensure quality.
+
+### 2. Team Roles
+*   **Scrum Master:** @Zeyu Li - Responsible for process coordination and project progress.
+*   **Code Reviewers:** @Lilin Zhu, @Yixuan Pan, @Xiangtian Ren @Zeyuan Huang - Responsible for code quality assurance and PR approvals.
+*   **Developers:** All team members.
+*   **Note:** Merging directly into main is strictly prohibited. All code must pass the review process.
+*   **Note** Each time creating an issue, you should add **label**, **type** and **milestone** for it, small issues should be labeled as "Epic: xxx", type as "Task" and large issue should be labeled as "Type: Epic", type as "feature". All issues during sprint 2 's milestone is "Sprint 2". **Important**
+*   Tasks are broken down into small, manageable units (Issues) assigned through the Project Board.

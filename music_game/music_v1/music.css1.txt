@@ -1,0 +1,545 @@
+/* =========================
+   全局颜色变量：页面主色、纸张质感、墨绿色、夕阳橙等
+   方便统一管理配色
+========================= */
+:root {
+    --paper: #f7f1de; /* 浅纸张色 */
+    --paper-deep: #efe2b9; /* 深一点的纸张色 */
+    --ink: #1f3127; /* 主文字颜色：深墨绿 */
+    --ink-soft: #55645e; /* 次级文字颜色：柔和灰绿 */
+    --grass: #8bb174; /* 草绿色 */
+    --grass-deep: #4f7a53; /* 深草绿色 */
+    --sunset: #ef7b45; /* 夕阳橙 */
+    --sunset-deep: #cf5422; /* 深夕阳橙 */
+    --tape: #ffe28a; /* 胶带黄色 */
+    --cream-card: rgba(255, 248, 226, 0.82); /* 卡片浅奶油背景 */
+    --line: rgba(31, 49, 39, 0.12); /* 边框线颜色 */
+    --shadow: 0 28px 70px rgba(38, 58, 44, 0.18); /* 卡片阴影 */
+}
+
+/* 所有元素统一使用 border-box，避免宽高计算混乱 */
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   页面主体样式
+========================= */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 215, 120, 0.35), transparent 20%),
+        radial-gradient(circle at 85% 15%, rgba(139, 177, 116, 0.28), transparent 22%),
+        linear-gradient(180deg, #fff8e8 0%, #f8f1d8 34%, #e8efcf 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* =========================
+   背景发光装饰
+========================= */
+.poster-glow {
+    position: fixed;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.38;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 左上发光块 */
+.poster-glow-left {
+    top: 40px;
+    left: -120px;
+    background: rgba(239, 123, 69, 0.42);
+}
+
+/* 右下发光块 */
+.poster-glow-right {
+    right: -120px;
+    bottom: 60px;
+    background: rgba(139, 177, 116, 0.4);
+}
+
+/* =========================
+   页面外层容器
+========================= */
+.festival-shell {
+    position: relative;
+    z-index: 1;
+    width: min(1220px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 36px;
+}
+
+/* 主视觉、左侧列表卡、右侧舞台卡共用样式 */
+.festival-hero,
+.lineup-card,
+.stage-card {
+    background: var(--cream-card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+}
+
+/* =========================
+   顶部主视觉区域
+========================= */
+.festival-hero {
+    border-radius: 34px;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 28px;
+    align-items: center;
+    position: relative;
+}
+
+/* 主视觉内部虚线边框装饰 */
+.festival-hero::before {
+    content: "";
+    position: absolute;
+    inset: 16px;
+    border: 2px dashed rgba(79, 122, 83, 0.18);
+    border-radius: 26px;
+    pointer-events: none;
+}
+
+/* 左侧文案区域 */
+.hero-copy {
+    padding-right: 12px;
+}
+
+/* 徽章、标签、胶囊标签等共用圆角居中样式 */
+.hero-badge,
+.hero-tags span,
+.stage-pill,
+.mini-label,
+.card-heading strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+/* 顶部小徽章 */
+.hero-badge {
+    padding: 8px 16px;
+    background: var(--ink);
+    color: #fff8ef;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* 日期文字 */
+.hero-date {
+    margin: 16px 0 10px;
+    color: var(--grass-deep);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+/* 主标题 */
+.hero-copy h1 {
+    margin: 0;
+    font-size: clamp(34px, 6vw, 68px);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+}
+
+/* 主描述文字 */
+.hero-text {
+    max-width: 620px;
+    margin: 18px 0 0;
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+}
+
+/* 标签组 */
+.hero-tags {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* 单个标签 */
+.hero-tags span {
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(31, 49, 39, 0.09);
+    color: var(--ink);
+    font-size: 13px;
+}
+
+/* 右侧视觉区域 */
+.hero-visual {
+    display: flex;
+    justify-content: center;
+}
+
+/* 图片相框外层 */
+.hero-frame {
+    position: relative;
+    width: min(100%, 390px);
+    transform: rotate(2deg);
+}
+
+/* 图片外发光/底色装饰 */
+.hero-frame::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, rgba(239, 123, 69, 0.14), rgba(139, 177, 116, 0.18));
+    z-index: 0;
+}
+
+/* 图片本身 */
+.hero-frame img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: block;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 24px;
+    border: 8px solid rgba(255, 251, 239, 0.95);
+    box-shadow: 0 26px 60px rgba(62, 79, 53, 0.24);
+}
+
+/* 图片上的贴纸标签 */
+.frame-sticker {
+    position: absolute;
+    z-index: 2;
+    padding: 10px 16px;
+    background: var(--tape);
+    color: #764800;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 24px rgba(118, 72, 0, 0.14);
+}
+
+/* 左上贴纸 */
+.sticker-top {
+    top: -10px;
+    left: -8px;
+    transform: rotate(-8deg);
+}
+
+/* 右下贴纸 */
+.sticker-bottom {
+    right: -6px;
+    bottom: 16px;
+    transform: rotate(6deg);
+}
+
+/* =========================
+   主体内容双栏布局
+========================= */
+.festival-grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+}
+
+/* 左右卡片基础样式 */
+.lineup-card,
+.stage-card {
+    border-radius: 30px;
+    padding: 24px;
+}
+
+/* 卡片标题区域 */
+.card-heading,
+.stage-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* 小标题、副标题文字 */
+.card-heading span,
+.eyebrow {
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* 右侧高亮标识 */
+.card-heading strong {
+    min-width: 88px;
+    padding: 8px 12px;
+    background: var(--paper-deep);
+    color: var(--sunset-deep);
+    font-size: 12px;
+}
+
+/* =========================
+   播放列表区域
+========================= */
+.playlist {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+/* 单条播放项 */
+.playlist-item {
+    width: 100%;
+    padding: 14px;
+    border-radius: 22px;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.66);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* 鼠标悬停/激活状态 */
+.playlist-item:hover,
+.playlist-item.active {
+    transform: translateY(-2px);
+    border-color: rgba(239, 123, 69, 0.34);
+    box-shadow: 0 14px 32px rgba(207, 84, 34, 0.12);
+}
+
+/* 序号圆点 */
+.playlist-order {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--sunset-deep) 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* 歌曲信息区域 */
+.playlist-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* 歌曲标题 */
+.playlist-meta strong {
+    font-size: 15px;
+}
+
+/* 歌曲副信息、描述、信息卡正文共用文字样式 */
+.playlist-meta small,
+.description,
+.info-card p {
+    color: var(--ink-soft);
+    line-height: 1.7;
+}
+
+/* =========================
+   右侧舞台详情
+========================= */
+.stage-head h2 {
+    margin: 6px 0 6px;
+    font-size: clamp(30px, 4.8vw, 54px);
+    line-height: 1;
+}
+
+/* 艺术家名 */
+.artist {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--grass-deep);
+}
+
+/* 右上状态胶囊标签 */
+.stage-pill {
+    padding: 10px 16px;
+    background: var(--ink);
+    color: #fff;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+/* 描述文本 */
+.description {
+    margin: 18px 0 0;
+    font-size: 16px;
+    max-width: 760px;
+}
+
+/* =========================
+   播放器区域
+========================= */
+.player-strip {
+    margin-top: 22px;
+    display: grid;
+    gap: 18px;
+}
+
+/* 进度条卡片 */
+.progress-card {
+    padding: 16px 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(31, 49, 39, 0.08);
+}
+
+/* 进度条 */
+#progressBar {
+    width: 100%;
+    accent-color: var(--sunset);
+}
+
+/* 时间显示行 */
+.time-row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+/* 控制按钮区域 */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* 控制按钮基础样式 */
+.controls button {
+    min-width: 108px;
+    padding: 13px 22px;
+    border: none;
+    border-radius: 18px;
+    background: #edf4e6;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 按钮悬停 */
+.controls button:hover {
+    transform: translateY(-2px);
+    opacity: 0.96;
+}
+
+/* 主按钮 */
+.controls .primary {
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--sunset-deep) 100%);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(207, 84, 34, 0.22);
+}
+
+/* =========================
+   底部信息卡区域
+========================= */
+.info-panels {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+/* 单个信息卡 */
+.info-card {
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.66);
+    border: 1px solid rgba(31, 49, 39, 0.08);
+}
+
+/* 小标签 */
+.mini-label {
+    padding: 7px 12px;
+    background: #ebf4d9;
+    color: var(--grass-deep);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* 信息卡段落 */
+.info-card p {
+    margin: 12px 0 0;
+}
+
+/* =========================
+   平板端适配
+========================= */
+@media (max-width: 980px) {
+    .festival-hero,
+    .festival-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-copy {
+        padding-right: 0;
+    }
+}
+
+/* =========================
+   手机端适配
+========================= */
+@media (max-width: 640px) {
+    .festival-shell {
+        width: min(100% - 20px, 1220px);
+        padding: 20px 0 26px;
+    }
+
+    .festival-hero,
+    .lineup-card,
+    .stage-card {
+        border-radius: 24px;
+        padding: 18px;
+    }
+
+    .festival-hero::before {
+        inset: 10px;
+        border-radius: 18px;
+    }
+
+    .hero-tags,
+    .controls,
+    .info-panels {
+        gap: 10px;
+    }
+
+    .stage-head,
+    .card-heading {
+        flex-direction: column;
+    }
+
+    .info-panels {
+        grid-template-columns: 1fr;
+    }
+
+    .controls button {
+        flex: 1 1 calc(50% - 10px);
+    }
+}

@@ -2,20 +2,48 @@
 session_start();
 require_once 'db_connect.php';
 
-// 1. Login Security Check
+// 1. Login verification
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
 
-$nickname = $_SESSION['nickname'] ?? 'Learner';
+$user_id = $_SESSION['user_id'];
 
-// Initialize parameters
+// ==========================================
+// A. Get user profile (for navbar avatar - fully synchronized with Listening logic)
+// ==========================================
+$username = ''; $nickname = 'Student'; $db_avatar = '';
+$stmt = $conn->prepare("SELECT username, nickname, avatar_url FROM users WHERE user_id = ?");
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $user_data = $stmt->get_result()->fetch_assoc();
+    if ($user_data) {
+        $username = $user_data['username'];
+        $nickname = !empty($user_data['nickname']) ? $user_data['nickname'] : $username;
+        $db_avatar = $user_data['avatar_url'];
+    }
+    $stmt->close();
+}
+
+// Dynamic avatar logic
+$avatar_html = '';
+$first_letter = strtoupper(substr($username ? $username : 'U', 0, 1));
+if (!empty($db_avatar)) {
+    $avatar_html = '<img src="' . htmlspecialchars($db_avatar) . '" alt="Avatar" class="user-avatar-img" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
+    $avatar_html .= '<div class="user-avatar-placeholder" style="display:none;">' . htmlspecialchars($first_letter) . '</div>';
+} else {
+    $avatar_html = '<div class="user-avatar-placeholder">' . htmlspecialchars($first_letter) . '</div>';
+}
+
+// ==========================================
+// B. IELTS business logic (maintain original functionality)
+// ==========================================
 $cam = isset($_GET['cam']) && is_numeric($_GET['cam']) ? (int)$_GET['cam'] : 0;
 $test = isset($_GET['test']) && is_numeric($_GET['test']) ? (int)$_GET['test'] : 0;
 $part_id = isset($_GET['part_id']) && is_numeric($_GET['part_id']) ? (int)$_GET['part_id'] : 0;
 
-// Fetch Data Logic (Maintained from original)
 $books = [];
 $res_books = $conn->query("SELECT DISTINCT cambridge_no FROM ielts_listening_parts ORDER BY cambridge_no DESC");
 if($res_books) { while($row = $res_books->fetch_assoc()) { $books[] = $row['cambridge_no']; } }
@@ -65,216 +93,167 @@ if ($part_id > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Listening - Word Garden</title>
+    <title>IELTS Practice - Spires Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* ===== Premium Green Theme System ===== */
         :root {
-            --primary-green: #1b4332;
-            --accent-green: #40916c;
-            --soft-green-bg: #f2f7f5;
-            --card-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
-            --card-shadow-hover: 0 20px 40px rgba(27, 67, 50, 0.15);
-            --text-main: #2d3436;
+            --oxford-blue: #002147;
+            --oxford-blue-light: #003066;
+            --oxford-gold: #c4a661;
+            --oxford-gold-light: #d4b671;
+            --white: #ffffff;
+            --bg-light: #f4f7f6;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: var(--soft-green-bg);
-            margin: 0;
-            color: var(--text-main);
-            padding-bottom: 100px; /* Space for footer player */
-        }
+        body { margin: 0; padding: 0; font-family: 'Open Sans', Arial, sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        h1, h2, h3 { font-family: 'PT Serif', Georgia, serif; letter-spacing: 0.5px; }
 
-        /* ===== 1. Navigation Header ===== */
-        .nav-header {
-            width: 100%;
-            height: 70px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 50px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            position: fixed;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-logo { font-size: 22px; font-weight: bold; color: var(--primary-green); text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; }
-        .nav-links a {
-            text-decoration: none;
-            color: #666;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 5px 12px;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        .nav-links a:hover, .nav-links a.active { color: var(--primary-green); background: #f0f7f4; }
+        /* ===== 1. Navbar (fully replicated from Listening.php) ===== */
+        .navbar { background-color: var(--oxford-blue); color: var(--white); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .navbar-left { display: flex; align-items: center; height: 100%; }
+        .college-logo { height: 50px; width: auto; cursor: pointer; transition: transform 0.3s; }
+        .college-logo:hover { transform: scale(1.02); }
 
-        /* ===== 2. Hero Banner ===== */
-        .hero-mini {
-            background: linear-gradient(135deg, #081c15 0%, #1b4332 100%);
-            color: white;
-            padding: 110px 20px 70px;
-            text-align: center;
+        .navbar-links { display: flex; gap: 10px; list-style: none; margin: 0 0 0 40px; padding: 0; height: 100%; align-items: center; }
+        .navbar-links > li { display: flex; align-items: center; position: relative; height: 100%; }
+        .navbar-links a { 
+            color: #ffffff; text-decoration: none; font-family: 'Playfair Display', serif;
+            font-size: 16px; font-weight: 800; padding: 0 20px; height: 100%; display: flex; align-items: center; 
+            text-transform: uppercase; letter-spacing: 1.8px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease; -webkit-font-smoothing: antialiased;
         }
-        .hero-mini h1 { margin: 0; font-size: 2.4rem; letter-spacing: 1px; }
-        .hero-mini p { opacity: 0.8; margin-top: 10px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }
+        .navbar-links a:hover { color: var(--oxford-gold); background-color: rgba(255, 255, 255, 0.05); }
 
-        /* ===== 3. Main Content Container ===== */
-        .main-content {
-            max-width: 1200px;
-            margin: -50px auto 60px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 10;
-        }
+        .dropdown-menu { display: none; position: absolute; top: 80px; left: 0; background-color: var(--oxford-blue-light); min-width: 220px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); list-style: none !important; padding: 0; margin: 0; border-top: 2px solid var(--oxford-gold); }
+        .dropdown-menu li { list-style: none !important; margin: 0; padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dropdown-menu li a { color: #e0e0e0 !important; padding: 15px 20px; text-transform: none; justify-content: flex-start; width: 100%; box-sizing: border-box; text-decoration: none !important; display: block; font-weight: 400; height: auto; text-shadow: none; letter-spacing: 0.5px;}
+        .dropdown-menu li a:hover { background-color: var(--oxford-blue) !important; color: var(--white) !important; padding-left: 25px; }
+        .navbar-links li:hover .dropdown-menu, .dropdown:hover .dropdown-menu { display: block; }
 
-        /* Card Grids */
-        .grid-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
+        .navbar-right { display: flex; align-items: center; gap: 10px; cursor: pointer; height: 100%; position: relative; }
+        .user-avatar-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--oxford-gold); object-fit: cover; }
+        .user-avatar-placeholder { width: 40px; height: 40px; border-radius: 50%; background-color: var(--oxford-gold); color: var(--oxford-blue); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid var(--oxford-gold); line-height: 1; box-sizing: border-box; }
+        .navbar-right .dropdown-menu { background-color: var(--white); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; font-family: 'Playfair Display', serif; }
+        .navbar-right .dropdown-menu li div[style*="font-size:12px"] { font-family: 'Playfair Display', serif !important; font-style: italic; letter-spacing: 0.5px; color: #888 !important; }
+        .navbar-right .dropdown-menu li div[style*="font-size:16px"] { font-family: 'Playfair Display', serif !important; font-weight: 800; color: var(--oxford-blue) !important; letter-spacing: 1px; text-transform: uppercase; }
+        .navbar-right .dropdown-menu li a { font-family: 'Playfair Display', serif !important; font-weight: 700; font-size: 15px; color: var(--oxford-blue) !important; letter-spacing: 0.5px; transition: all 0.2s ease; }
+        .navbar-right .dropdown-menu li a:hover { background-color: #f8fafc !important; color: var(--oxford-gold) !important; padding-left: 25px; }
+
+        /* ===== 2. Hero section (Oxford Style) ===== */
+        .hero {
+            background: url('hero_bg2.png') center/cover no-repeat; 
+            color: var(--white); text-align: center; padding: 140px 20px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
         }
+        .hero h1 { 
+            font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 800; 
+            margin: 0 0 20px; text-transform: uppercase; letter-spacing: 5px; 
+            text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.8);
+        }
+        .hero p { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; font-style: italic; max-width: 800px; margin: 0 auto; text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.8); }
+
+        /* ===== 3. Content layout ===== */
+        .main-content { max-width: 1200px; margin: -50px auto 100px; padding: 0 20px; position: relative; z-index: 10; }
+
+        .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
         .card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
-            transition: all 0.4s;
-            border: 1px solid transparent;
-            font-weight: 600;
-            color: var(--primary-green);
+            background: white; border-radius: 8px; padding: 40px 20px; text-align: center; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.4s;
+            border-top: 4px solid var(--oxford-gold); font-weight: 800; color: var(--oxford-blue);
+            font-family: 'Playfair Display', serif; letter-spacing: 1px;
         }
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow-hover);
-            border-color: var(--accent-green);
-        }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); border-top-color: var(--oxford-blue); }
 
-        /* Sidebar Replacement (Control Header) */
-        .breadcrumb-nav {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
+        .breadcrumb-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
         .btn-back {
-            background: white;
-            color: var(--primary-green);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: var(--card-shadow);
-            text-decoration: none;
-            font-size: 14px;
+            background: var(--oxford-blue); color: white; border: none; padding: 10px 20px;
+            border-radius: 4px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 13px; text-transform: uppercase;
         }
-        .btn-back:hover { background: #f0f7f4; }
+        .btn-back:hover { background: var(--oxford-gold); }
 
-        /* Question Box */
-        .question-container {
-            background: white;
-            border-radius: 25px;
-            padding: 50px;
-            box-shadow: var(--card-shadow);
-        }
-        .img-item {
-            max-width: 100%;
-            display: block;
-            margin: 30px auto;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .q-row {
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .q-input {
-            padding: 12px 15px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            width: 250px;
-            outline: none;
-            transition: 0.3s;
-        }
-        .q-input:focus { border-color: var(--accent-green); }
+        .question-container { background: white; border-radius: 8px; padding: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border-top: 4px solid var(--oxford-blue); }
+        .img-item { max-width: 100%; display: block; margin: 30px auto; border: 1px solid var(--border-color); border-radius: 4px; }
+        .q-row { margin: 20px 0; display: flex; align-items: center; gap: 15px; }
+        .q-input { padding: 12px 15px; border: 2px solid var(--border-color); border-radius: 4px; width: 250px; outline: none; transition: 0.3s; }
+        .q-input:focus { border-color: var(--oxford-gold); }
 
-        /* Submit Button */
         .submit-btn {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 30px;
-            font-size: 16px;
-            transition: 0.3s;
+            background: var(--oxford-blue); color: white; border: none; padding: 18px 50px;
+            border-radius: 4px; font-weight: 800; cursor: pointer; margin-top: 30px; font-size: 15px;
+            text-transform: uppercase; letter-spacing: 2px; font-family: 'Playfair Display', serif;
         }
-        .submit-btn:hover { background: var(--accent-green); transform: translateY(-2px); }
+        .submit-btn:hover { background: var(--oxford-gold); transform: translateY(-2px); }
 
-        /* ===== 4. Audio Player Bar ===== */
+        /* ===== 4. Player bar ===== */
         .player-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 50px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            z-index: 1000;
-            box-sizing: border-box;
+            position: fixed; bottom: 0; width: 100%; background: rgba(0, 33, 71, 0.95);
+            backdrop-filter: blur(10px); padding: 20px 50px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 30px; z-index: 1000; box-sizing: border-box; color: white;
         }
-        .player-info { min-width: 250px; }
-        .player-info strong { color: var(--primary-green); display: block; margin-bottom: 5px; }
-        audio { flex: 1; height: 35px; }
+        .player-info strong { color: var(--oxford-gold); display: block; margin-bottom: 5px; font-family: 'Playfair Display', serif; }
+        audio { flex: 1; height: 35px; filter: invert(100%) hue-rotate(180deg); }
 
         /* AI Assistant */
         .side-controls { position: fixed; bottom: 120px; right: 40px; z-index: 100; }
         .ai-assistant { display: flex; align-items: center; gap: 15px; }
         .chat-bubble {
-            background: white; color: var(--primary-green);
-            padding: 12px 20px; border-radius: 20px 20px 5px 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); font-size: 14px;
-            border: 1px solid #eef5f2;
+            background: white; color: var(--oxford-blue); padding: 15px 25px; border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); font-size: 14px; border-left: 4px solid var(--oxford-gold);
+            font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;
         }
         .ai-icon-circle {
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            color: white; font-weight: bold;
+            width: 60px; height: 60px; background: var(--oxford-blue); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; border: 2px solid var(--oxford-gold);
         }
     </style>
 </head>
 <body>
 
-    <nav class="nav-header">
-        <a href="home.php" class="nav-logo">Word Garden</a>
-        <div class="nav-links">
-            <a href="home.php">Home</a>
-            <a href="TED.php">TED Talk</a>
-            <a href="ielts.php" class="active">IELTS</a>
-            <a href="daily_talk.php">Daily Talk</a>
-            <a href="vocabulary.php">Vocabulary</a>
-            <a href="calendar.php">Calendar</a>
-            <a href="profile.php">Profile</a>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="home.php"><img src="college_logo.png" alt="Spires Academy Logo" class="college-logo"></a>
+            <ul class="navbar-links">
+                <li><a href="home.php">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" style="color:var(--oxford-gold);">Study ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="listening.php" style="color:var(--oxford-gold)!important; font-weight: bold;">Listening</a></li>
+                        <li><a href="reading.php">Reading</a></li>
+                        <li><a href="emma_server/speakAI.php">Speaking</a></li>
+                        <li><a href="writing.php">Writing</a></li>
+                        <li><a href="vocabulary.php">Vocabulary</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Games ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="galgame/galgame/index.html">Story game</a></li>
+                    </ul>
+                </li>
+                <li><a href="forum.php">Community</a></li>
+            </ul>
+        </div>
+
+        <div class="navbar-right dropdown">
+            <?php echo $avatar_html; ?>
+            <span style="font-size:14px; font-weight:600; color:#e0e0e0;"><?php echo htmlspecialchars($nickname); ?> ▾</span>
+            <ul class="dropdown-menu" style="right:0; left:auto; margin-top:0; min-width:220px;">
+                <li style="padding: 20px; background: #f8fafc; cursor:default;">
+                    <div style="color:var(--text-light); font-size:12px; margin-bottom:5px; font-family:'Playfair Display', serif; font-style:italic;">Signed in as</div>
+                    <div style="color:var(--oxford-blue); font-weight:bold; font-size:16px; text-transform:uppercase;"><?php echo htmlspecialchars($nickname); ?></div>
+                </li>
+                <li><a href="profile.php">My Profile</a></li>
+                <li><a href="logout.php" style="color:#dc3545 !important; font-weight: 600;">Sign Out</a></li>
+            </ul>
         </div>
     </nav>
 
-    <header class="hero-mini">
+    <header class="hero">
         <h1>IELTS Listening</h1>
-        <p>Master your Cambridge exams with precision</p>
+        <p>Master your Cambridge exams with academic precision</p>
     </header>
 
     <main class="main-content">
@@ -289,7 +268,7 @@ if ($part_id > 0) {
         <?php elseif ($test === 0): ?>
             <div class="breadcrumb-nav">
                 <a href="ielts.php" class="btn-back">← Back to Books</a>
-                <span style="font-weight: bold; color: var(--primary-green);">Cambridge <?= $cam ?></span>
+                <span style="font-weight: 800; color: var(--oxford-blue); font-family: 'Playfair Display', serif;">Cambridge <?= $cam ?></span>
             </div>
             <div class="grid-view">
                 <?php foreach ($tests as $t): ?>
@@ -300,7 +279,7 @@ if ($part_id > 0) {
         <?php elseif ($part_id === 0): ?>
             <div class="breadcrumb-nav">
                 <a href="?cam=<?= $cam ?>" class="btn-back">← Back to Tests</a>
-                <span style="font-weight: bold; color: var(--primary-green);">Cambridge <?= $cam ?> / Test <?= $test ?></span>
+                <span style="font-weight: 800; color: var(--oxford-blue); font-family: 'Playfair Display', serif;">Cambridge <?= $cam ?> / Test <?= $test ?></span>
             </div>
             <div class="grid-view">
                 <?php foreach ($parts as $p): ?>
@@ -311,7 +290,7 @@ if ($part_id > 0) {
         <?php else: ?>
             <div class="breadcrumb-nav">
                 <button onclick="history.back()" class="btn-back">← Back</button>
-                <span style="font-weight: bold; color: var(--primary-green);">Part <?= $current_part['part_no'] ?> - <?= htmlspecialchars($current_part['title']) ?></span>
+                <span style="font-weight: 800; color: var(--oxford-blue); font-family: 'Playfair Display', serif;">Part <?= $current_part['part_no'] ?> - <?= htmlspecialchars($current_part['title']) ?></span>
             </div>
 
             <div class="question-container">
@@ -322,7 +301,7 @@ if ($part_id > 0) {
                 <form id="quiz-form" style="margin-top:40px;">
                     <?php foreach ($questions as $q): ?>
                         <div class="q-row">
-                            <strong style="width: 50px; color: var(--primary-green);">Q<?= $q['question_no'] ?>:</strong>
+                            <strong style="width: 50px; color: var(--oxford-blue); font-family: 'Playfair Display', serif;">Q<?= $q['question_no'] ?>:</strong>
                             <input type="text" class="q-input" name="q<?= $q['question_no'] ?>" placeholder="Type answer here...">
                         </div>
                     <?php endforeach; ?>
@@ -339,7 +318,7 @@ if ($part_id > 0) {
     <div class="player-bar">
         <div class="player-info">
             <strong>Now Playing</strong>
-            <span style="font-size: 13px; color: #666;"><?= htmlspecialchars($current_part['title']) ?></span>
+            <span style="font-size: 13px; color: #ccc;"><?= htmlspecialchars($current_part['title']) ?></span>
         </div>
         <audio controls src="<?= htmlspecialchars($current_part['audio_url']) ?>"></audio>
     </div>
@@ -347,7 +326,7 @@ if ($part_id > 0) {
 
     <aside class="side-controls">
         <div class="ai-assistant">
-            <div class="chat-bubble">Hi <?= htmlspecialchars($nickname) ?>, focus on the keywords!</div>
+            <div class="chat-bubble">Focus on the academic keywords, <?= htmlspecialchars($nickname) ?>.</div>
             <div class="ai-icon-circle">AI</div>
         </div>
     </aside>
@@ -360,43 +339,42 @@ if ($part_id > 0) {
         };
 
         function submitAnswers() {
-        const form = document.getElementById('quiz-form');
-        const inputs = form.querySelectorAll('input[type="text"]');
-        let score = 0;
+            const form = document.getElementById('quiz-form');
+            const inputs = form.querySelectorAll('input[type="text"]');
+            let score = 0;
 
-        // Remove old global rating display
-        const oldScore = document.getElementById('final-score');
-        if (oldScore) oldScore.remove();
+            const oldScore = document.getElementById('final-score');
+            if (oldScore) oldScore.remove();
 
-        inputs.forEach(input => {
-            const qName = input.name;
-            const userAnswer = input.value.trim().toLowerCase();
-            const correctStr = (correctAnswers[qName] || "").toLowerCase();
-            const allowed = correctStr.split('|').map(s => s.trim());
+            inputs.forEach(input => {
+                const qName = input.name;
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctStr = (correctAnswers[qName] || "").toLowerCase();
+                const allowed = correctStr.split('|').map(s => s.trim());
 
-            // Remove old prompts
-            const existingHint = input.parentNode.querySelector('.hint');
-            if (existingHint) existingHint.remove();
+                const existingHint = input.parentNode.querySelector('.hint');
+                if (existingHint) existingHint.remove();
 
-            if (allowed.includes(userAnswer) && userAnswer !== "") {
-                input.style.borderColor = "#22c55e"; 
-                score++;
-            } else {
-                input.style.borderColor = "#ef4444"; 
-                const span = document.createElement('span');
-                span.className = 'hint';
-                span.style.cssText = 'color: #ef4444; font-size: 12px; margin-left: 10px; font-weight: 600;';
-                span.innerHTML = ' Correct: ' + correctStr.split('|')[0];
-                input.parentNode.appendChild(span);
-            }
-        });
+                if (allowed.includes(userAnswer) && userAnswer !== "") {
+                    input.style.borderColor = "#2d6a4f"; 
+                    input.style.background = "#f0f7f4";
+                    score++;
+                } else {
+                    input.style.borderColor = "#c0392b"; 
+                    input.style.background = "#fff5f5";
+                    const span = document.createElement('span');
+                    span.className = 'hint';
+                    span.style.cssText = 'color: #c0392b; font-size: 12px; margin-left: 10px; font-weight: 700; font-family: "Playfair Display";';
+                    span.innerHTML = ' Correct: ' + correctStr.split('|')[0];
+                    input.parentNode.appendChild(span);
+                }
+            });
 
-        // Create a dynamic rating bar to display above the submit button
-        const scoreDiv = document.createElement('div');
-        scoreDiv.id = 'final-score';
-        scoreDiv.style.cssText = 'text-align: center; font-size: 20px; font-weight: bold; margin-top: 20px; color: var(--primary-green);';
-        scoreDiv.innerHTML = `Your Score: ${score} / ${inputs.length}`;
-        form.appendChild(scoreDiv);
+            const scoreDiv = document.createElement('div');
+            scoreDiv.id = 'final-score';
+            scoreDiv.style.cssText = 'text-align: center; font-size: 24px; font-weight: 800; margin-top: 30px; color: var(--oxford-blue); font-family: "Playfair Display";';
+            scoreDiv.innerHTML = `Your Score: ${score} / ${inputs.length}`;
+            form.appendChild(scoreDiv);
         }
     </script>
 </body>
