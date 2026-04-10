@@ -1,0 +1,263 @@
+/* Style for the button that returns the player to the main hall */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    background-color: #f9d860;
+    border: 3px solid #5a3c26;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #5a3c26;
+    transition: all 0.1s;
+    z-index: 100;
+}
+
+/* Pressed-down effect when the back button is clicked */
+.back-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #5a3c26;
+}
+
+/* Global color variables used in this page */
+:root {
+    --wood-dark: #5a3c26;
+    --wood-light: #a1784f;
+    --gold: #f9d860;
+}
+
+/* Main page background and overall text style */
+body {
+    background-color: #2c3e50;
+    font-family: 'Microsoft YaHei', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+    color: white;
+}
+
+/* Main container for the collection / achievement gallery */
+.achievements-container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--wood-light);
+    border: 8px solid var(--wood-dark);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* Top title area of the gallery page */
+.gallery-header { text-align: center; margin-bottom: 40px; }
+
+/* Main title text inside the gallery header */
+.gallery-header h1 { font-size: 36px; color: var(--gold); text-shadow: 2px 2px #000; margin-bottom: 10px; }
+
+/* Global progress section style */
+.global-progress { margin-top: 15px; font-size: 18px; }
+
+/* Background of the overall progress bar */
+.progress-bar-bg {
+    width: 300px; height: 14px; background: rgba(0,0,0,0.3);
+    margin: 10px auto; border-radius: 7px; overflow: hidden; border: 2px solid var(--wood-dark);
+}
+
+/* Filled part of the overall progress bar */
+.progress-bar-fill { width: 0%; height: 100%; background: #2ecc71; transition: width 0.5s ease; }
+
+/* Grid layout used to display all collection cards */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+/* Basic card style for each collectible/achievement item */
+.achieve-card {
+    background: rgba(0,0,0,0.2);
+    border: 3px solid var(--wood-dark);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s transform;
+}
+
+/* Highlighted style for unlocked cards */
+.achieve-card.unlocked {
+    background: rgba(249, 216, 96, 0.1);
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(249, 216, 96, 0.2);
+}
+
+/* Image style inside each collection card */
+.achieve-card img {
+    width: 80px; height: 80px; margin-bottom: 15px;
+    transition: filter 0.3s;
+}
+
+/* Locked items appear greyed out and slightly blurred */
+.achieve-card.locked img { filter: grayscale(1) brightness(0.5) blur(1px); }
+
+/* Locked item name is also shown in a dimmer color */
+.achieve-card.locked .achieve-name { color: #888; }
+
+/* Name of each collectible/achievement */
+.achieve-name { display: block; font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+
+/* Description text under each item name */
+.achieve-desc { font-size: 13px; color: #ddd; line-height: 1.4; }
+
+/* Button control area at the bottom of the page */
+.controls { margin-top: 40px; display: flex; justify-content: center; gap: 20px; }
+
+/* Shared button style */
+.btn {
+    padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;
+    font-weight: bold; color: white; transition: opacity 0.2s;
+}
+
+/* Reset button color */
+.reset-btn { background: #e74c3c; }
+
+/* Test button color */
+.test-btn { background: #3498db; }
+
+/* Slight transparency effect when hovering over buttons */
+.btn:hover { opacity: 0.8; }
+
+/* ===== Loading Screen ===== */
+/* Full-screen loading overlay shown while page content is being prepared */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.48)),
+        #2c3e50;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* Hidden state of the loading screen */
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Inner box of the loading screen */
+.loading-inner {
+    width: min(520px, 86vw);
+    text-align: center;
+    padding: 36px 28px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+/* Main title text on the loading screen */
+.loading-title {
+    font-size: 42px;
+    color: #fff;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Subtitle text on the loading screen */
+.loading-subtitle {
+    font-size: 18px;
+    color: #f5f5f5;
+    margin-bottom: 22px;
+}
+
+/* Outer loading progress bar */
+.loading-bar {
+    width: 100%;
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.22);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Filled part of the loading bar */
+.loading-bar-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.2s linear;
+    background: linear-gradient(90deg, #f9d860, #2ecc71);
+}
+
+/* Loading percentage text */
+.loading-percent {
+    margin-top: 14px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* ===== BGM Button ===== */
+/* Floating button for toggling background music */
+.bgm-toggle {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 2000;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.68);
+    border: 2px solid #f9d860;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+/* Hover effect for the BGM button */
+.bgm-toggle:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Click effect for the BGM button */
+.bgm-toggle:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    /* Smaller loading title on mobile/tablet */
+    .loading-title {
+        font-size: 30px;
+    }
+
+    /* Smaller loading subtitle on mobile/tablet */
+    .loading-subtitle {
+        font-size: 15px;
+    }
+
+    /* Smaller loading percentage text on mobile/tablet */
+    .loading-percent {
+        font-size: 18px;
+    }
+
+    /* Smaller BGM button and adjusted position on mobile/tablet */
+    .bgm-toggle {
+        right: 14px;
+        bottom: 14px;
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+}
