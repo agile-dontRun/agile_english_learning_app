@@ -393,57 +393,54 @@ if (currentData.sfx) {
   playSfx(currentData.sfx);
 }
   // ===== Normal dialogue step =====
-  if (currentData.type === "dialogue") {
-    dialogueBox.classList.remove("hidden");
-    optionsContainer.classList.add("hidden");
-    speakerName.innerText = currentData.speaker;
-    dialogueText.innerText = currentData.text;
+if (currentData.type === "dialogue") {
+  isSceneBusy = true;
 
-    // narration / system lines do not need avatar or character sprite
-    if (
-      currentData.speaker === "Narration" ||
-      currentData.speaker === "System Prompt"
-    ) {
+  if (currentData.bg) {
+    await setBackgroundImage(currentData.bg);
+  }
+
+  dialogueBox.classList.remove("hidden");
+  optionsContainer.classList.add("hidden");
+  speakerName.innerText = currentData.speaker;
+  dialogueText.innerText = currentData.text;
+
+  if (
+    currentData.speaker === "Narration" ||
+    currentData.speaker === "System Prompt"
+  ) {
+    avatarBox.classList.add("hidden");
+    characterSprite.classList.add("hidden");
+  } else {
+    avatarBox.classList.remove("hidden");
+
+    if (currentData.speaker === "Karen") {
+      characterSprite.classList.remove("hidden");
+      avatarImg.src = "../frontend/assets/karen.png";
+      characterSprite.src = "../frontend/assets/karen.png";
+    } else if (currentData.speaker === "Xiaowang") {
+      characterSprite.classList.remove("hidden");
+      avatarImg.src = "../frontend/assets/XiaoWang.png";
+      characterSprite.src = "../frontend/assets/XiaoWang.png";
+    } else if (currentData.speaker === "barista") {
+      characterSprite.classList.remove("hidden");
+      avatarImg.src = "../frontend/assets/coffee_maker.png";
+      characterSprite.src = "../frontend/assets/coffee_maker.png";
+    } else if (currentData.speaker === "canteen server") {
+      characterSprite.classList.remove("hidden");
+      avatarImg.src = "../frontend/assets/chef.png";
+      characterSprite.src = "../frontend/assets/chef.png";
+    } else if (currentData.speaker === "😎 Oral Tutor") {
       avatarBox.classList.add("hidden");
       characterSprite.classList.add("hidden");
     } else {
-      avatarBox.classList.remove("hidden");
-
-      // switch character sprite/avatar depending on speaker
-      if (currentData.speaker === "Karen") {
-        characterSprite.classList.remove("hidden");
-        avatarImg.src = "../frontend/assets/karen.png";
-        characterSprite.src = "../frontend/assets/karen.png";
-      } else if (currentData.speaker === "Xiaowang") {
-        characterSprite.classList.remove("hidden");
-        avatarImg.src = "../frontend/assets/XiaoWang.png";
-        characterSprite.src = "../frontend/assets/XiaoWang.png";
-      } else if (currentData.speaker === "barista") {
-        characterSprite.classList.remove("hidden");
-        avatarImg.src = "../frontend/assets/coffee_maker.png";
-        characterSprite.src = "../frontend/assets/coffee_maker.png";
-      } else if (currentData.speaker === "canteen server") {
-        characterSprite.classList.remove("hidden");
-        avatarImg.src = "../frontend/assets/chef.png";
-        characterSprite.src = "../frontend/assets/chef.png";
-      } else if(currentData.speaker === "😎 Oral Tutor"){
-        // tutor currently does not use normal avatar display
-        avatarBox.classList.add("hidden");
-        characterSprite.classList.add("hidden");
-      } else {
-        // default case: assume the speaker is the player
-        characterSprite.classList.add("hidden");
-        avatarImg.src = getPlayerAvatarUrl();
-      }
+      characterSprite.classList.add("hidden");
+      avatarImg.src = getPlayerAvatarUrl();
     }
+  }
 
-    // update background if current step specifies one
-    if (currentData.bg) {
-      document.getElementById("bg-image").src = currentData.bg;
-    }
-
-  // ===== Choice step =====
-  } else if (currentData.type === "choice") {
+  isSceneBusy = false;
+} else if (currentData.type === "choice") {
     dialogueBox.classList.add("hidden");
     optionsContainer.classList.remove("hidden");
     optionsContainer.innerHTML = "";
