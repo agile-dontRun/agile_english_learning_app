@@ -14,7 +14,19 @@
 
   <body>
     <!-- Main game container: everything in the visual novel lives here -->
-    <div id="game-container">
+    <div id="game-container" class="preload">
+        <div id="loading-screen">
+  <div id="loading-card">
+    <div id="loading-title">Freshman Survival Guide</div>
+    <div id="loading-subtitle">Loading campus scenes...</div>
+
+    <div id="loading-bar-outer">
+      <div id="loading-bar-inner"></div>
+    </div>
+
+    <div id="loading-percent">0%</div>
+  </div>
+</div>
       <!-- Background image of the current scene -->
       <img
         id="bg-image"

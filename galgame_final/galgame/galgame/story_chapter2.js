@@ -2,13 +2,14 @@ const chapter2 = [
    {
     type: 'transition', 
     images:[
-        '../frontend/assets/scene2/lobby2.jpg',   // The first picture of the corridor
-        '../frontend/assets/scene2/corridor.jpg',   // Second picture of the corridor
+        '../frontend/assets/scene2/lobby2.jpg',   // 走廊第一张图
+        '../frontend/assets/scene2/corridor.jpg',   // 走廊第二张图
     ],
-    timePerImage: 800  // Each photo stays for 800 milliseconds (0.8 seconds)
+    timePerImage: 800  // 每张照片停留 800 毫秒 (0.8秒)，你可以调整这个数值控制走路的快慢
+    ,sfx: '../frontend/assets/audio/footsteps.mp3'
     },
-    {type: 'dialogue', speaker: "Karen", text: "This is your English Classroom. You'll be having your morning readings and english classes here. So, don't be late!",  bg: "../frontend/assets/scene2/english_classroom.jpg"},
-    { type: 'dialogue', speaker: 'Narration', text: 'Do you want to ask specifically when morning reading starts.' },
+    {type: 'dialogue', speaker: "Karen", text: "This is your English Classroom. You'll be having your morning readings and english classes here. So, don't be late!",  bg: "../frontend/assets/scene2/english_classroom.jpg", sfx:"../frontend/assets/audio/openDoor.mp3"},
+    { type: 'dialogue', speaker: 'Narration', text: 'You want to ask specifically when morning reading starts.' },
     {type: "choice",
         options:[
             {
@@ -43,5 +44,5 @@ timePerImage: 800},
             }   
         ]
     },
-        { type: 'dialogue', speaker: 'Karen', text: "This is our first floor. Next, we will take you to visit the sixth floor", bg:"../frontend/assets/scene2/english_corner.jpg" },
+        { type: 'dialogue', speaker: 'Karen', text: "This is our first floor. Next, we will take you to visit the sixth floor", bg:"../frontend/assets/scene2/english_corner.jpg" , sfx:"../frontend/assets/audio/elevator.mp3"},
 ]

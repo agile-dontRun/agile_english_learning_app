@@ -8,9 +8,9 @@ const chapter5 =[
         '../frontend/assets/scene5/canteen.jpg',
         '../frontend/assets/scene5/canteenLobby.jpg',   
     ],
-    timePerImage: 800  
+    timePerImage: 800, bgm: "../frontend/assets/audio/footsteps.mp3"  
     },
-    {type:"dialogue", speaker:"canteen server", text:"In the noisy cafeteria, steam rises everywhere, and the cafeteria auntie waves her big ladle while looking at you expressionlessly."},
+    {type:"dialogue", speaker:"canteen server", text:"In the noisy cafeteria, steam rises everywhere, and the cafeteria auntie waves her big ladle while looking at you expressionlessly.", bgm: "../frontend/assets/audio/canteen.mp3"},
     {type:"dialogue", speaker:"canteen server", text:"Next! What do you want, hon?"},
     {type:"choice",
         options:[
