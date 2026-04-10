@@ -104,6 +104,49 @@ function setDressUpImageWithFallback(img, candidates, index = 0) {
   img.src = `${candidate}${candidate.includes("?") ? "&" : "?"}t=${Date.now()}`;
 }
 
+function playBgm(src, loop = true) {
+  if (!src) return;
+
+  if (currentBgmSrc === src && bgmAudio) {
+    return; // 同一个背景音就不重复播放
+  }
+
+  stopBgm();
+
+  bgmAudio = new Audio(src);
+  bgmAudio.loop = loop;
+  bgmAudio.volume = 0.4;
+  bgmAudio.play().catch((err) => {
+    console.warn("BGM failed to play:", err);
+  });
+
+  currentBgmSrc = src;
+}
+
+function stopBgm() {
+  if (bgmAudio) {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+    bgmAudio = null;
+  }
+  currentBgmSrc = "";
+}
+
+function playSfx(src, volume = 0.8) {
+  if (!src) return;
+
+  if (sfxAudio) {
+    sfxAudio.pause();
+    sfxAudio.currentTime = 0;
+  }
+
+  sfxAudio = new Audio(src);
+  sfxAudio.volume = volume;
+  sfxAudio.play().catch((err) => {
+    console.warn("SFX failed to play:", err);
+  });
+}
+
 // Clear all rendered avatar layers on the home page
 function resetHomeAvatarStage() {
   if (!homeAvatarStage) {
