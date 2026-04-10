@@ -64,6 +64,7 @@ const floor6Screen = document.getElementById("floor6-screen");
 
 // Show home page and hide story-related UI
 function showHomeScreen() {
+  stopBgm();
   dialogueBox.classList.add("hidden");
   optionsContainer.classList.add("hidden");
   characterSprite.classList.add("hidden");
