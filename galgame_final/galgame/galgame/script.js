@@ -26,6 +26,33 @@ const characterSprite = document.getElementById("character-sprite");
 const avatarBox = document.getElementById("speaker-avatar-box");
 const avatarImg = document.getElementById("speaker-avatar");
 
+const loadingScreen = document.getElementById("loading-screen");
+const loadingBarInner = document.getElementById("loading-bar-inner");
+const loadingPercent = document.getElementById("loading-percent");
+const loadingSubtitle = document.getElementById("loading-subtitle");
+
+function updateLoadingProgress(current, total, label = "Loading campus scenes...") {
+  const safeTotal = Math.max(total, 1);
+  const percent = Math.round((current / safeTotal) * 100);
+
+  if (loadingBarInner) {
+    loadingBarInner.style.width = `${percent}%`;
+  }
+
+  if (loadingPercent) {
+    loadingPercent.innerText = `${percent}%`;
+  }
+
+  if (loadingSubtitle) {
+    loadingSubtitle.innerText = label;
+  }
+}
+
+function hideLoadingScreen() {
+  if (!loadingScreen) return;
+  loadingScreen.classList.add("hidden-loading");
+}
+
 // ===== Home screen avatar display =====
 const homeAvatarStage = document.getElementById("home-avatar-stage");
 const homeAvatarEmpty = document.getElementById("home-avatar-empty");
